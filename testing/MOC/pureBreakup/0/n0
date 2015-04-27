@@ -21,22 +21,9 @@ internalField   uniform 10;
 
 boundaryField
 {
-    inlet
-    {
-        type            fixedValue;
-        value           uniform 100;
-    }
-    outlet
-    {
-        type            zeroGradient;
-    }
     walls
     {
         type            zeroGradient;
-    }
-    defaultFaces
-    {
-        type            empty;
     }
 }
 

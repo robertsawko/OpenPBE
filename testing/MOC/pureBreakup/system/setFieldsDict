@@ -9,36 +9,28 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      n0;
+    class       dictionary;
+    location    "system";
+    object      setFieldsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+defaultFieldValues
+(
+    volScalarFieldValue alpha1 1
+);
 
-internalField   uniform 10;
-
-boundaryField
-{
-    inlet
+regions
+(
+    boxToCell
     {
-        type            fixedValue;
-        value           uniform 100;
+        box (0 0 -0.1) (0.15 0.701 0.1);
+        fieldValues
+        (
+            volScalarFieldValue alphaair 0
+        );
     }
-    outlet
-    {
-        type            zeroGradient;
-    }
-    walls
-    {
-        type            zeroGradient;
-    }
-    defaultFaces
-    {
-        type            empty;
-    }
-}
+);
 
 
 // ************************************************************************* //

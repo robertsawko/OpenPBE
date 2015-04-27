@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      n0;
+    object      n2;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -21,22 +21,9 @@ internalField   uniform 10;
 
 boundaryField
 {
-    inlet
-    {
-        type            fixedValue;
-        value           uniform 100;
-    }
-    outlet
-    {
-        type            zeroGradient;
-    }
     walls
     {
         type            zeroGradient;
-    }
-    defaultFaces
-    {
-        type            empty;
     }
 }
 
