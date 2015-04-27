@@ -26,9 +26,7 @@ air
         MOCCoeffs
         {
             numberOfClasses 3;
-            d0 0.01;
-            d1 0.02;
-            d2 0.03;
+            xi1 0.01;
         }
         coalescenceKernel noCoalescence;
         breakupKernel noBreakup;

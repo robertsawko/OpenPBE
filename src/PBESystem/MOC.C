@@ -98,7 +98,7 @@ MOC::MOC
             new dimensionedScalar
             (
                 xiName.str(),
-                dimLength,
+                dimVolume,
                 xi1 * i
             )
         );
