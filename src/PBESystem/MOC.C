@@ -195,13 +195,17 @@ volScalarField MOC::breakupSourceTerm(label i)
 void MOC::correct()
 {
     const fvMesh& m = classNumberDensity_[0].mesh();
+
     forAll(classNumberDensity_, k)
     {
         surfaceScalarField phi = fvc::interpolate(classVelocity_[k]) & m.Sf();
+        volScalarField S = classSourceTerm(k);
         solve(
             fvm::ddt(classNumberDensity_[k])
             + 
             fvm::div(phi, classNumberDensity_[k], "div(U,nk)")
+            ==
+            S
         );
     }
 }

@@ -25,15 +25,19 @@ air
         method methodOfClasses;
         MOCCoeffs
         {
-            numberOfClasses 3;
+            numberOfClasses 10;
             xi1 0.01;
         }
         coalescenceKernel noCoalescence;
-        breakupKernel noBreakup;
+        breakupKernel binaryBreakup;
         noCoalescenceCoeffs
         {}
         noBreakupCoeffs
         {}
+        binaryBreakupCoeffs
+        {
+                c 0.01;
+        }
     }
 }
 

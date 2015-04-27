@@ -14,6 +14,7 @@
 file(GLOB lib_source_files
   coalescenceKernels/coalescenceKernel.C
   coalescenceKernels/noCoalescence.C
+  breakupKernels/binaryBreakup.C
   breakupKernels/breakupKernel.C
   breakupKernels/noBreakup.C
   PBEDiameter.C

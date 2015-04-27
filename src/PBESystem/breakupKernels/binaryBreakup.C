@@ -23,76 +23,67 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "noCoalescence.H"
+#include "binaryBreakup.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
-namespace coalescenceKernels
+namespace breakupKernels
 {
-defineTypeNameAndDebug(noCoalescence, 0);
+defineTypeNameAndDebug(binaryBreakup, 0);
 addToRunTimeSelectionTable
 (
-    coalescenceKernel,
-    noCoalescence,
+    breakupKernel,
+    binaryBreakup,
     dictionary
 );
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-noCoalescence::noCoalescence
+binaryBreakup::binaryBreakup
 (
-    const dictionary& coalescenceDict,
+    const dictionary& breakupDict,
     const phaseModel& dispersedPhase
 )
 :
-   coalescenceKernel(coalescenceDict, dispersedPhase)
+    breakupKernel(breakupDict, dispersedPhase),
+    c_("c", dimensionSet(0, -3, -1, 0, 0), breakupDict.lookup("c"))
 {
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 //
-noCoalescence::~noCoalescence()
+binaryBreakup::~binaryBreakup()
 {}
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-tmp<volScalarField> noCoalescence::S
-(
-    const volScalarField& xi1,
-    const volScalarField& xi2
-) const
+dimensionedScalar binaryBreakup::S(const dimensionedScalar& xi) const
 {
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "S",
-                xi1.mesh().time().timeName(),
-                xi1.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            xi1.mesh(),
-            //TODO Is the dimension correct?
-            dimensionedScalar("S", dimless/dimTime, 0) 
-        )
-    );
+    return c_ * xi;
 }
 
-const dimensionedScalar noCoalescence::S
-(
-    const dimensionedScalar& xi1,
-    const dimensionedScalar& xi2
-) const
+tmp<volScalarField> binaryBreakup::S(const volScalarField& xi) const
 {
-    return dimensionedScalar("S", dimless/dimTime, 0);
+    return tmp<volScalarField>
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    "bRate",
+                    xi.mesh().time().timeName(),
+                    xi.mesh(),
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                c_ * xi
+            )
+        );
 }
-} //End namespace coalescenceKernels
+
+} //End namespace breakupKernels
 } //End namespace Foam
 // ************************************************************************* //
