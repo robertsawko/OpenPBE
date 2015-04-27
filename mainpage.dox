@@ -1,0 +1,10 @@
+
+/**
+\mainpage 
+
+This document outlines the class structure and functionality of a custom
+OpenFOAM library for population balance modelling.
+
+Solvers are provided as example application.
+
+*/

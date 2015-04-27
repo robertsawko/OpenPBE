@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+PBESystem methodOfMoments;//methodOfClasses, methodOfMoments
+dispersedPhase cont;
+continuousPhase disp;
+
+breakupKernel CoulaloglouTavlarides; //LoAndRao, noBreakup, CoulaloglouTavlarides
+
+CoulaloglouTavlaridesCoeffs
+{
+	//c1 and c2 after Hsia and Talvarides (1983)
+	c1	0.01031;
+	c2	0.06354;
+	sigma	0.047;
+	gamma	0.0;
+}
+LoAndRaoCoeffs
+{
+}
+noBreakupCoeffs
+{
+}
+
+coalescenceKernel noCoalescence;//Madsen;//noCoalescence;//Madsen;
+noCoalescenceCoeffs
+{
+}
+MadsenCoeffs
+{
+}
+
+
+MOCCoeffs
+{
+  numberOfClasses 3;
+  d0 0.01;
+  d1 0.02;
+  d2 0.03;
+}
+
+MOMCoeffs
+{
+  scaleDiameter 	0.1;
+  maxDiameter		0.06;
+  //parameters with default values
+  maxGammaBeta	80.0; 			//default 10
+  minGammaAlpha	1e-05; 			//default 1e-05;
+  maxDiameterMultiplicator	3; 	//default 10
+  integrationSteps		20; 	//default 10
+  //daughterDropletsNr	2; 		//default 2
+  scaleM3	0.01;			//default 1.0
+  minDiameter 1e-5;
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,96 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//Oil phase
+phases
+(
+  oil
+  {
+    rho             837.3;
+    nu              1.56e-6;
+    kappa           0;
+    Cp              0;
+    diameterModel constant;
+    constantCoeffs 
+    {
+	d 0.847e-3;
+    }
+
+  }
+  water
+  {
+    rho             996;
+    nu              1e-06;
+    kappa           0;
+    Cp              0;
+    diameterModel constant;
+    constantCoeffs 
+    {
+	d 0.847e-3;
+    }
+
+  }
+);
+
+sigmas
+(
+);
+
+
+interfaceCompression
+(
+    (water oil)     1
+
+);
+
+virtualMass
+(
+);
+
+drag
+(
+    (oil water)
+    {
+        type SchillerNaumann;
+        dragPhase oil;
+        residualPhaseFraction 1e-3;
+        residualSlip 1e-3;
+    }
+    (oil water)
+    {
+        type interface;
+        residualPhaseFraction 1e-3;
+        residualSlip 1e-3;
+    }
+    (oil oil)//dodgy
+    {
+        type SchillerNaumann;
+        residualPhaseFraction 1e-3;
+        residualSlip 1e-3;
+    }
+);
+phaseTransfer
+(
+    (oil oil)
+    {
+        type Stoke;
+    }
+);
+// This is a dummy to support the Smagorinsky model
+transportModel  Newtonian;
+nu              nu [ 0 2 -1 0 0 0 0 ] 0;
+// ************************************************************************* //

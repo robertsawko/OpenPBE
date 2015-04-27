@@ -1,0 +1,2575 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : 2.2.0
+Exec   : PBEEulerFoam
+Date   : Dec 10 2013
+Time   : 13:35:30
+Host   : "reborn"
+PID    : 8890
+Case   : /home/s200292/Projects/PBEFoam.git/testing/separation2d
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster
+allowSystemOperations : Disallowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+
+PIMPLE: Operating solver in PISO mode
+
+
+Reading g
+Reading field p
+
+Selecting population balance model: methodOfMoments
+Calculating face flux field phioil
+Selecting diameterModel for phase oil: constant
+Calculating face flux field phiwater
+Selecting diameterModel for phase water: constant
+Selecting dragModel for phase oil: SchillerNaumann
+Selecting dragModel for phase oil: SchillerNaumann
+Selecting coalescence model: noCoalescence
+Selecting breakup model: noBreakup
+Selecting turbulence model type LESModel
+Selecting LES turbulence model Smagorinsky
+Selecting LES delta type cubeRootVol
+--> FOAM Warning : 
+    From function cubeRootVolDelta::calcDelta()
+    in file cubeRootVolDelta/cubeRootVolDelta.C at line 52
+    Case is 2D, LES is not strictly applicable
+
+SmagorinskyCoeffs
+{
+    ce              1.048;
+    ck              0.094;
+}
+
+Creating MRF zone list from MRFProperties
+time step continuity errors : sum local = 0, global = 0, cumulative = 0
+GAMG:  Solving for pcorr, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 0, global = 0, cumulative = 0
+Courant Number mean: 0 max: 0
+
+Starting time loop
+
+Courant Number mean: 0 max: 0
+Time = 0.001
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.3 0.3
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.7 0.7
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.3 0.3
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.7 0.7
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395471, 0.0395471, 0.0395471
+gamma parameters:
+C0: avg, max,min 2090, 2090, 2090
+alpha: avg, max,min 0.00505256, 0.00505256, 0.00505256
+beta: avg, max,min 4.73492, 4.73492, 4.73492
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 1, Final residual = 3.95097e-19, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.999999, Final residual = 1.8131e-19, No Iterations 1
+DILUPBiCG:  Solving for m2, Initial residual = 0.00074756, Final residual = 1.18962e-22, No Iterations 1
+diameter: avg, max,min 0.0395471, 0.0395471, 0.0395471
+expected diameter: avg, max,min 0.0239234, 0.0239234, 0.0239234
+GAMG:  Solving for p, Initial residual = 1, Final residual = 0.00690145, No Iterations 17
+time step continuity errors : sum local = 7.78662e-07, global = 3.64683e-22, cumulative = 3.64683e-22
+GAMG:  Solving for p, Initial residual = 0.000849532, Final residual = 8.39612e-10, No Iterations 41
+time step continuity errors : sum local = 8.86597e-13, global = 2.77552e-22, cumulative = 6.42235e-22
+ExecutionTime = 0.16 s
+
+
+Courant Number mean: 0.00118597 max: 0.00119401
+Time = 0.002
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299821 0.300179
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.699821 0.700179
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299821 0.300179
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.699821 0.700179
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395471, 0.0395706, 0.0395235
+gamma parameters:
+C0: avg, max,min 2090, 2090, 2090
+alpha: avg, max,min 0.00505256, 0.00505256, 0.00505256
+beta: avg, max,min 4.73492, 4.73492, 4.73492
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 1, Final residual = 3.68533e-11, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 1, Final residual = 6.06102e-19, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 1, Final residual = 5.73468e-21, No Iterations 2
+diameter: avg, max,min 0.0395471, 0.0395942, 0.0394999
+expected diameter: avg, max,min 0.0239234, 0.0239234, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.000152959, Final residual = 1.4698e-06, No Iterations 15
+time step continuity errors : sum local = 1.53494e-09, global = -9.48164e-23, cumulative = 5.47418e-22
+GAMG:  Solving for p, Initial residual = 0.000101252, Final residual = 8.12718e-10, No Iterations 37
+time step continuity errors : sum local = 8.49387e-13, global = -9.27859e-23, cumulative = 4.54633e-22
+ExecutionTime = 0.31 s
+
+
+Courant Number mean: 0.00233166 max: 0.00234687
+Time = 0.003
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.29946 0.30041
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69959 0.70054
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299468 0.30041
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69959 0.700532
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395471, 0.0396011, 0.0394769
+gamma parameters:
+C0: avg, max,min 2090, 2092.49, 2087.51
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73484
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.495563, Final residual = 1.38504e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.49559, Final residual = 2.67607e-21, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.495571, Final residual = 4.32367e-19, No Iterations 2
+diameter: avg, max,min 0.0395471, 0.0396869, 0.0394078
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00039599, Final residual = 3.23974e-06, No Iterations 13
+time step continuity errors : sum local = 3.38093e-09, global = -3.33009e-21, cumulative = -2.87546e-21
+GAMG:  Solving for p, Initial residual = 0.000138037, Final residual = 8.07488e-10, No Iterations 37
+time step continuity errors : sum local = 8.43425e-13, global = -3.3336e-21, cumulative = -6.20907e-21
+ExecutionTime = 0.45 s
+
+
+Courant Number mean: 0.00342918 max: 0.00345203
+Time = 0.004
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299471 0.30071
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69929 0.700529
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299403 0.300694
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.699306 0.700597
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395471, 0.0396869, 0.0394078
+gamma parameters:
+C0: avg, max,min 2090, 2097.38, 2082.64
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73484
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.328565, Final residual = 1.33616e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.328565, Final residual = 1.0279e-21, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.328565, Final residual = 5.48224e-21, No Iterations 2
+diameter: avg, max,min 0.0395471, 0.0398234, 0.0392733
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.000736315, Final residual = 6.33924e-06, No Iterations 11
+time step continuity errors : sum local = 6.62386e-09, global = 9.57289e-23, cumulative = -6.11334e-21
+GAMG:  Solving for p, Initial residual = 0.000170894, Final residual = 7.92591e-10, No Iterations 37
+time step continuity errors : sum local = 8.28535e-13, global = 9.4756e-23, cumulative = -6.01858e-21
+ExecutionTime = 0.59 s
+
+
+Courant Number mean: 0.00447608 max: 0.00450714
+Time = 0.005
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299196 0.300779
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.699221 0.700804
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.299196 0.300779
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.699221 0.700804
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395471, 0.0398234, 0.0392733
+gamma parameters:
+C0: avg, max,min 2090, 2104.57, 2075.5
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73484
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.245452, Final residual = 1.29221e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.245452, Final residual = 4.77077e-21, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.245452, Final residual = 6.75577e-21, No Iterations 2
+diameter: avg, max,min 0.0395471, 0.0400019, 0.0390992
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0010095, Final residual = 9.60158e-06, No Iterations 10
+time step continuity errors : sum local = 1.01892e-08, global = -1.95392e-21, cumulative = -7.9725e-21
+GAMG:  Solving for p, Initial residual = 0.00017429, Final residual = 7.19865e-10, No Iterations 37
+time step continuity errors : sum local = 7.5249e-13, global = -1.94648e-21, cumulative = -9.91898e-21
+ExecutionTime = 0.74 s
+
+
+Courant Number mean: 0.00547104 max: 0.00551141
+Time = 0.006
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.298888 0.300898
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.699102 0.701112
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.298816 0.301013
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.698987 0.701184
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395471, 0.0400019, 0.0390992
+gamma parameters:
+C0: avg, max,min 2090, 2113.94, 2066.24
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73484
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.195154, Final residual = 1.64554e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.195154, Final residual = 3.95653e-20, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.195154, Final residual = 3.34178e-20, No Iterations 2
+diameter: avg, max,min 0.0395472, 0.0402209, 0.0388887
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00133703, Final residual = 1.17769e-05, No Iterations 9
+time step continuity errors : sum local = 1.23167e-08, global = 2.1137e-21, cumulative = -7.80528e-21
+GAMG:  Solving for p, Initial residual = 0.000177217, Final residual = 7.36624e-10, No Iterations 37
+time step continuity errors : sum local = 7.70092e-13, global = 2.13205e-21, cumulative = -5.67323e-21
+ExecutionTime = 0.88 s
+
+
+Courant Number mean: 0.00641359 max: 0.00646536
+Time = 0.007
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.298458 0.301124
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.698876 0.701542
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.298549 0.301283
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.698717 0.701451
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395472, 0.0402209, 0.0388887
+gamma parameters:
+C0: avg, max,min 2090, 2125.38, 2054.99
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73484
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.161627, Final residual = 2.34546e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.161627, Final residual = 1.28628e-19, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.161627, Final residual = 1.21323e-19, No Iterations 2
+diameter: avg, max,min 0.0395474, 0.0404787, 0.038645
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00166038, Final residual = 1.15284e-05, No Iterations 9
+time step continuity errors : sum local = 1.20597e-08, global = 6.58309e-22, cumulative = -5.01492e-21
+GAMG:  Solving for p, Initial residual = 0.000177264, Final residual = 7.09155e-10, No Iterations 37
+time step continuity errors : sum local = 7.41576e-13, global = 6.48268e-22, cumulative = -4.36666e-21
+ExecutionTime = 1.02 s
+
+
+Courant Number mean: 0.00730388 max: 0.00736375
+Time = 0.008
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.298229 0.30163
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69837 0.701771
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.298229 0.301663
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.698337 0.701771
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395473, 0.0404787, 0.038645
+gamma parameters:
+C0: avg, max,min 2090, 2138.79, 2041.89
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.137713, Final residual = 3.17631e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.137713, Final residual = 3.94657e-19, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.137713, Final residual = 5.027e-19, No Iterations 2
+diameter: avg, max,min 0.0395476, 0.040774, 0.0383714
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00210408, Final residual = 1.67444e-05, No Iterations 8
+time step continuity errors : sum local = 1.78251e-08, global = -4.25331e-21, cumulative = -8.61997e-21
+GAMG:  Solving for p, Initial residual = 0.000180959, Final residual = 9.27429e-10, No Iterations 36
+time step continuity errors : sum local = 9.82624e-13, global = -4.2502e-21, cumulative = -1.28702e-20
+ExecutionTime = 1.17 s
+
+
+Courant Number mean: 0.00814265 max: 0.0082163
+Time = 0.009
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.297935 0.301985
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.698015 0.702065
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.297819 0.30201
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69799 0.702181
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395475, 0.040774, 0.0383714
+gamma parameters:
+C0: avg, max,min 2090, 2154.04, 2027.11
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.11984, Final residual = 4.00717e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.11984, Final residual = 9.78146e-19, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.11984, Final residual = 1.11049e-18, No Iterations 2
+diameter: avg, max,min 0.0395479, 0.0411054, 0.0380711
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00250674, Final residual = 2.03137e-05, No Iterations 7
+time step continuity errors : sum local = 2.13272e-08, global = 7.01555e-22, cumulative = -1.21686e-20
+GAMG:  Solving for p, Initial residual = 0.000186122, Final residual = 9.75433e-10, No Iterations 36
+time step continuity errors : sum local = 1.03455e-12, global = 7.47084e-22, cumulative = -1.14215e-20
+ExecutionTime = 1.31 s
+
+
+Courant Number mean: 0.00893101 max: 0.00902284
+Time = 0.01
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.297461 0.30255
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69745 0.702539
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.297338 0.302928
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.697072 0.702662
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395477, 0.0411053, 0.0380711
+gamma parameters:
+C0: avg, max,min 2090, 2171.02, 2010.77
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.10605, Final residual = 4.92098e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.10605, Final residual = 1.40965e-18, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.10605, Final residual = 1.48211e-18, No Iterations 2
+diameter: avg, max,min 0.0395483, 0.0414714, 0.0377474
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00305638, Final residual = 2.93176e-05, No Iterations 6
+time step continuity errors : sum local = 3.13855e-08, global = -1.37996e-21, cumulative = -1.28015e-20
+GAMG:  Solving for p, Initial residual = 0.000193579, Final residual = 8.40025e-10, No Iterations 35
+time step continuity errors : sum local = 8.80822e-13, global = -1.39431e-21, cumulative = -1.41958e-20
+ExecutionTime = 1.45 s
+
+
+Courant Number mean: 0.00967043 max: 0.00977978
+Time = 0.011
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.2967 0.303069
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.696931 0.7033
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.296561 0.303141
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.696859 0.703439
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039548, 0.0414713, 0.0377474
+gamma parameters:
+C0: avg, max,min 2090, 2189.65, 1993.02
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0951241, Final residual = 6.11853e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0951241, Final residual = 2.26326e-18, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0951241, Final residual = 2.45374e-18, No Iterations 2
+diameter: avg, max,min 0.0395488, 0.0418709, 0.0374032
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00352025, Final residual = 3.30251e-05, No Iterations 5
+time step continuity errors : sum local = 3.51027e-08, global = -9.77678e-22, cumulative = -1.51735e-20
+GAMG:  Solving for p, Initial residual = 0.000194221, Final residual = 9.41922e-10, No Iterations 35
+time step continuity errors : sum local = 9.8886e-13, global = -1.01489e-21, cumulative = -1.61884e-20
+ExecutionTime = 1.59 s
+
+
+Courant Number mean: 0.0103626 max: 0.0104925
+Time = 0.012
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.296325 0.303211
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.696789 0.703675
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.29583 0.30385
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.69615 0.70417
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395484, 0.0418708, 0.0374033
+gamma parameters:
+C0: avg, max,min 2090, 2209.79, 1974
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0862706, Final residual = 7.54657e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0862706, Final residual = 4.2942e-18, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0862706, Final residual = 4.68508e-18, No Iterations 2
+diameter: avg, max,min 0.0395495, 0.0423027, 0.0370416
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00397649, Final residual = 3.19291e-05, No Iterations 5
+time step continuity errors : sum local = 3.39994e-08, global = 2.31217e-21, cumulative = -1.38762e-20
+GAMG:  Solving for p, Initial residual = 0.000197488, Final residual = 8.83406e-10, No Iterations 35
+time step continuity errors : sum local = 9.29044e-13, global = 2.30338e-21, cumulative = -1.15728e-20
+ExecutionTime = 1.73 s
+
+
+Courant Number mean: 0.0110094 max: 0.0111611
+Time = 0.013
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.29583 0.304123
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.695877 0.70417
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.295342 0.304509
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.695491 0.704658
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039549, 0.0423025, 0.0370423
+gamma parameters:
+C0: avg, max,min 2090, 2231.37, 1953.84
+alpha: avg, max,min 0.00505256, 0.00505263, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0789662, Final residual = 8.56571e-10, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0789662, Final residual = 1.41817e-17, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0789662, Final residual = 1.22352e-17, No Iterations 2
+diameter: avg, max,min 0.0395504, 0.0427658, 0.0366658
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00444315, Final residual = 4.35864e-05, No Iterations 4
+time step continuity errors : sum local = 4.71066e-08, global = 2.36657e-21, cumulative = -9.20623e-21
+GAMG:  Solving for p, Initial residual = 0.000201287, Final residual = 9.5827e-10, No Iterations 34
+time step continuity errors : sum local = 1.02236e-12, global = 2.32082e-21, cumulative = -6.88542e-21
+ExecutionTime = 1.86 s
+
+
+Courant Number mean: 0.0116129 max: 0.0117891
+Time = 0.014
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.294932 0.304772
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.695228 0.705068
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.294914 0.305187
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.694813 0.705086
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395496, 0.0427652, 0.0366678
+gamma parameters:
+C0: avg, max,min 2090, 2254.28, 1932.67
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.072914, Final residual = 1.03669e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.072914, Final residual = 1.67846e-17, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.072914, Final residual = 1.69118e-17, No Iterations 2
+diameter: avg, max,min 0.0395515, 0.0432588, 0.0362791
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00480446, Final residual = 4.54176e-05, No Iterations 3
+time step continuity errors : sum local = 5.03458e-08, global = -1.10919e-21, cumulative = -7.99461e-21
+GAMG:  Solving for p, Initial residual = 0.000204909, Final residual = 7.83051e-10, No Iterations 33
+time step continuity errors : sum local = 8.26722e-13, global = -9.9859e-22, cumulative = -8.9932e-21
+ExecutionTime = 2 s
+
+
+Courant Number mean: 0.0121751 max: 0.0123844
+Time = 0.015
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.294429 0.305186
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.694814 0.705571
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.294236 0.305956
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.694044 0.705764
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395504, 0.0432578, 0.0362828
+gamma parameters:
+C0: avg, max,min 2090, 2278.43, 1910.61
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0677706, Final residual = 1.10239e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0677706, Final residual = 2.99792e-17, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0677706, Final residual = 3.05222e-17, No Iterations 2
+diameter: avg, max,min 0.0395528, 0.0437809, 0.0358842
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00563932, Final residual = 5.43287e-05, No Iterations 2
+time step continuity errors : sum local = 5.89816e-08, global = -1.14427e-21, cumulative = -1.01375e-20
+GAMG:  Solving for p, Initial residual = 0.000212232, Final residual = 6.71771e-10, No Iterations 33
+time step continuity errors : sum local = 7.10951e-13, global = -1.2411e-21, cumulative = -1.13786e-20
+ExecutionTime = 2.14 s
+
+
+Courant Number mean: 0.0126983 max: 0.0129425
+Time = 0.016
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.293101 0.306444
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.693556 0.706899
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.292971 0.306784
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.693216 0.707029
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395513, 0.0437785, 0.0358881
+gamma parameters:
+C0: avg, max,min 2090, 2303.74, 1887.75
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0633578, Final residual = 1.45777e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0633578, Final residual = 4.77052e-17, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0633578, Final residual = 4.75285e-17, No Iterations 2
+diameter: avg, max,min 0.0395544, 0.0443303, 0.0354818
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00639806, Final residual = 5.45464e-05, No Iterations 2
+time step continuity errors : sum local = 5.86102e-08, global = -4.40234e-21, cumulative = -1.57809e-20
+GAMG:  Solving for p, Initial residual = 0.000218892, Final residual = 6.37299e-10, No Iterations 33
+time step continuity errors : sum local = 6.7618e-13, global = -4.33886e-21, cumulative = -2.01198e-20
+ExecutionTime = 2.28 s
+
+
+Courant Number mean: 0.0131844 max: 0.0134623
+Time = 0.017
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.292317 0.307189
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.692811 0.707683
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.292319 0.307186
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.692814 0.707681
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395524, 0.0443289, 0.0354819
+gamma parameters:
+C0: avg, max,min 2090, 2330.13, 1864.2
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0595991, Final residual = 1.92536e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0595991, Final residual = 1.71078e-16, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0595991, Final residual = 1.73648e-16, No Iterations 2
+diameter: avg, max,min 0.0395563, 0.0449087, 0.0350698
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00700312, Final residual = 5.29659e-05, No Iterations 2
+time step continuity errors : sum local = 5.61649e-08, global = 3.33279e-21, cumulative = -1.6787e-20
+GAMG:  Solving for p, Initial residual = 0.000222393, Final residual = 8.142e-10, No Iterations 32
+time step continuity errors : sum local = 8.77964e-13, global = 3.35096e-21, cumulative = -1.3436e-20
+ExecutionTime = 2.41 s
+
+
+Courant Number mean: 0.0136358 max: 0.0139542
+Time = 0.018
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.291974 0.307402
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.692598 0.708026
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.290991 0.308171
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.691829 0.709009
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395536, 0.0449037, 0.0350709
+gamma parameters:
+C0: avg, max,min 2090, 2357.51, 1840.04
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0563129, Final residual = 2.3888e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0563129, Final residual = 2.30046e-16, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0563129, Final residual = 2.32482e-16, No Iterations 2
+diameter: avg, max,min 0.0395585, 0.0455105, 0.0346548
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00755341, Final residual = 5.28764e-05, No Iterations 2
+time step continuity errors : sum local = 5.50333e-08, global = 3.59473e-22, cumulative = -1.30765e-20
+GAMG:  Solving for p, Initial residual = 0.000224816, Final residual = 8.96574e-10, No Iterations 31
+time step continuity errors : sum local = 9.56999e-13, global = 3.80797e-22, cumulative = -1.26957e-20
+ExecutionTime = 2.55 s
+
+
+Courant Number mean: 0.0140544 max: 0.0144114
+Time = 0.019
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.29082 0.308849
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.691151 0.70918
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.290035 0.309397
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.690603 0.709965
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039555, 0.0455105, 0.0346674
+gamma parameters:
+C0: avg, max,min 2090, 2385.82, 1815.36
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0534051, Final residual = 2.89789e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0534051, Final residual = 3.30553e-16, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0534051, Final residual = 3.32393e-16, No Iterations 2
+diameter: avg, max,min 0.039561, 0.046144, 0.0342487
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00738704, Final residual = 4.83567e-05, No Iterations 2
+time step continuity errors : sum local = 5.02472e-08, global = -5.934e-22, cumulative = -1.32891e-20
+GAMG:  Solving for p, Initial residual = 0.000226135, Final residual = 8.10734e-10, No Iterations 31
+time step continuity errors : sum local = 8.6764e-13, global = -4.13364e-22, cumulative = -1.37025e-20
+ExecutionTime = 2.68 s
+
+
+Courant Number mean: 0.0144423 max: 0.0148414
+Time = 0.02
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.289444 0.309508
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.690492 0.710556
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.289438 0.309812
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.690188 0.710562
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395565, 0.0461433, 0.0342642
+gamma parameters:
+C0: avg, max,min 2090, 2414.99, 1790.27
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73485
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.050844, Final residual = 3.26074e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.050844, Final residual = 4.1782e-16, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.050844, Final residual = 4.16763e-16, No Iterations 2
+diameter: avg, max,min 0.0395638, 0.046803, 0.0338444
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00768235, Final residual = 4.45437e-05, No Iterations 2
+time step continuity errors : sum local = 4.63613e-08, global = -4.42711e-22, cumulative = -1.41452e-20
+GAMG:  Solving for p, Initial residual = 0.000230086, Final residual = 7.11356e-10, No Iterations 31
+time step continuity errors : sum local = 7.63422e-13, global = -3.90176e-22, cumulative = -1.45354e-20
+ExecutionTime = 2.83 s
+
+
+Courant Number mean: 0.0148015 max: 0.0152409
+Time = 0.021
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.288294 0.310201
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.689799 0.711706
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.288029 0.310913
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.689087 0.711971
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395583, 0.046803, 0.0338479
+gamma parameters:
+C0: avg, max,min 2090, 2444.95, 1764.86
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0485212, Final residual = 3.70275e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0485212, Final residual = 8.3753e-16, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0485212, Final residual = 8.39849e-16, No Iterations 2
+diameter: avg, max,min 0.0395671, 0.0474882, 0.0334282
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00814718, Final residual = 4.0572e-05, No Iterations 2
+time step continuity errors : sum local = 4.17289e-08, global = -6.96251e-21, cumulative = -2.14979e-20
+GAMG:  Solving for p, Initial residual = 0.000231017, Final residual = 7.2189e-10, No Iterations 31
+time step continuity errors : sum local = 7.76762e-13, global = -7.10411e-21, cumulative = -2.8602e-20
+ExecutionTime = 2.97 s
+
+
+Courant Number mean: 0.0151338 max: 0.0156064
+Time = 0.022
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.287852 0.311835
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.688165 0.712148
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.286916 0.312248
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.687752 0.713084
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395602, 0.0474872, 0.0334284
+gamma parameters:
+C0: avg, max,min 2090, 2475.65, 1739.21
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0463706, Final residual = 4.38965e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0463706, Final residual = 1.10429e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0463706, Final residual = 1.09897e-15, No Iterations 2
+diameter: avg, max,min 0.0395707, 0.0481976, 0.0330101
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00846764, Final residual = 4.27154e-05, No Iterations 2
+time step continuity errors : sum local = 4.46203e-08, global = -5.38232e-22, cumulative = -2.91402e-20
+GAMG:  Solving for p, Initial residual = 0.000239588, Final residual = 8.12352e-10, No Iterations 30
+time step continuity errors : sum local = 8.8821e-13, global = -5.62907e-22, cumulative = -2.97032e-20
+ExecutionTime = 3.1 s
+
+
+Courant Number mean: 0.0154412 max: 0.0159579
+Time = 0.023
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.286374 0.312734
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.687266 0.713626
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.285657 0.312819
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.687181 0.714343
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395624, 0.0481913, 0.0330109
+gamma parameters:
+C0: avg, max,min 2090, 2507.02, 1713.4
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0444434, Final residual = 5.08602e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0444434, Final residual = 1.4473e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0444434, Final residual = 1.4368e-15, No Iterations 2
+diameter: avg, max,min 0.0395748, 0.0489265, 0.0325948
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00869479, Final residual = 3.70809e-05, No Iterations 2
+time step continuity errors : sum local = 3.73891e-08, global = -3.47755e-22, cumulative = -3.00509e-20
+GAMG:  Solving for p, Initial residual = 0.000246328, Final residual = 8.69052e-10, No Iterations 29
+time step continuity errors : sum local = 9.4116e-13, global = -3.03593e-22, cumulative = -3.03545e-20
+ExecutionTime = 3.23 s
+
+
+Courant Number mean: 0.0157253 max: 0.0162857
+Time = 0.024
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.285582 0.313503
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.686497 0.714418
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.285584 0.314164
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.685836 0.714416
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395647, 0.0489059, 0.0325997
+gamma parameters:
+C0: avg, max,min 2090, 2539.02, 1687.43
+alpha: avg, max,min 0.00505256, 0.00505262, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0426628, Final residual = 5.92288e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0426628, Final residual = 1.66019e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0426628, Final residual = 1.67598e-15, No Iterations 2
+diameter: avg, max,min 0.0395793, 0.0496653, 0.0321866
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00895103, Final residual = 3.60825e-05, No Iterations 2
+time step continuity errors : sum local = 3.67348e-08, global = 2.50869e-21, cumulative = -2.78458e-20
+GAMG:  Solving for p, Initial residual = 0.000255924, Final residual = 7.28992e-10, No Iterations 29
+time step continuity errors : sum local = 7.91503e-13, global = 2.57355e-21, cumulative = -2.52723e-20
+ExecutionTime = 3.37 s
+
+
+Courant Number mean: 0.0159879 max: 0.0165768
+Time = 0.025
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.284726 0.315195
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.684805 0.715274
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.284042 0.315676
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.684324 0.715958
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395672, 0.0496427, 0.0321921
+gamma parameters:
+C0: avg, max,min 2090, 2571.59, 1661.4
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0410316, Final residual = 6.66871e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0410316, Final residual = 1.69928e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0410316, Final residual = 1.69963e-15, No Iterations 2
+diameter: avg, max,min 0.0395843, 0.0504261, 0.0317827
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00908007, Final residual = 3.35817e-05, No Iterations 2
+time step continuity errors : sum local = 3.41525e-08, global = -4.83718e-21, cumulative = -3.01094e-20
+GAMG:  Solving for p, Initial residual = 0.00025588, Final residual = 9.37248e-10, No Iterations 28
+time step continuity errors : sum local = 1.03371e-12, global = -4.88904e-21, cumulative = -3.49985e-20
+ExecutionTime = 3.5 s
+
+
+Courant Number mean: 0.0162304 max: 0.0168587
+Time = 0.026
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.282969 0.316153
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.683847 0.717031
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.282972 0.316318
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.683682 0.717028
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395699, 0.0504201, 0.0317866
+gamma parameters:
+C0: avg, max,min 2090, 2604.72, 1635.34
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0395125, Final residual = 7.53538e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0395125, Final residual = 2.36852e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0395125, Final residual = 2.37037e-15, No Iterations 2
+diameter: avg, max,min 0.0395898, 0.0512272, 0.0313815
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00882666, Final residual = 3.14088e-05, No Iterations 2
+time step continuity errors : sum local = 3.30099e-08, global = -5.21621e-23, cumulative = -3.50507e-20
+GAMG:  Solving for p, Initial residual = 0.000260144, Final residual = 9.56545e-10, No Iterations 28
+time step continuity errors : sum local = 1.05732e-12, global = -4.58339e-23, cumulative = -3.50965e-20
+ExecutionTime = 3.63 s
+
+
+Courant Number mean: 0.0164542 max: 0.0171256
+Time = 0.027
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.282975 0.316978
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.683022 0.717025
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.282432 0.31771
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.68229 0.717568
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395729, 0.0511681, 0.0313816
+gamma parameters:
+C0: avg, max,min 2090, 2638.34, 1609.31
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0380653, Final residual = 8.35466e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0380653, Final residual = 4.71253e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0380653, Final residual = 4.73124e-15, No Iterations 2
+diameter: avg, max,min 0.0395958, 0.0519979, 0.0309815
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.009173, Final residual = 2.78865e-05, No Iterations 2
+time step continuity errors : sum local = 2.85483e-08, global = 2.7702e-21, cumulative = -3.23263e-20
+GAMG:  Solving for p, Initial residual = 0.000266994, Final residual = 8.21825e-10, No Iterations 27
+time step continuity errors : sum local = 9.10411e-13, global = 2.6779e-21, cumulative = -2.96484e-20
+ExecutionTime = 3.77 s
+
+
+Courant Number mean: 0.0166608 max: 0.0173572
+Time = 0.028
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.281522 0.318701
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.681299 0.718478
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.280612 0.319253
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.680747 0.719388
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039576, 0.051948, 0.0309816
+gamma parameters:
+C0: avg, max,min 2090, 2672.41, 1583.31
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0367288, Final residual = 9.40471e-09, No Iterations 1
+DILUPBiCG:  Solving for m1, Initial residual = 0.0367288, Final residual = 4.45373e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0367288, Final residual = 4.44789e-15, No Iterations 2
+diameter: avg, max,min 0.0396022, 0.0528009, 0.0305868
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00921671, Final residual = 2.96614e-05, No Iterations 2
+time step continuity errors : sum local = 3.06758e-08, global = -9.70785e-22, cumulative = -3.06192e-20
+GAMG:  Solving for p, Initial residual = 0.000277209, Final residual = 9.23476e-10, No Iterations 26
+time step continuity errors : sum local = 1.0138e-12, global = -8.90304e-22, cumulative = -3.15095e-20
+ExecutionTime = 3.9 s
+
+
+Courant Number mean: 0.0168514 max: 0.0175821
+Time = 0.029
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.279878 0.31969
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.68031 0.720122
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.27969 0.319941
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.680059 0.72031
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395794, 0.052797, 0.0305868
+gamma parameters:
+C0: avg, max,min 2090, 2706.92, 1557.44
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0354623, Final residual = 1.95499e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0354623, Final residual = 1.94936e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0354623, Final residual = 1.94168e-14, No Iterations 2
+diameter: avg, max,min 0.0396091, 0.053675, 0.0301976
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00936415, Final residual = 2.71004e-05, No Iterations 2
+time step continuity errors : sum local = 2.78246e-08, global = -4.72921e-21, cumulative = -3.62387e-20
+GAMG:  Solving for p, Initial residual = 0.000282634, Final residual = 8.1778e-10, No Iterations 27
+time step continuity errors : sum local = 9.11464e-13, global = -4.5975e-21, cumulative = -4.08362e-20
+ExecutionTime = 4.03 s
+
+
+Courant Number mean: 0.0170274 max: 0.0177932
+Time = 0.03
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.279446 0.320563
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.679437 0.720554
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.278859 0.321365
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.678635 0.721141
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395829, 0.053675, 0.0301976
+gamma parameters:
+C0: avg, max,min 2090, 2741.81, 1531.68
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73486
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0342826, Final residual = 5.07172e-15, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0342826, Final residual = 5.07248e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0342826, Final residual = 5.07241e-15, No Iterations 2
+diameter: avg, max,min 0.0396166, 0.0545771, 0.0298143
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00966358, Final residual = 2.35402e-05, No Iterations 2
+time step continuity errors : sum local = 2.48528e-08, global = 1.71007e-21, cumulative = -3.91261e-20
+GAMG:  Solving for p, Initial residual = 0.000293659, Final residual = 8.12962e-10, No Iterations 26
+time step continuity errors : sum local = 8.97546e-13, global = 1.84299e-21, cumulative = -3.72831e-20
+ExecutionTime = 4.17 s
+
+
+Courant Number mean: 0.0171898 max: 0.0180003
+Time = 0.031
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.277778 0.322293
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.677707 0.722222
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.276799 0.322914
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.677086 0.723201
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395868, 0.0545766, 0.0298143
+gamma parameters:
+C0: avg, max,min 2090, 2777.07, 1506.08
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0331781, Final residual = 6.87681e-15, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0331781, Final residual = 6.88053e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0331781, Final residual = 6.77847e-15, No Iterations 2
+diameter: avg, max,min 0.0396247, 0.0555027, 0.0294372
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00981274, Final residual = 2.34454e-05, No Iterations 2
+time step continuity errors : sum local = 2.47667e-08, global = -3.23875e-21, cumulative = -4.05219e-20
+GAMG:  Solving for p, Initial residual = 0.000303113, Final residual = 7.11046e-10, No Iterations 26
+time step continuity errors : sum local = 7.87605e-13, global = -2.41645e-21, cumulative = -4.29383e-20
+ExecutionTime = 4.31 s
+
+
+Courant Number mean: 0.0173398 max: 0.0181895
+Time = 0.032
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.276413 0.323308
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.676692 0.723587
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.276417 0.323653
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.676347 0.723583
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395908, 0.0555019, 0.0294373
+gamma parameters:
+C0: avg, max,min 2090, 2812.66, 1480.69
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0321212, Final residual = 1.32664e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0321212, Final residual = 1.32791e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0321212, Final residual = 1.32565e-14, No Iterations 2
+diameter: avg, max,min 0.0396334, 0.0564524, 0.0290664
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00993166, Final residual = 2.17038e-05, No Iterations 2
+time step continuity errors : sum local = 2.33557e-08, global = 9.94063e-22, cumulative = -4.19443e-20
+GAMG:  Solving for p, Initial residual = 0.000310504, Final residual = 7.26867e-10, No Iterations 24
+time step continuity errors : sum local = 8.07224e-13, global = 1.04378e-21, cumulative = -4.09005e-20
+ExecutionTime = 4.45 s
+
+
+Courant Number mean: 0.0174783 max: 0.0183709
+Time = 0.033
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.276059 0.324229
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.675771 0.723941
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.275111 0.325097
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.674903 0.724889
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395951, 0.0564511, 0.0290665
+gamma parameters:
+C0: avg, max,min 2090, 2848.57, 1455.49
+alpha: avg, max,min 0.00505256, 0.00505261, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.031137, Final residual = 9.54804e-15, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.031137, Final residual = 9.54905e-15, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.031137, Final residual = 9.54708e-15, No Iterations 2
+diameter: avg, max,min 0.0396427, 0.0574261, 0.028702
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0097301, Final residual = 2.08263e-05, No Iterations 2
+time step continuity errors : sum local = 2.1736e-08, global = -2.32695e-22, cumulative = -4.11332e-20
+GAMG:  Solving for p, Initial residual = 0.000319348, Final residual = 9.32792e-10, No Iterations 25
+time step continuity errors : sum local = 1.05159e-12, global = -6.68977e-23, cumulative = -4.12001e-20
+ExecutionTime = 4.58 s
+
+
+Courant Number mean: 0.0176061 max: 0.0185541
+Time = 0.034
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.273956 0.325957
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.674043 0.726044
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.273181 0.32665
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.67335 0.726819
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0395995, 0.057424, 0.0287022
+gamma parameters:
+C0: avg, max,min 2090, 2884.76, 1430.55
+alpha: avg, max,min 0.00505256, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0302274, Final residual = 1.48405e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0302274, Final residual = 1.48372e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0302274, Final residual = 1.4838e-14, No Iterations 2
+diameter: avg, max,min 0.0396523, 0.0584233, 0.0283441
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00956396, Final residual = 1.90744e-05, No Iterations 2
+time step continuity errors : sum local = 2.05152e-08, global = 2.87081e-21, cumulative = -3.83293e-20
+GAMG:  Solving for p, Initial residual = 0.000315568, Final residual = 9.52106e-10, No Iterations 25
+time step continuity errors : sum local = 1.06182e-12, global = 2.7428e-21, cumulative = -3.55865e-20
+ExecutionTime = 4.71 s
+
+
+Courant Number mean: 0.0177241 max: 0.0187152
+Time = 0.035
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.273183 0.327014
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.672986 0.726817
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.273031 0.327455
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.672545 0.726969
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396041, 0.0584203, 0.0283448
+gamma parameters:
+C0: avg, max,min 2090, 2921.21, 1405.87
+alpha: avg, max,min 0.00505256, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0293334, Final residual = 3.60044e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0293334, Final residual = 3.5984e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0293334, Final residual = 3.60269e-14, No Iterations 2
+diameter: avg, max,min 0.0396626, 0.0594436, 0.0279933
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00943521, Final residual = 1.87982e-05, No Iterations 2
+time step continuity errors : sum local = 2.09134e-08, global = 2.0543e-21, cumulative = -3.35322e-20
+GAMG:  Solving for p, Initial residual = 0.000319978, Final residual = 8.54634e-10, No Iterations 25
+time step continuity errors : sum local = 9.56221e-13, global = 1.96855e-21, cumulative = -3.15636e-20
+ExecutionTime = 4.84 s
+
+
+Courant Number mean: 0.0178333 max: 0.0188474
+Time = 0.036
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.272462 0.327986
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.672014 0.727538
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.271156 0.328907
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.671093 0.728844
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039609, 0.0594414, 0.0279939
+gamma parameters:
+C0: avg, max,min 2090, 2957.91, 1381.47
+alpha: avg, max,min 0.00505256, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0285059, Final residual = 4.00911e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0285059, Final residual = 4.00089e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0285059, Final residual = 2.99302e-20, No Iterations 3
+diameter: avg, max,min 0.0396732, 0.0604895, 0.0276489
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00975761, Final residual = 1.83452e-05, No Iterations 2
+time step continuity errors : sum local = 1.93114e-08, global = 2.54573e-22, cumulative = -3.1309e-20
+GAMG:  Solving for p, Initial residual = 0.000327786, Final residual = 8.76662e-10, No Iterations 23
+time step continuity errors : sum local = 9.83677e-13, global = 8.00964e-23, cumulative = -3.12289e-20
+ExecutionTime = 4.98 s
+
+
+Courant Number mean: 0.0179341 max: 0.0189783
+Time = 0.037
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.269983 0.329693
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.670307 0.730017
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.269779 0.330453
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.669547 0.730221
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396139, 0.0604878, 0.0276493
+gamma parameters:
+C0: avg, max,min 2090, 2994.84, 1357.34
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0277067, Final residual = 5.08368e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0277067, Final residual = 5.08449e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0277067, Final residual = 5.08313e-14, No Iterations 2
+diameter: avg, max,min 0.0396845, 0.0615608, 0.0273108
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00990756, Final residual = 1.75752e-05, No Iterations 2
+time step continuity errors : sum local = 1.92923e-08, global = -1.90478e-21, cumulative = -3.31337e-20
+GAMG:  Solving for p, Initial residual = 0.000336242, Final residual = 8.98287e-10, No Iterations 18
+time step continuity errors : sum local = 9.81401e-13, global = -1.27015e-21, cumulative = -3.44039e-20
+ExecutionTime = 5.11 s
+
+
+Courant Number mean: 0.0180276 max: 0.0191001
+Time = 0.038
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.269789 0.33078
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.66922 0.730211
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.269351 0.331324
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.668676 0.730649
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396192, 0.0615592, 0.0273109
+gamma parameters:
+C0: avg, max,min 2090, 3031.98, 1333.52
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73487
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0269693, Final residual = 3.72741e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0269693, Final residual = 3.72769e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0269693, Final residual = 3.72767e-14, No Iterations 2
+diameter: avg, max,min 0.0396964, 0.0626571, 0.026979
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0100564, Final residual = 1.68396e-05, No Iterations 2
+time step continuity errors : sum local = 1.80945e-08, global = 1.14413e-21, cumulative = -3.32597e-20
+GAMG:  Solving for p, Initial residual = 0.000341942, Final residual = 7.38833e-10, No Iterations 18
+time step continuity errors : sum local = 8.35296e-13, global = 1.57698e-21, cumulative = -3.16828e-20
+ExecutionTime = 5.25 s
+
+
+Courant Number mean: 0.0181141 max: 0.0192234
+Time = 0.039
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.268539 0.331973
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.668027 0.731461
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.267228 0.332794
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.667206 0.732772
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396247, 0.0626536, 0.026979
+gamma parameters:
+C0: avg, max,min 2090, 3069.32, 1310.01
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0262532, Final residual = 3.98753e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0262532, Final residual = 3.98716e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0262532, Final residual = 3.98787e-14, No Iterations 2
+diameter: avg, max,min 0.0397091, 0.0637763, 0.0266535
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0103167, Final residual = 2.31034e-05, No Iterations 2
+time step continuity errors : sum local = 2.47984e-08, global = 5.59228e-22, cumulative = -3.11235e-20
+GAMG:  Solving for p, Initial residual = 0.000353331, Final residual = 8.9058e-10, No Iterations 23
+time step continuity errors : sum local = 1.02003e-12, global = 9.23097e-22, cumulative = -3.02004e-20
+ExecutionTime = 5.38 s
+
+
+Courant Number mean: 0.0181943 max: 0.0193438
+Time = 0.04
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.266365 0.333518
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.666482 0.733635
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.266377 0.334334
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.665666 0.733623
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396305, 0.0637673, 0.0266534
+gamma parameters:
+C0: avg, max,min 2090, 3106.84, 1286.78
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0255747, Final residual = 4.50559e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0255747, Final residual = 4.50522e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0255747, Final residual = 4.50588e-14, No Iterations 2
+diameter: avg, max,min 0.0397224, 0.0649146, 0.0263343
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00994107, Final residual = 1.97111e-05, No Iterations 2
+time step continuity errors : sum local = 2.16229e-08, global = 7.26111e-22, cumulative = -2.94743e-20
+GAMG:  Solving for p, Initial residual = 0.000363272, Final residual = 7.05178e-10, No Iterations 24
+time step continuity errors : sum local = 8.00777e-13, global = 3.48229e-22, cumulative = -2.91261e-20
+ExecutionTime = 5.51 s
+
+
+Courant Number mean: 0.0182688 max: 0.0194431
+Time = 0.041
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.266381 0.335076
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.664924 0.733619
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.265944 0.336092
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.663908 0.734056
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396364, 0.0648996, 0.0263343
+gamma parameters:
+C0: avg, max,min 2090, 3144.52, 1263.87
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0249363, Final residual = 6.2914e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0249363, Final residual = 6.29199e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0249363, Final residual = 6.29182e-14, No Iterations 2
+diameter: avg, max,min 0.0397363, 0.0660716, 0.0260215
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00974026, Final residual = 1.68979e-05, No Iterations 2
+time step continuity errors : sum local = 1.78765e-08, global = 3.7752e-21, cumulative = -2.53509e-20
+GAMG:  Solving for p, Initial residual = 0.000360278, Final residual = 6.55531e-10, No Iterations 23
+time step continuity errors : sum local = 7.45832e-13, global = 3.96703e-21, cumulative = -2.13839e-20
+ExecutionTime = 5.64 s
+
+
+Courant Number mean: 0.0183378 max: 0.0195271
+Time = 0.042
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.264635 0.336885
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.663115 0.735365
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.263341 0.337297
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.662703 0.736659
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396426, 0.0660511, 0.0260215
+gamma parameters:
+C0: avg, max,min 2090, 3182.37, 1241.29
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0243161, Final residual = 7.15365e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0243161, Final residual = 7.1538e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0243161, Final residual = 7.15406e-14, No Iterations 2
+diameter: avg, max,min 0.0397506, 0.067248, 0.0257149
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00973208, Final residual = 1.85541e-05, No Iterations 2
+time step continuity errors : sum local = 2.02947e-08, global = -4.17188e-21, cumulative = -2.55557e-20
+GAMG:  Solving for p, Initial residual = 0.000362127, Final residual = 9.2816e-10, No Iterations 22
+time step continuity errors : sum local = 1.05867e-12, global = -5.2154e-21, cumulative = -3.07711e-20
+ExecutionTime = 5.77 s
+
+
+Courant Number mean: 0.018402 max: 0.0196161
+Time = 0.043
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.262982 0.33804
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.66196 0.737018
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.262994 0.338928
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.661072 0.737006
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039649, 0.0672229, 0.0257148
+gamma parameters:
+C0: avg, max,min 2090, 3220.35, 1219.05
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0237037, Final residual = 7.50808e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0237037, Final residual = 7.50768e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0237037, Final residual = 7.50845e-14, No Iterations 2
+diameter: avg, max,min 0.0397655, 0.0684447, 0.0254144
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0100667, Final residual = 1.75354e-05, No Iterations 2
+time step continuity errors : sum local = 1.89711e-08, global = -3.88006e-22, cumulative = -3.11592e-20
+GAMG:  Solving for p, Initial residual = 0.000367597, Final residual = 9.05006e-10, No Iterations 22
+time step continuity errors : sum local = 1.04925e-12, global = -2.73241e-22, cumulative = -3.14324e-20
+ExecutionTime = 5.9 s
+
+
+Courant Number mean: 0.0184619 max: 0.0197034
+Time = 0.044
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.262588 0.340259
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.659741 0.737412
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.262073 0.341191
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.658809 0.737927
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396555, 0.0684164, 0.0254143
+gamma parameters:
+C0: avg, max,min 2090, 3258.48, 1197.14
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0231239, Final residual = 5.67188e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0231239, Final residual = 5.67228e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0231239, Final residual = 5.67203e-14, No Iterations 2
+diameter: avg, max,min 0.0397808, 0.0696634, 0.0251199
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00967919, Final residual = 2.31031e-05, No Iterations 2
+time step continuity errors : sum local = 2.53934e-08, global = 6.65767e-22, cumulative = -3.07666e-20
+GAMG:  Solving for p, Initial residual = 0.000366804, Final residual = 8.02277e-10, No Iterations 24
+time step continuity errors : sum local = 9.19495e-13, global = 8.68404e-22, cumulative = -2.98982e-20
+ExecutionTime = 6.04 s
+
+
+Courant Number mean: 0.0185175 max: 0.0197994
+Time = 0.045
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.26079 0.341817
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.658183 0.73921
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.259922 0.34216
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.65784 0.740078
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396623, 0.0696354, 0.0251198
+gamma parameters:
+C0: avg, max,min 2090, 3296.74, 1175.54
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0225474, Final residual = 8.62094e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0225474, Final residual = 8.62245e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0225474, Final residual = 8.62144e-14, No Iterations 2
+diameter: avg, max,min 0.0397967, 0.0709079, 0.0248314
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00948851, Final residual = 2.02352e-05, No Iterations 2
+time step continuity errors : sum local = 2.21606e-08, global = 4.26287e-21, cumulative = -2.56353e-20
+GAMG:  Solving for p, Initial residual = 0.000360727, Final residual = 7.64721e-10, No Iterations 24
+time step continuity errors : sum local = 8.78317e-13, global = 5.03321e-21, cumulative = -2.06021e-20
+ExecutionTime = 6.17 s
+
+
+Courant Number mean: 0.0185694 max: 0.0198721
+Time = 0.046
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.259577 0.342971
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.657029 0.740423
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.259542 0.343995
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.656005 0.740458
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396693, 0.070881, 0.0248312
+gamma parameters:
+C0: avg, max,min 2090, 3335.12, 1154.26
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0220027, Final residual = 8.98638e-14, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0220027, Final residual = 8.98874e-14, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0220027, Final residual = 8.98681e-14, No Iterations 2
+diameter: avg, max,min 0.0398128, 0.0721793, 0.0245487
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00948333, Final residual = 2.28032e-05, No Iterations 2
+time step continuity errors : sum local = 2.49857e-08, global = 7.23715e-22, cumulative = -1.98784e-20
+GAMG:  Solving for p, Initial residual = 0.000361226, Final residual = 9.46384e-10, No Iterations 24
+time step continuity errors : sum local = 1.09005e-12, global = -3.9551e-23, cumulative = -1.9918e-20
+ExecutionTime = 6.3 s
+
+
+Courant Number mean: 0.018618 max: 0.0199699
+Time = 0.047
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.259119 0.345368
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.654632 0.740881
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.258177 0.34619
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.65381 0.741823
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396765, 0.0721509, 0.0245486
+gamma parameters:
+C0: avg, max,min 2090, 3373.6, 1133.3
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0214797, Final residual = 1.16052e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0214797, Final residual = 1.16129e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0214797, Final residual = 1.3212e-19, No Iterations 3
+diameter: avg, max,min 0.0398297, 0.0734752, 0.0242717
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00951772, Final residual = 2.45347e-05, No Iterations 2
+time step continuity errors : sum local = 2.69053e-08, global = 3.10261e-21, cumulative = -1.68154e-20
+GAMG:  Solving for p, Initial residual = 0.000366, Final residual = 9.46725e-10, No Iterations 24
+time step continuity errors : sum local = 1.09329e-12, global = 2.76776e-21, cumulative = -1.40476e-20
+ExecutionTime = 6.43 s
+
+
+Courant Number mean: 0.0186634 max: 0.020072
+Time = 0.048
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.256955 0.346702
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.653298 0.743045
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.256171 0.347027
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.652973 0.743829
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396839, 0.0734453, 0.0242716
+gamma parameters:
+C0: avg, max,min 2090, 3412.21, 1112.69
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0209831, Final residual = 1.96428e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0209831, Final residual = 1.96483e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0209831, Final residual = 1.77359e-19, No Iterations 3
+diameter: avg, max,min 0.0398471, 0.0747959, 0.0240004
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00905574, Final residual = 2.62549e-05, No Iterations 2
+time step continuity errors : sum local = 2.89277e-08, global = 4.29266e-21, cumulative = -9.75495e-21
+GAMG:  Solving for p, Initial residual = 0.000371119, Final residual = 9.30573e-10, No Iterations 24
+time step continuity errors : sum local = 1.07707e-12, global = 4.02602e-21, cumulative = -5.72893e-21
+ExecutionTime = 6.57 s
+
+
+Courant Number mean: 0.018706 max: 0.0201853
+Time = 0.049
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.256167 0.347955
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.652045 0.743833
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.25606 0.349078
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.650922 0.74394
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396915, 0.0747655, 0.0240003
+gamma parameters:
+C0: avg, max,min 2090, 3450.92, 1092.39
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0205238, Final residual = 2.12317e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0205238, Final residual = 2.12451e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0205238, Final residual = 1.89257e-19, No Iterations 3
+diameter: avg, max,min 0.039865, 0.0761428, 0.0237346
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0092427, Final residual = 2.50186e-05, No Iterations 2
+time step continuity errors : sum local = 2.76739e-08, global = -3.54214e-21, cumulative = -9.27107e-21
+GAMG:  Solving for p, Initial residual = 0.00036389, Final residual = 9.66269e-10, No Iterations 22
+time step continuity errors : sum local = 1.11984e-12, global = -1.97122e-21, cumulative = -1.12423e-20
+ExecutionTime = 6.7 s
+
+
+Courant Number mean: 0.018746 max: 0.0202881
+Time = 0.05
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.255533 0.350476
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.649524 0.744467
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.254237 0.351183
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.648817 0.745763
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0396994, 0.0761102, 0.0237345
+gamma parameters:
+C0: avg, max,min 2090, 3489.73, 1072.41
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0200693, Final residual = 1.9462e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0200693, Final residual = 1.94815e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0200693, Final residual = 3.79271e-19, No Iterations 3
+diameter: avg, max,min 0.0398836, 0.0775144, 0.0234741
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00896521, Final residual = 2.51166e-05, No Iterations 2
+time step continuity errors : sum local = 2.77564e-08, global = 3.91351e-22, cumulative = -1.08509e-20
+GAMG:  Solving for p, Initial residual = 0.000362087, Final residual = 8.22386e-10, No Iterations 24
+time step continuity errors : sum local = 9.55769e-13, global = 6.84978e-22, cumulative = -1.0166e-20
+ExecutionTime = 6.83 s
+
+
+Courant Number mean: 0.0187837 max: 0.0203849
+Time = 0.051
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.253065 0.35163
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.64837 0.746935
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.252733 0.351936
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.648064 0.747267
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397074, 0.0774808, 0.0234739
+gamma parameters:
+C0: avg, max,min 2090, 3528.73, 1052.64
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0196162, Final residual = 2.50184e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0196162, Final residual = 2.50176e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0196162, Final residual = 3.84836e-19, No Iterations 3
+diameter: avg, max,min 0.0399024, 0.0789124, 0.0232188
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00899357, Final residual = 2.78797e-05, No Iterations 2
+time step continuity errors : sum local = 3.01935e-08, global = -5.76947e-22, cumulative = -1.07429e-20
+GAMG:  Solving for p, Initial residual = 0.000361147, Final residual = 8.57913e-10, No Iterations 22
+time step continuity errors : sum local = 9.99375e-13, global = -9.2373e-22, cumulative = -1.16666e-20
+ExecutionTime = 6.96 s
+
+
+Courant Number mean: 0.0188191 max: 0.0204695
+Time = 0.052
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.252741 0.352995
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.647005 0.747259
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.252378 0.354187
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.645813 0.747622
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397156, 0.0788832, 0.0232187
+gamma parameters:
+C0: avg, max,min 2090, 3567.87, 1033.12
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0191791, Final residual = 1.60348e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0191791, Final residual = 1.60325e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0191791, Final residual = 6.57696e-19, No Iterations 3
+diameter: avg, max,min 0.0399217, 0.0803427, 0.0229687
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00879826, Final residual = 2.48856e-05, No Iterations 2
+time step continuity errors : sum local = 2.75762e-08, global = 3.55841e-21, cumulative = -8.10823e-21
+GAMG:  Solving for p, Initial residual = 0.000364318, Final residual = 8.20387e-10, No Iterations 22
+time step continuity errors : sum local = 9.57714e-13, global = 3.46241e-21, cumulative = -4.64582e-21
+ExecutionTime = 7.09 s
+
+
+Courant Number mean: 0.0188527 max: 0.020557
+Time = 0.053
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.251603 0.355604
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.644396 0.748397
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.250338 0.356209
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.643791 0.749662
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039724, 0.0803195, 0.0229685
+gamma parameters:
+C0: avg, max,min 2090, 3607.1, 1013.93
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.018761, Final residual = 2.59029e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.018761, Final residual = 2.58953e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.018761, Final residual = 8.2395e-19, No Iterations 3
+diameter: avg, max,min 0.0399418, 0.0818074, 0.0227236
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00905728, Final residual = 2.3034e-05, No Iterations 2
+time step continuity errors : sum local = 2.51325e-08, global = -1.21916e-21, cumulative = -5.86499e-21
+GAMG:  Solving for p, Initial residual = 0.000371384, Final residual = 9.14837e-10, No Iterations 23
+time step continuity errors : sum local = 1.07069e-12, global = -8.09823e-22, cumulative = -6.67481e-21
+ExecutionTime = 7.23 s
+
+
+Courant Number mean: 0.0188846 max: 0.0206531
+Time = 0.054
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.249373 0.35662
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.64338 0.750627
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.249222 0.356926
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.643074 0.750778
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397327, 0.0817894, 0.0227234
+gamma parameters:
+C0: avg, max,min 2090, 3646.42, 995.021
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0183715, Final residual = 4.70181e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0183715, Final residual = 4.6993e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0183715, Final residual = 6.0327e-19, No Iterations 3
+diameter: avg, max,min 0.0399623, 0.0833062, 0.0224833
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00908868, Final residual = 2.98742e-05, No Iterations 2
+time step continuity errors : sum local = 3.32014e-08, global = 2.29459e-21, cumulative = -4.38022e-21
+GAMG:  Solving for p, Initial residual = 0.000373627, Final residual = 9.13263e-10, No Iterations 22
+time step continuity errors : sum local = 1.086e-12, global = 2.84785e-21, cumulative = -1.53237e-21
+ExecutionTime = 7.36 s
+
+
+Courant Number mean: 0.018915 max: 0.0207503
+Time = 0.055
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.24917 0.35808
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.64192 0.75083
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.248873 0.359306
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.640694 0.751127
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397417, 0.0832941, 0.0224831
+gamma parameters:
+C0: avg, max,min 2090, 3685.82, 976.441
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0179897, Final residual = 3.35433e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0179897, Final residual = 3.35778e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0179897, Final residual = 3.70578e-18, No Iterations 3
+diameter: avg, max,min 0.0399838, 0.0848403, 0.0222479
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00901086, Final residual = 2.60295e-05, No Iterations 2
+time step continuity errors : sum local = 2.95126e-08, global = 2.86033e-22, cumulative = -1.24633e-21
+GAMG:  Solving for p, Initial residual = 0.000377264, Final residual = 8.15406e-10, No Iterations 23
+time step continuity errors : sum local = 9.58868e-13, global = -1.02697e-22, cumulative = -1.34903e-21
+ExecutionTime = 7.49 s
+
+
+Courant Number mean: 0.0189439 max: 0.020822
+Time = 0.056
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.247682 0.360683
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.639317 0.752318
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.24648 0.361207
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.638793 0.75352
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039751, 0.0848299, 0.0222477
+gamma parameters:
+C0: avg, max,min 2090, 3725.31, 958.186
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0176244, Final residual = 2.59395e-12, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0176244, Final residual = 2.58571e-12, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0176244, Final residual = 1.36799e-18, No Iterations 3
+diameter: avg, max,min 0.0400062, 0.0864061, 0.0220172
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00893923, Final residual = 2.42362e-05, No Iterations 2
+time step continuity errors : sum local = 2.66293e-08, global = 8.55748e-22, cumulative = -4.93284e-22
+GAMG:  Solving for p, Initial residual = 0.000381091, Final residual = 8.45465e-10, No Iterations 23
+time step continuity errors : sum local = 9.97492e-13, global = 1.17234e-21, cumulative = 6.79053e-22
+ExecutionTime = 7.63 s
+
+
+Courant Number mean: 0.0189717 max: 0.0208946
+Time = 0.057
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.24573 0.361673
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.638327 0.75427
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.245746 0.361995
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.638005 0.754254
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397606, 0.0863974, 0.022017
+gamma parameters:
+C0: avg, max,min 2090, 3764.87, 940.244
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0172843, Final residual = 3.98415e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0172843, Final residual = 3.98441e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0172843, Final residual = 1.48104e-18, No Iterations 3
+diameter: avg, max,min 0.0400291, 0.0880041, 0.021791
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00915398, Final residual = 2.93747e-05, No Iterations 2
+time step continuity errors : sum local = 3.27492e-08, global = -1.30215e-21, cumulative = -6.23101e-22
+GAMG:  Solving for p, Initial residual = 0.000377563, Final residual = 8.5197e-10, No Iterations 21
+time step continuity errors : sum local = 1.00611e-12, global = -1.38605e-21, cumulative = -2.00915e-21
+ExecutionTime = 7.76 s
+
+
+Courant Number mean: 0.0189983 max: 0.020967
+Time = 0.058
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.245489 0.363232
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.636768 0.754511
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.24502 0.364397
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.635603 0.75498
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397704, 0.0879967, 0.0217909
+gamma parameters:
+C0: avg, max,min 2090, 3804.51, 922.609
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0169717, Final residual = 3.566e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0169717, Final residual = 3.57154e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0169717, Final residual = 1.33191e-18, No Iterations 3
+diameter: avg, max,min 0.0400524, 0.0896344, 0.0215694
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00899554, Final residual = 2.51303e-05, No Iterations 2
+time step continuity errors : sum local = 2.77838e-08, global = -9.32951e-23, cumulative = -2.10244e-21
+GAMG:  Solving for p, Initial residual = 0.000377111, Final residual = 8.92462e-10, No Iterations 24
+time step continuity errors : sum local = 1.07044e-12, global = 1.98758e-21, cumulative = -1.1486e-22
+ExecutionTime = 7.9 s
+
+
+Courant Number mean: 0.0190239 max: 0.021055
+Time = 0.059
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.243692 0.365763
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.634237 0.756308
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.242684 0.366222
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.633778 0.757316
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0397806, 0.0896289, 0.0215692
+gamma parameters:
+C0: avg, max,min 2090, 3844.23, 905.227
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0166587, Final residual = 3.25294e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0166587, Final residual = 3.25343e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0166587, Final residual = 1.26081e-18, No Iterations 3
+diameter: avg, max,min 0.0400765, 0.0912982, 0.0213521
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00889995, Final residual = 2.07826e-05, No Iterations 2
+time step continuity errors : sum local = 2.34938e-08, global = 1.11556e-22, cumulative = -3.3033e-24
+GAMG:  Solving for p, Initial residual = 0.000372072, Final residual = 8.85034e-10, No Iterations 18
+time step continuity errors : sum local = 1.05279e-12, global = 8.38933e-22, cumulative = 8.3563e-22
+ExecutionTime = 8.02 s
+
+
+Courant Number mean: 0.0190485 max: 0.0211439
+Time = 0.06
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.242193 0.366764
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.633236 0.757807
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.242197 0.36711
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.63289 0.757803
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.039791, 0.091293, 0.021352
+gamma parameters:
+C0: avg, max,min 2090, 3884.01, 888.154
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0163632, Final residual = 2.91192e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0163632, Final residual = 2.91221e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0163632, Final residual = 1.57146e-18, No Iterations 3
+diameter: avg, max,min 0.040101, 0.0929945, 0.0211391
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00853362, Final residual = 2.34674e-05, No Iterations 2
+time step continuity errors : sum local = 2.6571e-08, global = 5.29938e-21, cumulative = 6.13501e-21
+GAMG:  Solving for p, Initial residual = 0.000367597, Final residual = 9.22368e-10, No Iterations 20
+time step continuity errors : sum local = 1.11178e-12, global = 4.08148e-21, cumulative = 1.02165e-20
+ExecutionTime = 8.15 s
+
+
+Courant Number mean: 0.0190722 max: 0.0212219
+Time = 0.061
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.241816 0.368398
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.631602 0.758184
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.241083 0.369461
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.630539 0.758917
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398016, 0.0929894, 0.021139
+gamma parameters:
+C0: avg, max,min 2090, 3923.86, 871.383
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0160795, Final residual = 2.87026e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0160795, Final residual = 2.87051e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0160795, Final residual = 1.76763e-18, No Iterations 3
+diameter: avg, max,min 0.0401263, 0.0947236, 0.0209303
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00859897, Final residual = 2.46663e-05, No Iterations 2
+time step continuity errors : sum local = 2.78386e-08, global = 4.95404e-23, cumulative = 1.0266e-20
+GAMG:  Solving for p, Initial residual = 0.000372264, Final residual = 9.79885e-10, No Iterations 22
+time step continuity errors : sum local = 1.17011e-12, global = 2.07564e-22, cumulative = 1.04736e-20
+ExecutionTime = 8.28 s
+
+
+Courant Number mean: 0.0190952 max: 0.021252
+Time = 0.062
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.239774 0.370839
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.629161 0.760226
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.238901 0.371249
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.628751 0.761099
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398123, 0.0947196, 0.0209302
+gamma parameters:
+C0: avg, max,min 2090, 3963.85, 854.596
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0158047, Final residual = 2.26711e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0158047, Final residual = 2.26722e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0158047, Final residual = 2.23334e-18, No Iterations 3
+diameter: avg, max,min 0.0401517, 0.096487, 0.0207256
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00871109, Final residual = 2.27598e-05, No Iterations 2
+time step continuity errors : sum local = 2.53015e-08, global = 1.80569e-21, cumulative = 1.22793e-20
+GAMG:  Solving for p, Initial residual = 0.000370794, Final residual = 9.26827e-10, No Iterations 14
+time step continuity errors : sum local = 1.0609e-12, global = 7.20868e-22, cumulative = 1.30002e-20
+ExecutionTime = 8.41 s
+
+
+Courant Number mean: 0.0191175 max: 0.0212835
+Time = 0.063
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.238621 0.371938
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.628062 0.761379
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.238622 0.372239
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.627761 0.761378
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398235, 0.096483, 0.0207255
+gamma parameters:
+C0: avg, max,min 2090, 4003.96, 838.067
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.015546, Final residual = 2.37647e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.015546, Final residual = 2.37658e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.015546, Final residual = 2.36389e-18, No Iterations 3
+diameter: avg, max,min 0.040178, 0.0982842, 0.0205249
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00858838, Final residual = 2.41707e-05, No Iterations 2
+time step continuity errors : sum local = 2.81048e-08, global = -1.91038e-21, cumulative = 1.10898e-20
+GAMG:  Solving for p, Initial residual = 0.000371405, Final residual = 7.77926e-10, No Iterations 21
+time step continuity errors : sum local = 9.32322e-13, global = -1.24086e-21, cumulative = 9.84892e-21
+ExecutionTime = 8.54 s
+
+
+Courant Number mean: 0.0191393 max: 0.0213194
+Time = 0.064
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.238129 0.373522
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.626478 0.761871
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.237224 0.374477
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.625523 0.762776
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398348, 0.0982802, 0.0205248
+gamma parameters:
+C0: avg, max,min 2090, 4044.13, 821.83
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0152997, Final residual = 2.84001e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0152997, Final residual = 2.84016e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0152997, Final residual = 1.85193e-18, No Iterations 3
+diameter: avg, max,min 0.0402047, 0.1, 0.020328
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.0083957, Final residual = 2.68626e-05, No Iterations 2
+time step continuity errors : sum local = 3.01949e-08, global = 3.10261e-22, cumulative = 1.01592e-20
+GAMG:  Solving for p, Initial residual = 0.000365407, Final residual = 6.80365e-10, No Iterations 18
+time step continuity errors : sum local = 8.18747e-13, global = -4.66476e-23, cumulative = 1.01125e-20
+ExecutionTime = 8.67 s
+
+
+Courant Number mean: 0.0191606 max: 0.021394
+Time = 0.065
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.23593 0.375779
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.624221 0.76407
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.235177 0.376243
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.623757 0.764823
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398464, 0.1, 0.0203279
+gamma parameters:
+C0: avg, max,min 2090, 4084.39, 805.882
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.015059, Final residual = 4.17351e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.015059, Final residual = 4.17342e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.015059, Final residual = 1.07776e-18, No Iterations 3
+diameter: avg, max,min 0.0402309, 0.1, 0.0201348
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00813412, Final residual = 2.35711e-05, No Iterations 2
+time step continuity errors : sum local = 2.65782e-08, global = 2.51825e-21, cumulative = 1.26308e-20
+GAMG:  Solving for p, Initial residual = 0.000361802, Final residual = 7.57321e-10, No Iterations 21
+time step continuity errors : sum local = 9.13535e-13, global = 2.69543e-21, cumulative = 1.53262e-20
+ExecutionTime = 8.8 s
+
+
+Courant Number mean: 0.0191814 max: 0.0214807
+Time = 0.066
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.235006 0.37697
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.62303 0.764994
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.235006 0.377401
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.622599 0.764994
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398573, 0.1, 0.0201346
+gamma parameters:
+C0: avg, max,min 2090, 4124.71, 790.194
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0148162, Final residual = 2.92374e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0148162, Final residual = 2.92384e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0148162, Final residual = 1.12412e-18, No Iterations 3
+diameter: avg, max,min 0.0402543, 0.1, 0.0199452
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00826831, Final residual = 2.61899e-05, No Iterations 2
+time step continuity errors : sum local = 3.02547e-08, global = -5.86168e-22, cumulative = 1.474e-20
+GAMG:  Solving for p, Initial residual = 0.000356556, Final residual = 9.01166e-10, No Iterations 20
+time step continuity errors : sum local = 1.1059e-12, global = -5.93581e-22, cumulative = 1.41465e-20
+ExecutionTime = 8.94 s
+
+
+Courant Number mean: 0.0192017 max: 0.0215598
+Time = 0.067
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.234388 0.378536
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.621464 0.765612
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.233388 0.379453
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.620547 0.766612
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398649, 0.1, 0.0199449
+gamma parameters:
+C0: avg, max,min 2090, 4165.11, 774.776
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0145866, Final residual = 3.02543e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0145866, Final residual = 3.02553e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0145866, Final residual = 1.16465e-18, No Iterations 3
+diameter: avg, max,min 0.0402765, 0.1, 0.0197589
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00810708, Final residual = 2.70826e-05, No Iterations 2
+time step continuity errors : sum local = 3.07961e-08, global = 2.0722e-21, cumulative = 1.62187e-20
+GAMG:  Solving for p, Initial residual = 0.000354966, Final residual = 9.642e-10, No Iterations 22
+time step continuity errors : sum local = 1.16526e-12, global = 3.04149e-21, cumulative = 1.92602e-20
+ExecutionTime = 9.07 s
+
+
+Courant Number mean: 0.0192218 max: 0.0216543
+Time = 0.068
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.232155 0.380578
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.619422 0.767845
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.231533 0.381045
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.618955 0.768467
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398709, 0.1, 0.0197586
+gamma parameters:
+C0: avg, max,min 2090, 4205.59, 759.627
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0143623, Final residual = 3.18023e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0143623, Final residual = 3.18031e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0143623, Final residual = 1.18894e-18, No Iterations 3
+diameter: avg, max,min 0.0402986, 0.1, 0.019576
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00813239, Final residual = 2.10452e-05, No Iterations 2
+time step continuity errors : sum local = 2.39778e-08, global = -1.93099e-22, cumulative = 1.90671e-20
+GAMG:  Solving for p, Initial residual = 0.000364416, Final residual = 7.3172e-10, No Iterations 21
+time step continuity errors : sum local = 8.8606e-13, global = -6.4728e-23, cumulative = 1.90023e-20
+ExecutionTime = 9.2 s
+
+
+Courant Number mean: 0.0192416 max: 0.0217436
+Time = 0.069
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.23136 0.381304
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.618696 0.76864
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.231346 0.381886
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.618114 0.768654
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398766, 0.1, 0.0195756
+gamma parameters:
+C0: avg, max,min 2090, 4246.14, 744.763
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0141511, Final residual = 3.38911e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0141511, Final residual = 3.38918e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0141511, Final residual = 1.27027e-18, No Iterations 3
+diameter: avg, max,min 0.0403203, 0.1, 0.0193964
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00806319, Final residual = 2.31284e-05, No Iterations 2
+time step continuity errors : sum local = 2.64621e-08, global = -1.97167e-22, cumulative = 1.88052e-20
+GAMG:  Solving for p, Initial residual = 0.000360185, Final residual = 8.88792e-10, No Iterations 23
+time step continuity errors : sum local = 1.07799e-12, global = 4.70725e-22, cumulative = 1.92759e-20
+ExecutionTime = 9.33 s
+
+
+Courant Number mean: 0.0192609 max: 0.0218258
+Time = 0.07
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.230649 0.382996
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.617004 0.769351
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.229684 0.384257
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.615743 0.770316
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398824, 0.1, 0.0193959
+gamma parameters:
+C0: avg, max,min 2090, 4286.76, 730.158
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0139477, Final residual = 3.5819e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0139477, Final residual = 3.58197e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0139477, Final residual = 1.36318e-18, No Iterations 3
+diameter: avg, max,min 0.040342, 0.1, 0.0192199
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00794713, Final residual = 2.22491e-05, No Iterations 2
+time step continuity errors : sum local = 2.68612e-08, global = 1.2461e-21, cumulative = 2.0522e-20
+GAMG:  Solving for p, Initial residual = 0.000357631, Final residual = 8.02903e-10, No Iterations 19
+time step continuity errors : sum local = 9.76535e-13, global = 6.76842e-22, cumulative = 2.11988e-20
+ExecutionTime = 9.46 s
+
+
+Courant Number mean: 0.0192803 max: 0.0219196
+Time = 0.071
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.228469 0.384257
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.615743 0.771531
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.227957 0.384826
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.615174 0.772043
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398875, 0.1, 0.0192194
+gamma parameters:
+C0: avg, max,min 2090, 4327.24, 715.813
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0137457, Final residual = 3.80874e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0137457, Final residual = 3.80882e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0137457, Final residual = 1.56637e-18, No Iterations 3
+diameter: avg, max,min 0.0403644, 0.1, 0.0190465
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234
+GAMG:  Solving for p, Initial residual = 0.00770903, Final residual = 2.50636e-05, No Iterations 2
+time step continuity errors : sum local = 2.84219e-08, global = 3.99307e-21, cumulative = 2.51919e-20
+GAMG:  Solving for p, Initial residual = 0.000359303, Final residual = 8.76867e-10, No Iterations 19
+time step continuity errors : sum local = 1.08339e-12, global = 2.18023e-21, cumulative = 2.73721e-20
+ExecutionTime = 9.59 s
+
+
+Courant Number mean: 0.0192992 max: 0.0220124
+Time = 0.072
+
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.227765 0.385302
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.614698 0.772235
+Phase-sum volume fraction, min, max = 1 1 1
+MULES: Solving for alphaoil
+oil volume fraction, min, max = 0.3 0.227733 0.386737
+MULES: Solving for alphawater
+water volume fraction, min, max = 0.7 0.613263 0.772267
+Phase-sum volume fraction, min, max = 1 1 1
+d32: avg, max,min 0.0398924, 0.1, 0.0190459
+gamma parameters:
+C0: avg, max,min 2090, 4367.68, 701.738
+alpha: avg, max,min 0.00505255, 0.0050526, 0.00505248
+beta: avg, max,min 4.73492, 4.735, 4.73488
+number of integration steps for breakup module: 10
+moment sources:
+m0: avg, max,min 0, 0, 0
+m1: avg, max,min 0, 0, 0
+m2: avg, max,min 0, 0, 0
+DILUPBiCG:  Solving for m0, Initial residual = 0.0135486, Final residual = 7.49375e-13, No Iterations 2
+DILUPBiCG:  Solving for m1, Initial residual = 0.0135486, Final residual = 7.49431e-13, No Iterations 2
+DILUPBiCG:  Solving for m2, Initial residual = 0.0135486, Final residual = 1.59643e-18, No Iterations 3
+diameter: avg, max,min 0.040387, 0.1, 0.0188761
+expected diameter: avg, max,min 0.0239234, 0.0239235, 0.0239234

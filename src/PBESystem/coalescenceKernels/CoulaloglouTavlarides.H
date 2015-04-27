@@ -1,0 +1,112 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::CoulaloglouTavlaridesC
+
+Description
+
+SourceFiles
+    CoulaloglouTavlaridesCI.H
+    CoulaloglouTavlaridesC.C
+    CoulaloglouTavlaridesCIO.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef CoulaloglouTavlaridesC_H
+#define CoulaloglouTavlaridesC_H
+
+#include "coalescenceKernel.H"
+#include "turbulenceModel.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace coalescenceKernels
+{
+
+/*---------------------------------------------------------------------------*\
+                         Class CoulaloglouTavlaridesC Declaration
+\*---------------------------------------------------------------------------*/
+
+class CoulaloglouTavlaridesC
+:
+    public coalescenceKernel
+{
+ private:
+  // Private data
+  const scalar c1_;
+  const scalar c2_;
+  const scalar gamma_;
+  const scalar sigma_;
+
+  //- Description of data_
+
+  // Private Member Functions
+
+  //- Disallow default bitwise copy construct
+  CoulaloglouTavlaridesC(const CoulaloglouTavlaridesC&);
+
+  //- Disallow default bitwise assignment
+  void operator=(const CoulaloglouTavlaridesC&);
+
+ public:
+
+  // Static data members
+
+  //- Static data staticData
+  TypeName("CoulaloglouTavlaridesC");
+
+  // Constructors
+
+  CoulaloglouTavlaridesC
+  (
+      const dictionary& coalescenceDict,
+      const phaseModel& continuousPhase,
+      const phaseModel& dispersedPhase
+  );
+
+  //- Destructor
+  virtual ~CoulaloglouTavlaridesC();
+
+  // Member Functions
+
+  tmp<volScalarField> S(
+      const volScalarField& xi1,
+      const volScalarField& xi2) const;
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace coalescenceModels
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

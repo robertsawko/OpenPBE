@@ -1,0 +1,35 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volSymmTensorField;
+    object      R;
+}
+// * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform (6.6e-05 0 0 6.6e-05 0 0);
+
+boundaryField
+{
+   inlet  
+    {
+        type            fixedValue;
+        value           uniform (6.6e-05 0 0 6.6e-05 0 0);
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform (6.6e-05 0 0 6.6e-05 0 0);
+    }
+    walls
+    {
+        type            kqRWallFunction;
+        value           uniform (1e-10 0 0 1e-10 0 0);
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
+}

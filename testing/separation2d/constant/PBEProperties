@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+PBESystem methodOfMoments;//methodOfClasses, methodOfMoments
+dispersedPhase oil;
+continuousPhase water;
+
+breakupKernel LoAndRao;
+LoAndRaoCoeffs
+{
+}
+noBreakupCoeffs
+{
+}
+
+coalescenceKernel Madsen;//noCoalescence;//Madsen;
+noCoalescenceCoeffs
+{
+}
+MadsenCoeffs
+{
+}
+
+
+MOCCoeffs
+{
+  numberOfClasses 3;
+  d0 0.01;
+  d1 0.02;
+  d2 0.03;
+}
+
+MOMCoeffs
+{
+  scaleDiameter 	0.01;
+  maxDiameter		0.1;
+  //parameters with default values
+  //maxGammaBeta	10.0; //default 10
+  //minGammaAlpha	1e-05; //default 1e-05;
+  maxDiameterMultiplicator	4; //default 10
+  integrationSteps		10; //default 10
+  minDiameter 		1e-5; //default 10
+  //daughterDropletsNr	2; //default 2
+}
+
+
+// ************************************************************************* //
