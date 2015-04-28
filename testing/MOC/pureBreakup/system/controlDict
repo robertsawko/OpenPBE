@@ -53,6 +53,31 @@ maxDeltaT       1;
 
 libs ("libPBE.so");
 
+functions
+{
+    probes
+    {
+        functionObjectLibs ( "libsampling.so" );
 
+        type            probes;
 
+        // Name of the directory for probe data
+        name            probes;
+
+        // Write at same frequency as fields
+        outputControl   outputTime;
+        outputInterval  1;
+
+        // Fields to be probed
+        fields
+        (
+            n0 n1 n2 n3 n4 n5 n6 n7 n8 n9
+        );
+
+        probeLocations
+        (
+            ( 0.5 0.5 0.5)        // box centre
+        );
+    }
+}
 // ************************************************************************* //
