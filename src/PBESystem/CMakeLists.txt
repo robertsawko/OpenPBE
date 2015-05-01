@@ -41,6 +41,7 @@ include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPha
 include_directories ("$ENV{FOAM_SRC}/transportModels/incompressible/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/transportModels/compressible/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude")
+include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
 #include_directories ("${PROJECT_SOURCE_DIR}/src/multiphaseTurbulence/")
 include_directories ("./")
 
