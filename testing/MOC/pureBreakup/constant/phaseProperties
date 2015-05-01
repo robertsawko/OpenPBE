@@ -30,11 +30,16 @@ air
         }
         coalescenceKernel noCoalescence;
         breakupKernel binaryBreakup;
+        daughterParticleDistribution uniformBinaryBreakup;
         noCoalescenceCoeffs
         {}
         noBreakupCoeffs
         {}
         binaryBreakupCoeffs
+        {
+                c 0.01;
+        }
+        uniformBinaryBreakupCoeffs
         {
                 c 0.01;
         }
