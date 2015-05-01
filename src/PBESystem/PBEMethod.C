@@ -42,7 +42,10 @@ Foam::PBEMethod::PBEMethod(
     const phaseModel& phase
 ) : 
     coalescence_(coalescenceKernel::New(pbeProperties, phase)),
-    breakup_(breakupKernel::New(pbeProperties, phase)) 
+    breakup_(breakupKernel::New(pbeProperties, phase)),
+    daughterParticleDistribution_(
+        daughterParticleDistribution::New(pbeProperties)
+    ) 
 {
     //TODO add some error checking. Do phases exist etc.
 }

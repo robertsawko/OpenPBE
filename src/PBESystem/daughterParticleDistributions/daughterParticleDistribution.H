@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2012 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,33 +22,24 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::PBEMethod
+    Foam::daughterParticleDistribution
 
 Description
-    Incompressible multi-phase mixture with built in solution for the
-    phase fractions with interface compression for interface-capturing.
-
-    Derived from transportModel so that it can be unsed in conjunction with
-    the incompressible turbulence models.
-
-    Surface tension and contact-angle is handled for the interface
-    between each phase-pair.
 
 SourceFiles
-    PBEMethod.C
+    daughterParticleDistributionI.H
+    daughterParticleDistribution.C
+    daughterParticleDistributionIO.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef PBEMethod_H
-#define PBEMethod_H
+#ifndef daughterParticleDistribution_H
+#define daughterParticleDistribution_H
 
-#include "dictionary.H"
-#include "autoPtr.H"
-#include "runTimeSelectionTables.H"
+//#include "fvCFD.H"
 #include "phaseModel.H"
-#include "breakupKernels/breakupKernel.H"
-#include "coalescenceKernels/coalescenceKernel.H"
-#include "daughterParticleDistributions/daughterParticleDistribution.H"
+#include "runTimeSelectionTables.H"
+#include "dictionary.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,73 +47,70 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class PBEMethod Declaration
+  Class daughterParticleDistribution Declaration
 \*---------------------------------------------------------------------------*/
 
-class PBEMethod
+class daughterParticleDistribution
 {
+ private:
+  // Private Member Functions
 
-protected:
+  //- Disallow default bitwise copy construct
+  daughterParticleDistribution(const daughterParticleDistribution&);
+
+  //- Disallow default bitwise assignment
+  void operator=(const daughterParticleDistribution&);
 
   // Protected data
-  //- coalescence kernel
-  autoPtr<coalescenceKernel> coalescence_;
-  //- breakup kernel
-  autoPtr<breakupKernel> breakup_;
-  //- breakup kernel
-  autoPtr<daughterParticleDistribution> daughterParticleDistribution_;
+ protected:
+  dictionary dpdDict_;
 
-public:
+ public:
+  TypeName("daughterParticleDistribution");
 
-  //- Runtime type information
-  TypeName("PBEMethod");
-
-
-  // Declare runtime construction
   declareRunTimeSelectionTable
   (
-     autoPtr,
-     PBEMethod,
-     dictionary,
-     (
-         const dictionary& pbeProperties,
-         const phaseModel& phase
-     ),
-     (pbeProperties, phase)
+      autoPtr,
+      daughterParticleDistribution,
+      dictionary,
+      (
+          dictionary dpdDict
+      ),
+      (dpdDict)
   );
+
+  // Static data members
+
+  //- Static data staticData
+
 
   // Constructors
 
-  //- Construct from components
-  PBEMethod(
-      const dictionary& pbeProperties,
-      const phaseModel& phase
-  );
+  //- Construct null
+  //daughterParticleDistribution();
 
-  static autoPtr<PBEMethod> New
-  (
-      const dictionary& pbeProperties,
-      const phaseModel& phase
+  //- Construct from components
+  daughterParticleDistribution(const dictionary& dpdDict);
+
+
+  // Selectors
+  static autoPtr<daughterParticleDistribution> New(
+      const dictionary& pbeDict
   );
 
   //- Destructor
-  virtual ~PBEMethod()
-  {}
+  virtual ~daughterParticleDistribution();
 
   // Member Functions
 
-  //- Dummy correct
-  virtual void correct() = 0;
+  //- Source function for the coalescence kernel used in PBE
+  virtual tmp<volScalarField> beta(
+      const volScalarField& xi1,const volScalarField& xi2) const = 0;
 
-  ////- Return the Sauter-mean diameter
-  virtual const volScalarField d() const = 0;
-
-  ////- Read base transportProperties dictionary
-  //virtual bool read(const dictionary& phaseProperties)
-  //{
-      //return true;
-  //};
+  virtual const dimensionedScalar beta(
+      const dimensionedScalar& xi1,const dimensionedScalar& xi2) const = 0;
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

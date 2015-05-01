@@ -23,48 +23,46 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "binaryBreakup.H"
+#include "uniformBinaryBreakup.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
-namespace breakupKernels
+namespace daughterParticleDistributions
 {
-defineTypeNameAndDebug(binaryBreakup, 0);
+defineTypeNameAndDebug(uniformBinaryBreakup, 0);
 addToRunTimeSelectionTable
 (
-    breakupKernel,
-    binaryBreakup,
+    daughterParticleDistribution,
+    uniformBinaryBreakup,
     dictionary
 );
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-binaryBreakup::binaryBreakup
+uniformBinaryBreakup::uniformBinaryBreakup
 (
-    const dictionary& breakupDict,
-    const phaseModel& dispersedPhase
+    const dictionary& dpdDict
 )
 :
-    breakupKernel(breakupDict, dispersedPhase)
+   daughterParticleDistribution(dpdDict)
 {
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 //
-binaryBreakup::~binaryBreakup()
+uniformBinaryBreakup::~uniformBinaryBreakup()
 {}
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-dimensionedScalar binaryBreakup::S(const dimensionedScalar& xi) const
-{
-    return pow(xi, 2);
-}
-
-tmp<volScalarField> binaryBreakup::S(const volScalarField& xi) const
+tmp<volScalarField> uniformBinaryBreakup::beta
+(
+    const volScalarField& xi1,
+    const volScalarField& xi2
+) const
 {
     return tmp<volScalarField>
     (
@@ -72,17 +70,26 @@ tmp<volScalarField> binaryBreakup::S(const volScalarField& xi) const
         (
             IOobject
             (
-                "bRate",
-                xi.mesh().time().timeName(),
-                xi.mesh(),
+                "S",
+                xi1.mesh().time().timeName(),
+                xi1.mesh(),
                 IOobject::NO_READ,
-                IOobject::NO_WRITE
+                IOobject::NO_WRITE,
+                false
             ),
-            pow(xi, 2)
+            2.0 / xi2
         )
     );
 }
 
-} //End namespace breakupKernels
+const dimensionedScalar uniformBinaryBreakup::beta
+(
+    const dimensionedScalar& xi1,
+    const dimensionedScalar& xi2
+) const
+{
+    return dimensionedScalar("beta", 2.0 / xi2);
+}
+} //End namespace daughterParticleDistributions
 } //End namespace Foam
 // ************************************************************************* //

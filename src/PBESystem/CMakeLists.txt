@@ -17,6 +17,8 @@ file(GLOB lib_source_files
   breakupKernels/binaryBreakup.C
   breakupKernels/breakupKernel.C
   breakupKernels/noBreakup.C
+  daughterParticleDistributions/daughterParticleDistribution.C
+  daughterParticleDistributions/uniformBinaryBreakup.C
   PBEDiameter.C
   PBEMethod.C
   dummy.C
