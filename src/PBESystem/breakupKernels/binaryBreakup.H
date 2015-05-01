@@ -55,7 +55,7 @@ class binaryBreakup
 {
  private:
   // Private data
-  const dimensionedScalar c_;
+  const dimensionedScalar consistency_;
   //const multiphaseTurbulence::turbulenceModel& turbulence_;
 //  const volScalarField& turbulence;
 

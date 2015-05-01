@@ -57,6 +57,7 @@ MOC::MOC
     numberOfClasses_(readLabel(MOCDict_.lookup("numberOfClasses"))),
     classNumberDensity_(numberOfClasses_),
     classVelocity_(numberOfClasses_),
+    deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
     xi_(numberOfClasses_)
 {
     Info << "Creating " << numberOfClasses_ << " class";
@@ -65,7 +66,6 @@ MOC::MOC
         Info << "es";
     Info << endl;
 
-    scalar xi1 = readScalar(MOCDict_.lookup("xi1"));
     //int phasei = 0;
     forAll(classNumberDensity_, i)
     {
@@ -74,7 +74,7 @@ MOC::MOC
         std::stringstream xiName;
         className << "n" << i; 
         //TODO: There MUST be a way of doing it more easily
-        xiName << "xi " << xi1 * i; 
+        xiName << "xi " << deltaXi_.value() * i; 
         classNumberDensity_.set
         (
             i,
@@ -95,12 +95,7 @@ MOC::MOC
         xi_.set
         (
             i,
-            new dimensionedScalar
-            (
-                xiName.str(),
-                dimVolume,
-                xi1 * i
-            )
+            new dimensionedScalar(xiName.str(), deltaXi_ * i)
         );
         Info<< className.str().c_str() << " has volume " << xi_[i]
             << endl;
@@ -185,9 +180,12 @@ volScalarField MOC::breakupSourceTerm(label i)
     breakupField -=
         breakup_().S( xi_[i]) * classNumberDensity_[i];
 
-    if (2 * i < numberOfClasses_)
+    for (label j = i + 1; j < numberOfClasses_; ++j)
+        // deltaXi comes from the application of mean value theorem on the
+        // second integral see Kumar and Ramkrishna (1996) paper
         breakupField +=
-            2 * breakup_().S( xi_[2 * i]) * classNumberDensity_[2 * i];
+            daughterParticleDistribution_().beta(xi_[i], xi_[j])
+            * breakup_().S( xi_[j]) * classNumberDensity_[j] * deltaXi_;
 
     return breakupField;
 }

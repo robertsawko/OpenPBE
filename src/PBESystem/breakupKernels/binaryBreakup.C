@@ -47,7 +47,8 @@ binaryBreakup::binaryBreakup
     const phaseModel& dispersedPhase
 )
 :
-    breakupKernel(breakupDict, dispersedPhase)
+    breakupKernel(breakupDict, dispersedPhase),
+    consistency_("c", dimensionSet(0, -6, -1, 0, 0, 0, 0), 1.0)
 {
 }
 
@@ -61,7 +62,7 @@ binaryBreakup::~binaryBreakup()
 
 dimensionedScalar binaryBreakup::S(const dimensionedScalar& xi) const
 {
-    return pow(xi, 2);
+    return consistency_ * pow(xi, 2);
 }
 
 tmp<volScalarField> binaryBreakup::S(const volScalarField& xi) const
@@ -78,7 +79,7 @@ tmp<volScalarField> binaryBreakup::S(const volScalarField& xi) const
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            pow(xi, 2)
+            consistency_ * pow(xi, 2)
         )
     );
 }

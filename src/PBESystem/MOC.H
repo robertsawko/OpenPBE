@@ -70,6 +70,9 @@ private:
  //- class velocities
  PtrList<volVectorField> classVelocity_;
 
+ //- uniform spacing of classes
+ dimensionedScalar deltaXi_;
+
  //- diameters for each class 
  PtrList<dimensionedScalar> xi_;
 
