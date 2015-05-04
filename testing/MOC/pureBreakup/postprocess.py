@@ -45,15 +45,38 @@ def set_plt_params(
     plt.rcParams.update(params)
 
 
-def total_number_graph(N=10, resolution=300, deltaX=0.01):
-    data = dict(
-        (
-            n,
-            np.genfromtxt("postProcessing/probes/0/n{0:d}".format(n))[:, 1]
-        ) for n in range(N))
+def zm_pure_breakup_total_number_solution(x, t, l):
+    """
+    This is simply an integral of Ziff and McGrady
+    """
+    return np.exp(-t * l**2) \
+        + np.trapz(2.0 * t * l * np.exp(-t * x**2), x=x)
 
-    time = np.genfromtxt("postProcessing/probes/0/n0")[:, 0]
+
+def zm_pure_breakup_pbe_solution(x, t, l):
+    """
+    This is based on Equation 25 from Ziff and McGrady
+    """
+    return np.piecewise(
+        x,
+        [x < l, x == l, x > l],
+        [
+            lambda x: 2.0 * t * l * np.exp(-t * x**2),
+            lambda x: np.exp(-t * x**2),
+            lambda x: 0.0
+        ]
+
+    )
+
+
+def total_number_graph(data, time):
+    # Total number function
     N = sum(data.values())
+
+    xi = np.linspace(0, 0.1, 100)
+    N_analytical = np.zeros(time.shape)
+    for i, t in enumerate(time):
+        N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, 0.1)
 
     #set_plt_params()
     fig = plt.figure()
@@ -62,19 +85,66 @@ def total_number_graph(N=10, resolution=300, deltaX=0.01):
     plt.xlabel("Time [s]")
     plt.ylabel("$N(t)/N(0)$")
     ax.loglog(time, N/N[0], label="Simulation")
+    ax.loglog(time, N_analytical/N_analytical[0], label="Ziff and McGrady")
     ax.legend(loc='lower right', shadow=True)
-    fig.savefig(
-        "total_number.pdf",
-        bbox_inches='tight', dpi=300)
+    fig.savefig("total_number.pdf", bbox_inches='tight')
     plt.close()
 
-total_number_graph()
 
-#time_averaged_jointpdf(
-    #N0=4000, N=10, resolution=0.02, a=3,
-    #x1=np.array([0, 0, 0]),
-    #x2=np.array([6, 0, 0]))
-#time_averaged_pdf_product(
-    #N0=4000, N=10, resolution=0.01, a=3,
-    #x1=np.array([0, 0, 0]),
-    #x2=np.array([6, 0, 0]))
+def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
+    # Number of classes
+    N = len(data)
+    v = np.linspace(deltaX, N * deltaX, N)
+    Nsimulation = dict(
+        (t, np.zeros(v.shape))
+        for t in ts
+    )
+    for t in ts:
+        ind = np.nonzero(time == t)[0]
+        for i in range(N):
+            Nsimulation[t][i] = data[i][ind]
+
+    # Calculating solutions for 0 and l values doesn't make much sense because
+    # there are no drops of volume zero and drops of size l are Dirac's delta
+    # so I don't know how ti visualise it.
+    xi = np.linspace(0, l, 100, endpoint=False)
+    N_analytical = dict(
+        (t, np.zeros(xi.shape))
+        for t in ts
+    )
+    for t in ts:
+        N_analytical[t] = zm_pure_breakup_pbe_solution(xi, t, l)
+
+    # set_plt_params()
+    fig = plt.figure()
+    ax = fig.gca()
+
+    plt.xlabel("Particle volume $[\mathrm{m}^3]$")
+    plt.ylabel("Particle number")
+    ax.set_xlim(1e-3, 0.12)
+    ax.set_ylim(1e-3, 120)
+    for t in ts:
+        ax.semilogy(v,
+            Nsimulation[t], "+", label="Simulation $t={0}$".format(t))
+        ax.semilogy(
+            xi, N_analytical[t], label="Ziff and McGrady $t={0}$".format(t))
+    ax.legend(loc='lower left', shadow=True)
+    fig.savefig("pbe.pdf", bbox_inches='tight')
+    plt.close()
+
+
+# Number of classes
+N = 10
+
+# Loading only number functions for each class
+data = dict(
+    (
+        n,
+        np.genfromtxt("postProcessing/probes/0/n{0:d}".format(n))[:, 1]
+    ) for n in range(N)
+)
+
+time = np.genfromtxt("postProcessing/probes/0/n0")[:, 0]
+
+total_number_graph(data, time)
+pbe_graph(data, time, [250, 500])
