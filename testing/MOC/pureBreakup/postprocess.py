@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib as mpl
 mpl.use("agg")
 import matplotlib.pyplot as plt
+from itertools import cycle
 
 plt.style.use('ggplot')
 plt.ioff()
@@ -122,12 +123,20 @@ def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
     plt.xlabel("Particle volume $[\mathrm{m}^3]$")
     plt.ylabel("Particle number")
     ax.set_xlim(1e-3, 0.12)
-    ax.set_ylim(1e-3, 120)
+    ax.set_ylim(1e-3, 1200)
+    linestyles = cycle(['-', '--', ':'])
+    markers = cycle(['o', 's', 'v', '*', '.', ','])
     for t in ts:
-        ax.semilogy(v,
-            Nsimulation[t], "+", label="Simulation $t={0}$".format(t))
         ax.semilogy(
-            xi, N_analytical[t], label="Ziff and McGrady $t={0}$".format(t))
+            v, Nsimulation[t], "+",
+            label="Simulation $t={0}$".format(t),
+            marker=next(markers)
+        )
+        ax.semilogy(
+            xi, N_analytical[t],
+            label="Ziff and McGrady $t={0}$".format(t),
+            linestyle=next(linestyles)
+        )
     ax.legend(loc='lower left', shadow=True)
     fig.savefig("pbe.pdf", bbox_inches='tight')
     plt.close()
@@ -147,4 +156,4 @@ data = dict(
 time = np.genfromtxt("postProcessing/probes/0/n0")[:, 0]
 
 total_number_graph(data, time)
-pbe_graph(data, time, [250, 500])
+pbe_graph(data, time, [1000, 2000])
