@@ -36,13 +36,9 @@ air
         noBreakupCoeffs
         {}
         binaryBreakupCoeffs
-        {
-                c 0.01;
-        }
+        {}
         uniformBinaryBreakupCoeffs
-        {
-                c 0.01;
-        }
+        {}
     }
 }
 
@@ -60,12 +56,8 @@ blending
 {
     default
     {
-        type            linear;
-        residualAlpha 1;
-        maxFullyDispersedAlpha.air 0.3;
-        maxPartlyDispersedAlpha.air 0.5;
-        maxFullyDispersedAlpha.water 0.3;
-        maxPartlyDispersedAlpha.water 0.5;
+        type            none;
+        continuousPhase water;
     }
 }
 
@@ -77,12 +69,6 @@ sigma
 aspectRatio
 (
     (air in water)
-    {
-        type            constant;
-        E0              1.0;
-    }
-
-    (water in air)
     {
         type            constant;
         E0              1.0;
@@ -101,29 +87,6 @@ drag
             type        none;
         }
     }
-
-    (water in air)
-    {
-        type            SchillerNaumann;
-        residualAlpha   1e-6;
-        residualRe      1e-3;
-        swarmCorrection
-        {
-            type        none;
-        }
-    }
-
-    (air and water)
-    {
-        type            segregated;
-        residualAlpha   1e-6;
-        m               0.5;
-        n               8;
-        swarmCorrection
-        {
-            type        none;
-        }
-    }
 );
 
 virtualMass
@@ -133,23 +96,11 @@ virtualMass
         type            constantCoefficient;
         Cvm             0.5;
     }
-
-    (water in air)
-    {
-        type            constantCoefficient;
-        Cvm             0.5;
-    }
 );
 
 heatTransfer
 (
     (air in water)
-    {
-        type            RanzMarshall;
-        residualAlpha   1e-4;
-    }
-
-    (water in air)
     {
         type            RanzMarshall;
         residualAlpha   1e-4;

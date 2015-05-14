@@ -74,7 +74,7 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors 3;
+    nOuterCorrectors 1;
     nCorrectors      1;
     nNonOrthogonalCorrectors 0;
     pRefCell 0;
@@ -85,7 +85,7 @@ relaxationFactors
 {
     equations
     {
-        ".*"            1;
+        "T.*"            0;
     }
 }
 

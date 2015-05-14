@@ -110,25 +110,23 @@ def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
     # so I don't know how ti visualise it.
     xi = np.linspace(0, l, 100, endpoint=False)
     N_analytical = dict(
-        (t, np.zeros(xi.shape))
+        (t, zm_pure_breakup_pbe_solution(xi, t, l))
         for t in ts
     )
-    for t in ts:
-        N_analytical[t] = zm_pure_breakup_pbe_solution(xi, t, l)
 
     # set_plt_params()
     fig = plt.figure()
     ax = fig.gca()
 
     plt.xlabel("Particle volume $[\mathrm{m}^3]$")
-    plt.ylabel("Particle number")
+    plt.ylabel("Particle number density")
     ax.set_xlim(1e-3, 0.12)
     ax.set_ylim(1e-3, 1200)
     linestyles = cycle(['-', '--', ':'])
     markers = cycle(['o', 's', 'v', '*', '.', ','])
     for t in ts:
         ax.semilogy(
-            v, Nsimulation[t], "+",
+            v, Nsimulation[t] / (l / N), "+",
             label="Simulation $t={0}$".format(t),
             marker=next(markers)
         )
