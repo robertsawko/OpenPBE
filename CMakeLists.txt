@@ -94,7 +94,6 @@ set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 add_subdirectory(ext/gtest/)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-
 #Library
 # add_subdirectory(src/PBESystem/PBEPhaseModel)
 # add_subdirectory(src/PBESystem/PBEInterfacialModels)
@@ -104,3 +103,27 @@ add_subdirectory(src/PBESystem)
 
 #Solvers
 #add_subdirectory(solvers/PBEEulerFoam)
+
+#unit tests
+find_package (Threads)
+
+set(test_SRCS
+    tests/breakup.cpp
+)
+
+include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")
+include_directories(${GTEST_INCLUDE_DIRS})
+include_directories ("$ENV{FOAM_SRC}/transportModels/incompressible/lnInclude")
+include_directories ("$ENV{FOAM_SRC}/transportModels/compressible/lnInclude")
+include_directories ("$ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude")
+include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
+add_executable(unit_tests ${test_SRCS})
+
+target_link_openfoam_userlib(unit_tests PBE)
+target_link_openfoam_libraries(unit_tests compressibleTwoPhaseSystem compressibleEulerianInterfacialModels compressibleTurbulenceModels incompressibleTurbulenceModels phaseCompressibleTurbulenceModels
+fvOptions)
+
+target_link_libraries(unit_tests ~/openPBE-build/ext/gtest/src/googletest-build/libgtest_main.a)
+target_link_libraries(unit_tests ~/openPBE-build/ext/gtest/src/googletest-build/libgtest.a)
+target_link_libraries(unit_tests  ${CMAKE_THREAD_LIBS_INIT})
+
