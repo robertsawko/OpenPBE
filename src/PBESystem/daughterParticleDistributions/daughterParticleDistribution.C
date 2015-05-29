@@ -62,10 +62,8 @@ Foam::daughterParticleDistribution::New
     );
     Info<< "Selecting daugheter particle model: " <<
         daughterParticleDistributionType << endl;
-    Info<< "Hi before iterator" << nl;
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(daughterParticleDistributionType);
-    Info<< "Hi" << nl;
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
@@ -76,7 +74,6 @@ Foam::daughterParticleDistribution::New
             << dictionaryConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
-    Info<< "Hi" << nl;
     return cstrIter()
     (
         pbeDict.subDict(daughterParticleDistributionType + "Coeffs")
