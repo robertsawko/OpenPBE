@@ -79,7 +79,6 @@ enable_testing()
 #option (UseOldLibs "Use old libraries" OFF)
 #General includes required by all code
 include_directories ("${PROJECT_SOURCE_DIR}/src/multiphaseTurbulence/turbulenceModel")
-#include_directories ("${PROJECT_SOURCE_DIR}/src/multiphaseTurbulence/RAS/RASModel")
 include_directories ("$ENV{FOAM_SRC}/OpenFOAM/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude")
 
@@ -94,13 +93,5 @@ set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 add_subdirectory(ext/gtest/)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-
 #Library
-# add_subdirectory(src/PBESystem/PBEPhaseModel)
-# add_subdirectory(src/PBESystem/PBEInterfacialModels)
 add_subdirectory(src/PBESystem)
-
-#add_subdirectory(src/multiphaseTurbulence)
-
-#Solvers
-#add_subdirectory(solvers/PBEEulerFoam)
