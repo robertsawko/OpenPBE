@@ -33,7 +33,7 @@ file(GLOB lib_source_files
 
 
 add_library(PBE SHARED ${lib_source_files})
-include_directories("${PROJECT_SOURCE_DIR}/src/eigen")
+#include_directories("${PROJECT_SOURCE_DIR}/src/eigen")
 
 #include_directories ("$ENV{FOAM_APP}/solvers/multiphase/multiphaseEulerFoam/phaseModel/lnInclude")
 #include_directories ("PBEPhaseModel/phaseModel")
