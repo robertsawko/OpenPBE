@@ -9,6 +9,7 @@ ExternalProject_Add(eigen
     # Disable configure, build, install (only checkout)
     CONFIGURE_COMMAND ""
     CMAKE_COMMAND ""
+    BUILD_COMMAND ""
     INSTALL_COMMAND ""
 )
 
