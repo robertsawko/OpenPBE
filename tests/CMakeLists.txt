@@ -10,7 +10,8 @@ include_directories ("$ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
 add_executable(unit_tests ${test_SRCS})
 
-target_link_openfoam_userlib(unit_tests PBE)
+# target_link_openfoam_userlib(unit_tests PBE)
+target_link_libraries(unit_tests PBE)
 target_link_openfoam_libraries(unit_tests compressibleTwoPhaseSystem
   compressibleEulerianInterfacialModels compressibleTurbulenceModels
   incompressibleTurbulenceModels phaseCompressibleTurbulenceModels
