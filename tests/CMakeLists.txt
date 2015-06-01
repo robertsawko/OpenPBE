@@ -11,7 +11,9 @@ include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
 add_executable(unit_tests ${test_SRCS})
 
 target_link_openfoam_userlib(unit_tests PBE)
-target_link_openfoam_libraries(unit_tests compressibleTwoPhaseSystem compressibleEulerianInterfacialModels compressibleTurbulenceModels incompressibleTurbulenceModels phaseIncompressibleTurbulenceModels
+target_link_openfoam_libraries(unit_tests compressibleTwoPhaseSystem
+  compressibleEulerianInterfacialModels compressibleTurbulenceModels
+  incompressibleTurbulenceModels phaseCompressibleTurbulenceModels
 fvOptions)
 
 target_link_libraries(unit_tests ${CMAKE_BINARY_DIR}/ext/gtest/src/googletest-build/libgtest_main.a)
