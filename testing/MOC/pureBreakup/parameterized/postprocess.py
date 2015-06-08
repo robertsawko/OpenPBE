@@ -3,6 +3,7 @@ import matplotlib as mpl
 mpl.use("agg")
 import matplotlib.pyplot as plt
 from itertools import cycle
+from os import listdir
 
 plt.style.use('ggplot')
 plt.ioff()
@@ -140,18 +141,19 @@ def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
     plt.close()
 
 
-# Number of classes
-N = 10
-
 # Loading only number functions for each class
+
+path = "postProcessing/probes/0/"
+classes = listdir(path)
+
 data = dict(
     (
         n,
-        np.genfromtxt("postProcessing/probes/0/n{0:d}".format(n))[:, 1]
-    ) for n in range(N)
+        np.genfromtxt(path+classes[n])[:, 1]
+    ) for n in range(len(classes))
 )
 
-time = np.genfromtxt("postProcessing/probes/0/n0")[:, 0]
+time = np.genfromtxt(path+"n0")[:, 0]
 
 total_number_graph(data, time)
 pbe_graph(data, time, [1000, 2000])
