@@ -1,6 +1,7 @@
 from os import path
 from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
+#import ipdb
 
 templateCase = SolutionDirectory(
     "parameterized", archive=None, paraviewLink=False)
@@ -19,9 +20,17 @@ for nC in nr_classes:
 
     phaseProperties.writeFile()
     n0 = ParsedParameterFile(path.join(case.name, "0", "n0"))
-    for i in range(1, nC-1):
-        n0.header["object"] = "n"+str(i)
-        n0.writeFileAs(path.join(case.name, "0", "n"+str(i)))
+    for i in range(1, nC - 1):
+        n0.header["object"] = "n" + str(i)
+        n0.writeFileAs(path.join(case.name, "0", "n" + str(i)))
     n0["internalField"].setUniform(1)
-    n0.header["object"] = "n"+str(nC-1)
-    n0.writeFileAs(path.join(case.name, "0", "n"+str(nC-1)))
+    n0.header["object"] = "n" + str(nC - 1)
+    n0.writeFileAs(path.join(case.name, "0", "n" + str(nC - 1)))
+
+    #ipdb.set_trace()
+    controlDict = ParsedParameterFile(
+        path.join(case.name, "system", "controlDict")
+    )
+    controlDict["functions"]["probes"]["fields"] = [
+        "n{0}".format(n) for n in range(nC)]
+    controlDict.writeFile()

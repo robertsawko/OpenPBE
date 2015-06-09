@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib as mpl
 mpl.use("agg")
+
 import matplotlib.pyplot as plt
 from itertools import cycle
 from os import listdir
@@ -80,7 +81,7 @@ def total_number_graph(data, time):
     for i, t in enumerate(time):
         N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, 0.1)
 
-    #set_plt_params()
+    # set_plt_params()
     fig = plt.figure()
     ax = fig.gca()
 
@@ -141,19 +142,22 @@ def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
     plt.close()
 
 
-# Loading only number functions for each class
+# from parametrizedVariation import nr_classes
+nr_classes = [10]
 
-path = "postProcessing/probes/0/"
-classes = listdir(path)
+for n in nr_classes:
+    # Loading only number functions for each class
+    path = "testCase{0}/postProcessing/probes/0/".format(n)
+    classes = listdir(path)
 
-data = dict(
-    (
-        n,
-        np.genfromtxt(path+classes[n])[:, 1]
-    ) for n in range(len(classes))
-)
+    data = dict(
+        (
+            n,
+            np.genfromtxt(path + classes[n])[:, 1]
+        ) for n in range(len(classes))
+    )
 
-time = np.genfromtxt(path+"n0")[:, 0]
+    time = np.genfromtxt(path + "n0")[:, 0]
 
-total_number_graph(data, time)
-pbe_graph(data, time, [1000, 2000])
+    total_number_graph(data, time)
+    pbe_graph(data, time, [1000, 2000])
