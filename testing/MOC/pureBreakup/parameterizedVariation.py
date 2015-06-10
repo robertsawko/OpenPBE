@@ -13,6 +13,7 @@ for nC in nr_classes:
     phaseProperties = ParsedParameterFile(
         path.join(case.name, "constant", "phaseProperties"))
     phaseProperties["air"]["PBEDiameterCoeffs"]["MOCCoeffs"]["numberOfClasses"] = nC
+    phaseProperties["air"]["PBEDiameterCoeffs"]["MOCCoeffs"]["xi1"] = 1.0 / nC
 
     # manually fix bad pyfoam parsing
     phaseProperties["blending"]["default"]["type"] = "none"

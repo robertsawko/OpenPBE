@@ -94,7 +94,7 @@ def total_number_graph(data, time):
     plt.close()
 
 
-def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
+def pbe_graph(data, time, ts, deltaX=0.1, l=1.0):
     # Number of classes
     N = len(data)
     v = np.linspace(deltaX, N * deltaX, N)
@@ -122,8 +122,8 @@ def pbe_graph(data, time, ts, deltaX=0.01, l=0.1):
 
     plt.xlabel("Particle volume $[\mathrm{m}^3]$")
     plt.ylabel("Particle number density")
-    ax.set_xlim(1e-3, 0.12)
-    ax.set_ylim(1e-3, 1200)
+    #ax.set_xlim(1e-3, 0.12)
+    #ax.set_ylim(1e-3, 1200)
     linestyles = cycle(['-', '--', ':'])
     markers = cycle(['o', 's', 'v', '*', '.', ','])
     for t in ts:
@@ -150,14 +150,17 @@ for n in nr_classes:
     path = "testCase{0}/postProcessing/probes/0/".format(n)
     classes = listdir(path)
 
+    import re
     data = dict(
         (
-            n,
-            np.genfromtxt(path + classes[n])[:, 1]
-        ) for n in range(len(classes))
+            int(re.findall('\d+', c)[0]),
+            np.genfromtxt(path + c)[:, 1]
+        ) for c in classes
     )
+
+    print(data)
 
     time = np.genfromtxt(path + "n0")[:, 0]
 
     total_number_graph(data, time)
-    pbe_graph(data, time, [1000, 2000])
+    pbe_graph(data, time, [100, 200])
