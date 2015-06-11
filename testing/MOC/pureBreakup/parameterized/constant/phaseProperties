@@ -25,8 +25,8 @@ air
         method methodOfClasses;
         MOCCoeffs
         {
-            numberOfClasses 10;
-            xi1 0.01;
+            numberOfClasses 20;
+            xi1 0.005;
         }
         coalescenceKernel noCoalescence;
         breakupKernel binaryBreakup;
@@ -100,7 +100,7 @@ virtualMass
 
 heatTransfer
 (
-    (air in water)
+  (air in water)
     {
         type            RanzMarshall;
         residualAlpha   1e-4;

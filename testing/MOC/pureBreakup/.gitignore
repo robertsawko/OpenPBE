@@ -1,0 +1,3 @@
+testCase*
+*.pyc
+PlyParser_FoamFileParser_parsetab.py
