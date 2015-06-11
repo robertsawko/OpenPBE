@@ -73,77 +73,25 @@ def zm_pure_breakup_pbe_solution(x, t, l):
     )
 
 
-def total_number_graph(data, time, l=1.0):
-    # Total number function
-    N = sum(data.values())
-
-    xi = np.linspace(0, l, 100)
-    N_analytical = np.zeros(time.shape)
-    for i, t in enumerate(time):
-        N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, l)
-
-    # set_plt_params()
-    fig = plt.figure()
-    ax = fig.gca()
-
-    plt.xlabel("Time [s]")
-    plt.ylabel("$N(t)/N(0)$")
-    ax.loglog(time, N / N[0], label="Simulation")
-    ax.loglog(time, N_analytical / N_analytical[0], label="Ziff and McGrady")
-    ax.legend(loc='lower right', shadow=True)
-    fig.savefig("N{0}total_number.pdf".format(len(data)), bbox_inches='tight')
-    plt.close()
+from parameterizedVariation import nr_classes, l
 
 
-def pbe_graph(data, time, ts, deltaX=0.1, l=1.0):
-    # Number of classes
-    N = len(data)
-    v = np.linspace(deltaX, N * deltaX, N)
-    Nsimulation = dict(
-        (t, np.zeros(v.shape))
-        for t in ts
-    )
-    for t in ts:
-        ind = np.nonzero(time == t)[0]
-        for i in range(N):
-            Nsimulation[t][i] = data[i][ind]
+total_fig = plt.figure()
+total_ax = total_fig.gca()
+plt.xlabel("Time [s]")
+plt.ylabel("$N(t)/N(0)$")
+pbe_fig = plt.figure()
+pbe_ax = pbe_fig.gca()
+plt.xlabel("Drop volume")
+plt.ylabel("Number density")
+linestyles = cycle(['-', '--', ':'])
+ts = [5, 10]
 
-    # Calculating solutions for 0 and l values doesn't make much sense because
-    # there are no drops of volume zero and drops of size l are Dirac's delta
-    # so I don't know how ti visualise it.
-    xi = np.linspace(0, l, 100, endpoint=False)
-    N_analytical = dict(
-        (t, zm_pure_breakup_pbe_solution(xi, t, l))
-        for t in ts
-    )
-
-    # set_plt_params()
-    fig = plt.figure()
-    ax = fig.gca()
-
-    plt.xlabel("Particle volume $[\mathrm{m}^3]$")
-    plt.ylabel("Particle number density")
-    #ax.set_xlim(1e-3, 0.12)
-    #ax.set_ylim(1e-3, 1200)
-    linestyles = cycle(['-', '--', ':'])
-    markers = cycle(['o', 's', 'v', '*', '.', ','])
-    for t in ts:
-        ax.semilogy(
-            v, Nsimulation[t] / (l / N), "+",
-            label="Simulation $t={0}$".format(t),
-            marker=next(markers)
-        )
-        ax.semilogy(
-            xi, N_analytical[t],
-            label="Ziff and McGrady $t={0}$".format(t),
-            linestyle=next(linestyles)
-        )
-    ax.legend(loc='lower left', shadow=True)
-    fig.savefig("N{0}pbe.pdf".format(N), bbox_inches='tight')
-    plt.close()
-
-
-from parameterizedVariation import nr_classes
+# Will use opacity but with consistent colors for each time step
+cc = pbe_ax._get_lines.color_cycle
+colors = dict(
+    [(t, next(cc)) for t in ts]
+)
 
 for n in nr_classes:
     # Loading only number functions for each class
@@ -159,5 +107,45 @@ for n in nr_classes:
 
     time = np.genfromtxt(path + "n0")[:, 0]
 
-    total_number_graph(data, time)
-    pbe_graph(data, time, [5, 10], deltaX=1.0 / n)
+    Ntotal = sum(data.values())
+    total_ax.loglog(time, Ntotal / Ntotal[0], label="MOC N={0}".format(n))
+
+    deltaX = 1.0 / n
+    xi_n = np.linspace(deltaX, n * deltaX, n)
+
+    for t in ts:
+        ind = np.nonzero(time == t)[0]
+        Nsimulation = np.array([data[i][ind] for i in range(n)])
+        pbe_ax.semilogy(
+            xi_n, Nsimulation / (l / n), "-",
+            color=colors[t],
+            alpha=n / 40.0,
+            label="MOC N={0} for $t={1}$".format(n, t)
+        )
+
+xi_a = np.linspace(0, l, 100, endpoint=False)
+N_analytical = dict(
+    (t, zm_pure_breakup_pbe_solution(xi_a, t, l))
+    for t in ts
+)
+for t in ts:
+    pbe_ax.semilogy(
+        xi_a, N_analytical[t], "k",
+        label="Ziff and McGrady $t={0}$".format(t),
+        linestyle=next(linestyles)
+    )
+
+pbe_ax.legend(loc='lower left', shadow=True)
+
+# Evalute the analytical solution for total number
+xi = np.linspace(0, l, 100)
+N_analytical = np.zeros(time.shape)
+for i, t in enumerate(time):
+    N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, l)
+total_ax.loglog(
+    time, N_analytical / N_analytical[0], "k", label="Ziff and McGrady")
+total_ax.legend(loc='upper left', shadow=True)
+
+total_fig.savefig("total_number.pdf", bbox_inches='tight')
+pbe_fig.savefig("pbe.pdf", bbox_inches='tight')
+plt.close()

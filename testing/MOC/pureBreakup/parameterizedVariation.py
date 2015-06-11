@@ -3,6 +3,7 @@ from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 
 nr_classes = [10, 20, 40]
+l = 1
 
 if __name__ == "__main__":
 
