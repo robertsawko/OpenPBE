@@ -5,6 +5,7 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 from itertools import cycle
 from os import listdir
+import re
 
 plt.style.use('ggplot')
 plt.ioff()
@@ -72,14 +73,14 @@ def zm_pure_breakup_pbe_solution(x, t, l):
     )
 
 
-def total_number_graph(data, time):
+def total_number_graph(data, time, l=1.0):
     # Total number function
     N = sum(data.values())
 
-    xi = np.linspace(0, 0.1, 100)
+    xi = np.linspace(0, l, 100)
     N_analytical = np.zeros(time.shape)
     for i, t in enumerate(time):
-        N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, 0.1)
+        N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, l)
 
     # set_plt_params()
     fig = plt.figure()
@@ -87,10 +88,10 @@ def total_number_graph(data, time):
 
     plt.xlabel("Time [s]")
     plt.ylabel("$N(t)/N(0)$")
-    ax.loglog(time, N/N[0], label="Simulation")
-    ax.loglog(time, N_analytical/N_analytical[0], label="Ziff and McGrady")
+    ax.loglog(time, N / N[0], label="Simulation")
+    ax.loglog(time, N_analytical / N_analytical[0], label="Ziff and McGrady")
     ax.legend(loc='lower right', shadow=True)
-    fig.savefig("total_number.pdf", bbox_inches='tight')
+    fig.savefig("N{0}total_number.pdf".format(len(data)), bbox_inches='tight')
     plt.close()
 
 
@@ -138,19 +139,17 @@ def pbe_graph(data, time, ts, deltaX=0.1, l=1.0):
             linestyle=next(linestyles)
         )
     ax.legend(loc='lower left', shadow=True)
-    fig.savefig("pbe.pdf", bbox_inches='tight')
+    fig.savefig("N{0}pbe.pdf".format(N), bbox_inches='tight')
     plt.close()
 
 
-# from parametrizedVariation import nr_classes
-nr_classes = [10]
+from parameterizedVariation import nr_classes
 
 for n in nr_classes:
     # Loading only number functions for each class
     path = "testCase{0}/postProcessing/probes/0/".format(n)
     classes = listdir(path)
 
-    import re
     data = dict(
         (
             int(re.findall('\d+', c)[0]),
@@ -158,9 +157,7 @@ for n in nr_classes:
         ) for c in classes
     )
 
-    print(data)
-
     time = np.genfromtxt(path + "n0")[:, 0]
 
     total_number_graph(data, time)
-    pbe_graph(data, time, [100, 200])
+    pbe_graph(data, time, [5, 10], deltaX=1.0 / n)
