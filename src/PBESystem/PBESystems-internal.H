@@ -1,11 +1,11 @@
 #ifndef PBESystems_internal
 #define PBESystems_internal
 
-#include "multiphaseSystem.H"
+//#include "multiphaseSystem.H"
 
 namespace Foam
 {
-namespace PBESystems
+namespace PBEMethods
 {
 namespace internal
 {

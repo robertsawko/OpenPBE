@@ -30,15 +30,20 @@ License
 #include "addToRunTimeSelectionTable.H"
 
 #include "PBESystems-internal.H"
+#include "fvScalarMatrix.H"
+#include "fvcSnGrad.H"
+#include "fvcFlux.H"
+#include "fvcAverage.H"
+#include "fvm.H"
 
 namespace Foam
 {
-namespace PBESystems
+namespace PBEMethods
 {
 
 
 defineTypeNameAndDebug(MOM, 0);
-addToRunTimeSelectionTable(PBESystem, MOM, PBESystem);
+addToRunTimeSelectionTable(PBEMethod, MOM, dictionary);
 // * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
 
 
@@ -49,71 +54,72 @@ addToRunTimeSelectionTable(PBESystem, MOM, PBESystem);
 
 MOM::MOM
 (
-    const volVectorField& U,
-    const surfaceScalarField& phi
+    const dictionary& pbeProperties,
+    const phaseModel& phase
 )
 :
-    PBESystem(U, phi),
-    MOMDict_(pbeDict_.subDict("MOMCoeffs")),
+    PBEMethod(pbeProperties, phase),
+    MOMDict_(pbeProperties.subDict("MOMCoeffs")),
+    phase_(phase),
     m0_
     (
         IOobject
         (
             "m0",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_
+        phase_.U().mesh()
     ),
     m1_
     (
         IOobject
         (
             "m1",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_
+        phase_.U().mesh()
     ),
     m2_
     (
         IOobject
         (
             "m2",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_
+        phase_.U().mesh()
     ),
     m3_
     (
         IOobject
         (
             "m3",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_
+        phase_.U().mesh()
     ),
     m0Source_
     (
         IOobject
         (
             "m0Source",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("m0Source", dimless / dimTime, 0.0)
     ),
     m1Source_
@@ -121,12 +127,12 @@ MOM::MOM
         IOobject
         (
             "m1Source",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("m1Source", dimLength / dimTime, 0.0)
     ),
     m2Source_
@@ -134,12 +140,12 @@ MOM::MOM
         IOobject
         (
             "m2Source",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("m2Source", pow(dimLength, 2) / dimTime, 0.0)
     ),
     m3Source_
@@ -147,12 +153,12 @@ MOM::MOM
         IOobject
         (
             "m3Source",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("m3Source", dimless / dimTime, 0.0)
     ),
     d32_
@@ -160,16 +166,16 @@ MOM::MOM
         //argument set to true applies this diameter in other places in the
         //solver (i.e. in drag models) leaving it empty or false prevent of
         //usign it in different places ('debug' mode)
-        dispersedPhase().calculatedD(true)
+        phase_.d()
         /*IOobject
         (
             "diameter",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("diameter", dimless, 0.0)*/
     ),
     expectedD_
@@ -177,12 +183,12 @@ MOM::MOM
         IOobject
         (
             "expectedDiameter",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("expectedDiameter", dimLength, 0.0)
     ),
     gamma_alpha_
@@ -190,12 +196,12 @@ MOM::MOM
         IOobject
         (
             "gamma_alpha",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("gamma_alpha", dimLength, 0.0)
     ),
     gamma_beta_
@@ -203,12 +209,12 @@ MOM::MOM
         IOobject
         (
             "gamma_beta",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("gamma_beta", dimless, 0.0)
     ),
     gamma_c0_
@@ -216,12 +222,12 @@ MOM::MOM
         IOobject
         (
             "gamma_c0",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar("c0", dimless, 0.0)
     ),
     scaleD_
@@ -267,12 +273,12 @@ MOM::MOM
     integrationSteps_(MOMDict_.lookupOrDefault<scalar>("integrationSteps", 10)),
     bList_(integrationSteps_),
     cList_(pow(integrationSteps_, 2)),
-    gammaList_(integrationSteps_),
-    limitedFlux_(dispersedPhase().phi()),
+    gammaList_(integrationSteps_)/*,
+    limitedFlux_(phase_.phi()),
     nAlphaSubCycles_
     (
-        readLabel(mesh_.solutionDict().subDict("PIMPLE").lookup("nAlphaSubCycles"))
-    )
+        readLabel(phase_.U().mesh().solutionDict().subDict("PIMPLE").lookup("nAlphaSubCycles"))
+    )*/
 {
 }
 
@@ -283,9 +289,9 @@ tmp<volScalarField> MOM::momentSourceTerm(label momenti)
     volScalarField bS = breakupSourceTerm(momenti);
     volScalarField cS = coalescenceSourceTerm(momenti) / scaleD_.value();
     Info << "breakup (moment "
-        << momenti << ") " << bS.weightedAverage(mesh_.V()).value() << endl;
+        << momenti << ") " << bS.weightedAverage(phase_.U().mesh().V()).value() << endl;
     Info << "coalescence (moment "
-        << momenti << ") " << cS.weightedAverage(mesh_.V()).value() << endl;
+        << momenti << ") " << cS.weightedAverage(phase_.U().mesh().V()).value() << endl;
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
@@ -294,7 +300,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 {
     dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
 
-    scalar d32Mean = max( d32_.weightedAverage(mesh_.V()).value() , SMALL);
+    scalar d32Mean = max( d32_.weightedAverage(phase_.U().mesh().V()).value() , SMALL);
     scalar maxArg = maxDiameterMultiplicator_ * d32Mean ;
     label maxIter = integrationSteps_;
     dimensionedScalar dx = xiDim * maxArg / integrationSteps_;
@@ -310,13 +316,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "Sbr",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar
             (
                 "Sbr", 
@@ -332,13 +338,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "Sbr",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar
             (
                 "Sbr", 
@@ -353,13 +359,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "f_i0",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar
             (
                 "f_i0", 
@@ -373,13 +379,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "f_i1",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar
             (
                 "f_i1", 
@@ -396,13 +402,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "arg",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar
             (
                 "arg", 
@@ -447,7 +453,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
                 avgCoalescenceRate += 
                     cList_[(iter-1)*maxIter + (iter2 - 1)].weightedAverage
                     (
-                        mesh_.V()
+                        phase_.U().mesh().V()
                     ).value()
                     / pow(maxIter,2);
                 if(iter2 == maxIter && iter==maxIter){
@@ -505,7 +511,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
     //integration step is calculated according to prescribed number of
     //integration steps
 
-    scalar d32Mean = max(d32_.weightedAverage(mesh_.V()).value(), SMALL);
+    scalar d32Mean = max(d32_.weightedAverage(phase_.U().mesh().V()).value(), SMALL);
     scalar maxArg = maxDiameterMultiplicator_ * d32Mean ;
     label maxIter = integrationSteps_;
     scalar dx = maxArg / integrationSteps_;
@@ -519,13 +525,13 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             IOobject
             (
                 "Sbr",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar
             (
                 "Sbr", 
@@ -540,13 +546,13 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
         IOobject
         (
             "f_i0",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar
         (
             "f_i0", 
@@ -560,13 +566,13 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
         IOobject
         (
             "f_i1",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar
         (
             "f_i1", 
@@ -583,13 +589,13 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
         IOobject
         (
             "arg",
-            mesh_.time().timeName(),
-            mesh_,
+            phase_.U().mesh().time().timeName(),
+            phase_.U().mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             false
         ),
-        mesh_,
+        phase_.U().mesh(),
         dimensionedScalar
         (
             "arg", 
@@ -623,7 +629,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             );
 
             avgBreakupRate += 
-                bList_[iter-1].weightedAverage(mesh_.V()).value()
+                bList_[iter-1].weightedAverage(phase_.U().mesh().V()).value()
                 / maxIter;
 
             gammaList_.set
@@ -632,12 +638,12 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
                 gammaDistribution(arg_i1 / scaleD_.value()) 
             );
 
-            maxGamma = max(maxGamma, gammaList_[iter-1].weightedAverage(mesh_.V()).value() );
+            maxGamma = max(maxGamma, gammaList_[iter-1].weightedAverage(phase_.U().mesh().V()).value() );
 
             if (iter == maxIter)
             {
                Info << "Gamma distribution values for maximum considered diameter: " 
-                    << gammaList_[iter -1].weightedAverage(mesh_.V()).value() 
+                    << gammaList_[iter -1].weightedAverage(phase_.U().mesh().V()).value()
                     << ", max: " << max(gammaList_[iter-1].internalField())
                     << ", min: " << min(gammaList_[iter-1]).value() << endl;
                 Info << "Maximum value for the distribution is: " << maxGamma << endl;
@@ -645,7 +651,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
                 Info << "Average breakup rate: " << avgBreakupRate << endl;
             }
             /*Info << "breakup kernels:" 
-                << bList[iter -1].weightedAverage(mesh_.V()).value() 
+                << bList[iter -1].weightedAverage(phase_.U().mesh().V()).value()
                 << ", max: " << max(bList[iter-1].internalField())
                 << ", min: " << min(bList[iter-1]).value() << endl;*/
 
@@ -664,15 +670,15 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             << endl;*/
         sum += (f_i1 + f_i0) * dx * 0.5 * xiDim;
             /*Info << "f0: " 
-                << f_i0.weightedAverage(mesh_.V()).value() 
+                << f_i0.weightedAverage(phase_.U().mesh().V()).value()
                 << ", max: " << max(f_i0.internalField())
                 << ", min: " << min(f_i0.internalField()) << endl;
             Info << "f1: " 
-                << f_i1.weightedAverage(mesh_.V()).value() 
+                << f_i1.weightedAverage(phase_.U().mesh().V()).value()
                 << ", max: " << max(f_i1.internalField())
                 << ", min: " << min(f_i1.internalField()) << endl;
             Info << "sum: " 
-                << sum.weightedAverage(mesh_.V()).value() 
+                << sum.weightedAverage(phase_.U().mesh().V()).value()
                 << ", max: " << max(sum.internalField())
                 << ", min: " << min(sum.internalField()) << endl;*/
         //Info << max(sum.internalField()) << endl;
@@ -686,162 +692,162 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
 
 
-void MOM::solveAlphas()
-{
-    //Solve continuos phase
-    PtrList<surfaceScalarField> phiAlphaCorrs(phases_.size());
-    int phasei = 0;
+//void MOM::solveAlphas()
+//{
+//    //Solve continuos phase
+//    PtrList<surfaceScalarField> phiAlphaCorrs(phases_.size());
+//    int phasei = 0;
 
-    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-    {
-        phaseModel& phase1 = iter();
-        volScalarField& alpha1 = phase1;
+//    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
+//    {
+//        phaseModel& phase1 = iter();
+//        volScalarField& alpha1 = phase1;
 
-        phase1.phiAlpha() =
-            dimensionedScalar("0", dimensionSet(0, 3, -1, 0, 0), 0);
+//        phase1.phiAlpha() =
+//            dimensionedScalar("0", dimensionSet(0, 3, -1, 0, 0), 0);
 
-        phiAlphaCorrs.set
-        (
-            phasei,
-            new surfaceScalarField
-            (
-                fvc::flux
-                (
-                    phi_,
-                    phase1,
-                    "div(phi," + alpha1.name() + ')'
-                )
-            )
-        );
+//        phiAlphaCorrs.set
+//        (
+//            phasei,
+//            new surfaceScalarField
+//            (
+//                fvc::flux
+//                (
+//                    phi_,
+//                    phase1,
+//                    "div(phi," + alpha1.name() + ')'
+//                )
+//            )
+//        );
 
-        surfaceScalarField& phiAlphaCorr = phiAlphaCorrs[phasei];
+//        surfaceScalarField& phiAlphaCorr = phiAlphaCorrs[phasei];
 
-        forAllIter(PtrDictionary<phaseModel>, phases_, iter2)
-        {
-            phaseModel& phase2 = iter2();
-            volScalarField& alpha2 = phase2;
+//        forAllIter(PtrDictionary<phaseModel>, phases_, iter2)
+//        {
+//            phaseModel& phase2 = iter2();
+//            volScalarField& alpha2 = phase2;
 
-            if (&phase2 == &phase1) continue;
+//            if (&phase2 == &phase1) continue;
 
-            surfaceScalarField phir(phase1.phi() - phase2.phi());
+//            surfaceScalarField phir(phase1.phi() - phase2.phi());
 
-            //RS: Do we need the cAlpha at all in PBE code?
-            scalarCoeffSymmTable::const_iterator cAlpha
-                (
-                    cAlphas_.find(interfacePair(phase1, phase2))
-                );
+//            //RS: Do we need the cAlpha at all in PBE code?
+//            scalarCoeffSymmTable::const_iterator cAlpha
+//                (
+//                    cAlphas_.find(interfacePair(phase1, phase2))
+//                );
 
-            if (cAlpha != cAlphas_.end())
-            {
-                surfaceScalarField phic
-                    (
-                        (mag(phi_) + mag(phase1.phi() - phase2.phi()))
-                        / mesh_.magSf()
-                    );
+//            if (cAlpha != cAlphas_.end())
+//            {
+//                surfaceScalarField phic
+//                    (
+//                        (mag(phi_) + mag(phase1.phi() - phase2.phi()))
+//                        / phase_.U().mesh().magSf()
+//                    );
 
-                phir += min(cAlpha() * phic, max(phic)) * nHatf(phase1, phase2);
-            }
+//                phir += min(cAlpha() * phic, max(phic)) * nHatf(phase1, phase2);
+//            }
 
-            word phirScheme
-            (
-                "div(phir," + alpha2.name() + ',' + alpha1.name() + ')'
-            );
+//            word phirScheme
+//            (
+//                "div(phir," + alpha2.name() + ',' + alpha1.name() + ')'
+//            );
 
-            phiAlphaCorr += fvc::flux
-            (
-                -fvc::flux(-phir, phase2, phirScheme),
-                phase1,
-                phirScheme
-            );
-        }
+//            phiAlphaCorr += fvc::flux
+//            (
+//                -fvc::flux(-phir, phase2, phirScheme),
+//                phase1,
+//                phirScheme
+//            );
+//        }
 
-        MULES::limit
-        (
-            geometricOneField(),
-            phase1,
-            phi_,
-            phiAlphaCorr,
-            zeroField(),
-            zeroField(),
-            1,
-            0,
-            3,
-            true
-        );
+//        MULES::limit
+//        (
+//            geometricOneField(),
+//            phase1,
+//            phi_,
+//            phiAlphaCorr,
+//            zeroField(),
+//            zeroField(),
+//            1,
+//            0,
+//            3,
+//            true
+//        );
 
-        phasei++;
-    }
+//        phasei++;
+//    }
 
-    MULES::limitSum(phiAlphaCorrs);
+//    MULES::limitSum(phiAlphaCorrs);
 
-    volScalarField sumAlpha
-    (
-        IOobject
-        (
-            "sumAlpha",
-            mesh_.time().timeName(),
-            mesh_
-        ),
-        mesh_,
-        dimensionedScalar("sumAlpha", dimless, 0)
-    );
+//    volScalarField sumAlpha
+//    (
+//        IOobject
+//        (
+//            "sumAlpha",
+//            phase_.U().mesh().time().timeName(),
+//            phase_.U().mesh()
+//        ),
+//        phase_.U().mesh(),
+//        dimensionedScalar("sumAlpha", dimless, 0)
+//    );
 
-    phasei = 0;
+//    phasei = 0;
 
-    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-    {
-        phaseModel& phase1 = iter();
+//    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
+//    {
+//        phaseModel& phase1 = iter();
 
-        surfaceScalarField& phiAlpha = phiAlphaCorrs[phasei];
-        phiAlpha += upwind<scalar>(mesh_, phi_).flux(phase1);
+//        surfaceScalarField& phiAlpha = phiAlphaCorrs[phasei];
+//        phiAlpha += upwind<scalar>(phase_.U().mesh(), phi_).flux(phase1);
 
-        MULES::explicitSolve
-            (
-                geometricOneField(),
-                phase1,
-                phiAlpha,
-                zeroField(),
-                zeroField()
-            );
-        /*
+//        MULES::explicitSolve
+//            (
+//                geometricOneField(),
+//                phase1,
+//                phiAlpha,
+//                zeroField(),
+//                zeroField()
+//            );
+//        /*
 
-           this provided correct prediction od diameter ( d32 = m3 / m2) but failed to 
-           preserve boundedness of alpha
-           fvScalarMatrix alphaEqn
-            (
-                fvm::ddt(phase1)
-                + fvm::div(phiAlpha,phase1)
-            ); 
+//           this provided correct prediction od diameter ( d32 = m3 / m2) but failed to
+//           preserve boundedness of alpha
+//           fvScalarMatrix alphaEqn
+//            (
+//                fvm::ddt(phase1)
+//                + fvm::div(phiAlpha,phase1)
+//            );
 
-        alphaEqn.relax();
-        alphaEqn.solve();*/
+//        alphaEqn.relax();
+//        alphaEqn.solve();*/
 
-        if (&phase1 == &dispersedPhase()){
-            //reuse this field in solution method for moments
-            limitedFlux_ = phiAlpha;
-        }
+//        if (&phase1 == &dispersedPhase()){
+//            //reuse this field in solution method for moments
+//            limitedFlux_ = phiAlpha;
+//        }
 
-        phase1.phiAlpha() += phiAlpha;
+//        phase1.phiAlpha() += phiAlpha;
 
-        Info<< phase1.name() << " volume fraction, min, max = "
-            << phase1.weightedAverage(mesh_.V()).value()
-            << ' ' << min(phase1).value()
-            << ' ' << max(phase1).value()
-            << endl;
+//        Info<< phase1.name() << " volume fraction, min, max = "
+//            << phase1.weightedAverage(phase_.U().mesh().V()).value()
+//            << ' ' << min(phase1).value()
+//            << ' ' << max(phase1).value()
+//            << endl;
 
-        sumAlpha += phase1;
+//        sumAlpha += phase1;
 
-        phasei++;
-    }
+//        phasei++;
+//    }
 
-    Info<< "Phase-sum volume fraction, min, max = "
-        << sumAlpha.weightedAverage(mesh_.V()).value()
-        << ' ' << min(sumAlpha).value()
-        << ' ' << max(sumAlpha).value()
-        << endl;
+//    Info<< "Phase-sum volume fraction, min, max = "
+//        << sumAlpha.weightedAverage(phase_.U().mesh().V()).value()
+//        << ' ' << min(sumAlpha).value()
+//        << ' ' << max(sumAlpha).value()
+//        << endl;
 
-    calcAlphas();
-}
+//    calcAlphas();
+//}
 
 
 tmp<volScalarField> MOM::gamma(const volScalarField& x)
@@ -851,12 +857,12 @@ tmp<volScalarField> MOM::gamma(const volScalarField& x)
             IOobject
             (
                 "gamma",
-                mesh_.time().timeName(),
-                mesh_,
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            mesh_,
+            phase_.U().mesh(),
             dimensionedScalar("gamma", dimless, 0.0)
         );
     scalar pi = constant::mathematical::pi;
@@ -911,21 +917,21 @@ void MOM::updateMoments()
     d32_ = min(d32_,  maxD_);
     d32_ = max(d32_,  minD_);
     Info << "d32: avg, max,min "
-        << d32_.weightedAverage(mesh_.V()).value() 
+        << d32_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(d32_).value()
         << ", " << min(d32_).value() << endl;
 
     Info << "gamma parameters:" << endl;
     Info << "C0: avg, max,min "
-        << gamma_c0_.weightedAverage(mesh_.V()).value() 
+        << gamma_c0_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(gamma_c0_).value()
         << ", " << min(gamma_c0_).value() << endl;
     Info << "alpha: avg, max,min " 
-        << gamma_alpha_.weightedAverage(mesh_.V()).value() 
+        << gamma_alpha_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(gamma_alpha_).value()
         << ", " << min(gamma_alpha_).value() << endl;
     Info << "beta: avg, max,min " 
-        << gamma_beta_.weightedAverage(mesh_.V()).value() 
+        << gamma_beta_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(gamma_beta_).value()
         << ", " << min(gamma_beta_).value() << endl;
 
@@ -942,7 +948,7 @@ void MOM::updateMoments()
     m3Source_.boundaryField() = 0;
 
     //fix for nan values
-    forAll(mesh_.C(), celli)
+    forAll(phase_.U().mesh().C(), celli)
     {
         if ( m0Source_[celli] != m0Source_[celli] )
         {
@@ -960,22 +966,22 @@ void MOM::updateMoments()
 
     Info << "moment sources:" << endl;
     Info << "m0: avg, max,min " 
-        << m0Source_.weightedAverage(mesh_.V()).value() 
+        << m0Source_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(m0Source_).value()
         << ", " << min(m0Source_).value() << endl;
     Info << "m1: avg, max,min " 
-        << m1Source_.weightedAverage(mesh_.V()).value() 
+        << m1Source_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(m1Source_).value()
         << ", " << min(m1Source_).value() << endl;
     Info << "m2: avg, max,min " 
-        << m2Source_.weightedAverage(mesh_.V()).value() 
+        << m2Source_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(m2Source_).value()
         << ", " << min(m2Source_).value() << endl;
 
     fvScalarMatrix m0Eqn
         (
             fvm::ddt(m0_)
-            + fvm::div(dispersedPhase().phi(),m0_)
+            + fvm::div(phase_.phi(),m0_)
             //+ fvm::div(limitedFlux_,m0_)
             ==
             m0Source_
@@ -986,7 +992,7 @@ void MOM::updateMoments()
     fvScalarMatrix m1Eqn
         (
             fvm::ddt(m1_)
-            + fvm::div(dispersedPhase().phi(),m1_)
+            + fvm::div(phase_.phi(),m1_)
             //+ fvm::div(limitedFlux_,m1_)
             ==
             m1Source_
@@ -997,7 +1003,7 @@ void MOM::updateMoments()
     fvScalarMatrix m2Eqn
         (
             fvm::ddt(m2_)
-            + fvm::div(dispersedPhase().phi(),m2_)
+            + fvm::div(phase_.phi(),m2_)
             //+ fvm::div(limitedFlux_,m2_)
             ==
             m2Source_
@@ -1008,7 +1014,7 @@ void MOM::updateMoments()
     fvScalarMatrix m3Eqn
         (
             fvm::ddt(m3_)
-            + fvm::div(dispersedPhase().phi(),m3_)
+            + fvm::div(phase_.phi(),m3_)
             //+ fvm::div(limitedFlux_,m3_)
             ==
             m3Source_
@@ -1051,136 +1057,136 @@ void MOM::updateMoments()
     expectedD_ = gamma_alpha_ * gamma_beta_ * scaleD_.value();
 
     Info << "diameter: avg, max,min " 
-        << d32_.weightedAverage(mesh_.V()).value() 
+        << d32_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(d32_).value()
         << ", " << min(d32_).value() << endl;
     Info << "expected diameter: avg, max,min " 
-        << expectedD_.weightedAverage(mesh_.V()).value() 
+        << expectedD_.weightedAverage(phase_.U().mesh().V()).value()
         << ", " << max(expectedD_).value()
         << ", " << min(expectedD_).value() << endl;
 };
 
 void MOM::solve()
 {
-    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-    {
-        iter().correct();
-    }
+//    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
+//    {
+//        iter().correct();
+//    }
 
-    const Time& runTime = mesh_.time();
+//    const Time& runTime = phase_.U().mesh().time();
 
-    if (nAlphaSubCycles_ > 1)
-    {
-        dimensionedScalar totalDeltaT = runTime.deltaT();
+//    if (nAlphaSubCycles_ > 1)
+//    {
+//        dimensionedScalar totalDeltaT = runTime.deltaT();
 
-        /*volScalarField m0_0 = m0_.oldTime();
-        volScalarField m1_0 = m1_.oldTime();
-        volScalarField m2_0 = m2_.oldTime();
-        volScalarField m3_0 = m3_.oldTime();*/
+//        /*volScalarField m0_0 = m0_.oldTime();
+//        volScalarField m1_0 = m1_.oldTime();
+//        volScalarField m2_0 = m2_.oldTime();
+//        volScalarField m3_0 = m3_.oldTime();*/
 
-        PtrList<volScalarField> alpha0s(phases_.size());
-        PtrList<surfaceScalarField> phiSums(phases_.size());
+//        PtrList<volScalarField> alpha0s(phases_.size());
+//        PtrList<surfaceScalarField> phiSums(phases_.size());
 
-        int phasei = 0;
-        forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-        {
-            phaseModel& phase = iter();
-            volScalarField& alpha = phase;
+//        int phasei = 0;
+//        forAllIter(PtrDictionary<phaseModel>, phases_, iter)
+//        {
+//            phaseModel& phase = iter();
+//            volScalarField& alpha = phase;
 
-            alpha0s.set
-            (
-                phasei,
-                new volScalarField(alpha.oldTime())
-            );
+//            alpha0s.set
+//            (
+//                phasei,
+//                new volScalarField(alpha.oldTime())
+//            );
 
-            phiSums.set
-            (
-                phasei,
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        "phiSum" + alpha.name(),
-                        runTime.timeName(),
-                        mesh_
-                    ),
-                    mesh_,
-                    dimensionedScalar("0", dimensionSet(0, 3, -1, 0, 0), 0)
-                )
-            );
-            phasei++;
-        }
+//            phiSums.set
+//            (
+//                phasei,
+//                new surfaceScalarField
+//                (
+//                    IOobject
+//                    (
+//                        "phiSum" + alpha.name(),
+//                        runTime.timeName(),
+//                        phase_.U().mesh()
+//                    ),
+//                    phase_.U().mesh(),
+//                    dimensionedScalar("0", dimensionSet(0, 3, -1, 0, 0), 0)
+//                )
+//            );
+//            phasei++;
+//        }
 
-        for
-        (
-            subCycleTime alphaSubCycle
-            (
-                const_cast<Time&>(runTime),
-                nAlphaSubCycles_
-            );
-            !(++alphaSubCycle).end();
-        )
-        {
-            //Is this in the right order? phiSums and solveAlphas
-            solveAlphas();
+//        for
+//        (
+//            subCycleTime alphaSubCycle
+//            (
+//                const_cast<Time&>(runTime),
+//                nAlphaSubCycles_
+//            );
+//            !(++alphaSubCycle).end();
+//        )
+//        {
+//            //Is this in the right order? phiSums and solveAlphas
+//            solveAlphas();
 
-            int phasei = 0;
-            forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-            {
-                phiSums[phasei] += 
-                    (runTime.deltaT() / totalDeltaT) * iter().phi();
-                phasei++;
-            }
-        }
+//            int phasei = 0;
+//            forAllIter(PtrDictionary<phaseModel>, phases_, iter)
+//            {
+//                phiSums[phasei] +=
+//                    (runTime.deltaT() / totalDeltaT) * iter().phi();
+//                phasei++;
+//            }
+//        }
 
-        phasei = 0;
-        forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-        {
-            phaseModel& phase = iter();
-            volScalarField& alpha = phase;
+//        phasei = 0;
+//        forAllIter(PtrDictionary<phaseModel>, phases_, iter)
+//        {
+//            phaseModel& phase = iter();
+//            volScalarField& alpha = phase;
 
-            //Is this supposed to correct velocity field? I don't think this is
-            //doing anything.
-            phase.phi() = phiSums[phasei];
+//            //Is this supposed to correct velocity field? I don't think this is
+//            //doing anything.
+//            phase.phi() = phiSums[phasei];
 
-            // Correct the time index of the field
-            // to correspond to the global time
-            alpha.timeIndex() = runTime.timeIndex();
+//            // Correct the time index of the field
+//            // to correspond to the global time
+//            alpha.timeIndex() = runTime.timeIndex();
 
-            /*m0_.timeIndex() = runTime.timeIndex();
-            m1_.timeIndex() = runTime.timeIndex();
-            m2_.timeIndex() = runTime.timeIndex();
-            m3_.timeIndex() = runTime.timeIndex();*/
+//            /*m0_.timeIndex() = runTime.timeIndex();
+//            m1_.timeIndex() = runTime.timeIndex();
+//            m2_.timeIndex() = runTime.timeIndex();
+//            m3_.timeIndex() = runTime.timeIndex();*/
 
-            // Reset the old-time field value
-            alpha.oldTime() = alpha0s[phasei];
-            alpha.oldTime().timeIndex() = runTime.timeIndex();
+//            // Reset the old-time field value
+//            alpha.oldTime() = alpha0s[phasei];
+//            alpha.oldTime().timeIndex() = runTime.timeIndex();
 
-            /*m0_.oldTime() = m0_0;
-            m1_.oldTime() = m1_0;
-            m2_.oldTime() = m2_0;
-            m3_.oldTime() = m3_0;
-            m0_.oldTime().timeIndex() = runTime.timeIndex();
-            m1_.oldTime().timeIndex() = runTime.timeIndex();
-            m2_.oldTime().timeIndex() = runTime.timeIndex();
-            m3_.oldTime().timeIndex() = runTime.timeIndex();*/
+//            /*m0_.oldTime() = m0_0;
+//            m1_.oldTime() = m1_0;
+//            m2_.oldTime() = m2_0;
+//            m3_.oldTime() = m3_0;
+//            m0_.oldTime().timeIndex() = runTime.timeIndex();
+//            m1_.oldTime().timeIndex() = runTime.timeIndex();
+//            m2_.oldTime().timeIndex() = runTime.timeIndex();
+//            m3_.oldTime().timeIndex() = runTime.timeIndex();*/
 
-            phasei++;
-        }
+//            phasei++;
+//        }
 
-    }
-    else
-    {
-        solveAlphas();
-        //updateMoments();
-    }
+//    }
+//    else
+//    {
+//        solveAlphas();
+//        //updateMoments();
+//    }
 
     updateMoments();
 }
 
 
 
-}//end namespace PBESystem
+}//end namespace PBEMethods
 }//end namespace Foam
 
 // ************************************************************************* //

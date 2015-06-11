@@ -19,6 +19,7 @@ set(lib_header_files
   PBEMethod.H
   dummy.H
   MOC.H
+  MOM.H
 )
 
 set(lib_source_files
@@ -33,6 +34,7 @@ set(lib_source_files
   PBEMethod.C
   dummy.C
   MOC.C
+  MOM.C
 )
 
 add_library(PBE SHARED ${lib_header_files} ${lib_source_files})

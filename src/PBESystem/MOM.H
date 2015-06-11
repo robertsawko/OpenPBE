@@ -42,22 +42,23 @@ SourceFiles
 #ifndef MOMPBE_H
 #define MOMPBE_H
 
-#include "PBESystem.H"
+#include "PBEMethod.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace PBESystems
+namespace PBEMethods
 {
 /*---------------------------------------------------------------------------*\
                       Class MOM Declaration
 \*---------------------------------------------------------------------------*/
 
-class MOM : public PBESystem
+class MOM : public PBEMethod
 {
 private:
  const dictionary MOMDict_;
+ const phaseModel& phase_;
  //first three moments
  volScalarField m0_;
  volScalarField m1_;
@@ -76,7 +77,7 @@ private:
  volScalarField m3Source_;
 
  //Sauter mean diameter
- volScalarField& d32_;
+ volScalarField d32_;
  //expected diameter TODO: it's only for debugging purposes; to be removed later
  volScalarField expectedD_;
 
@@ -110,7 +111,7 @@ private:
  PtrList<volScalarField> gammaList_;
 
  //used to copy flux calculated in solveAlphas() to updateMoments() method
- surfaceScalarField limitedFlux_;
+ //surfaceScalarField limitedFlux_;
 
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);
@@ -120,7 +121,7 @@ private:
  tmp<volScalarField> momentSourceTerm(label momenti);
 
  //- Sub-cycle number
- label nAlphaSubCycles_;
+ //label nAlphaSubCycles_;
 
  // Private member functions
  
@@ -157,9 +158,16 @@ public:
  //- Construct from components
  MOM
  (
-     const volVectorField& U,
-     const surfaceScalarField& phi
+     const dictionary& pbeProperties,
+     const phaseModel& phase
  );
+
+ //- Dummy correct
+ virtual void correct();
+
+ ////- Return the Sauter-mean diameter
+ virtual const volScalarField d() const;
+
 
 
  //- Destructor
@@ -173,7 +181,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace PBESystems
+} // End namespace PBEMethods
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

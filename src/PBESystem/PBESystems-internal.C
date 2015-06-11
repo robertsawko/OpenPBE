@@ -3,7 +3,7 @@
 namespace Foam
 {
 
-scalar PBESystems::internal::gamma(const scalar& x)
+scalar PBEMethods::internal::gamma(const scalar& x)
 {
 	scalar e = constant::mathematical::e;
 	scalar pi = constant::mathematical::pi;
