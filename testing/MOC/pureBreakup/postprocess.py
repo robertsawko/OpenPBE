@@ -1,4 +1,5 @@
-import numpy as np
+from numpy import (
+    array, exp, genfromtxt, linspace, nonzero, sqrt, piecewise, trapz, zeros)
 import matplotlib as mpl
 mpl.use("agg")
 
@@ -16,7 +17,7 @@ def set_plt_params(
 
     fig_width_pt = page_width * relative_fig_width
     inches_per_pt = 1.0 / 72.27               # Convert pt to inch
-    golden_mean = (np.sqrt(5.0) - 1.0) / 2.0  # Aesthetic ratio
+    golden_mean = (sqrt(5.0) - 1.0) / 2.0  # Aesthetic ratio
     fig_width = fig_width_pt * inches_per_pt  # width in inches
 
     if landscape:
@@ -49,24 +50,28 @@ def set_plt_params(
     plt.rcParams.update(params)
 
 
+def L2_relative_error(x, f, g):
+    return sqrt(trapz((f - g)**2, x=x)) / sqrt(trapz(f**2, x=x))
+
+
 def zm_pure_breakup_total_number_solution(x, t, l):
     """
     This is simply an integral of Ziff and McGrady
     """
-    return np.exp(-t * l**2) \
-        + np.trapz(2.0 * t * l * np.exp(-t * x**2), x=x)
+    return exp(-t * l**2) \
+        + trapz(2.0 * t * l * exp(-t * x**2), x=x)
 
 
 def zm_pure_breakup_pbe_solution(x, t, l):
     """
     This is based on Equation 25 from Ziff and McGrady
     """
-    return np.piecewise(
+    return piecewise(
         x,
         [x < l, x == l, x > l],
         [
-            lambda x: 2.0 * t * l * np.exp(-t * x**2),
-            lambda x: np.exp(-t * x**2),
+            lambda x: 2.0 * t * l * exp(-t * x**2),
+            lambda x: exp(-t * x**2),
             lambda x: 0.0
         ]
 
@@ -101,21 +106,21 @@ for n in nr_classes:
     data = dict(
         (
             int(re.findall('\d+', c)[0]),
-            np.genfromtxt(path + c)[:, 1]
+            genfromtxt(path + c)[:, 1]
         ) for c in classes
     )
 
-    time = np.genfromtxt(path + "n0")[:, 0]
+    time = genfromtxt(path + "n0")[:, 0]
 
     Ntotal = sum(data.values())
     total_ax.loglog(time, Ntotal / Ntotal[0], label="MOC N={0}".format(n))
 
     deltaX = 1.0 / n
-    xi_n = np.linspace(deltaX, n * deltaX, n)
+    xi_n = linspace(deltaX, n * deltaX, n)
 
     for t in ts:
-        ind = np.nonzero(time == t)[0]
-        Nsimulation = np.array([data[i][ind] for i in range(n)])
+        ind = nonzero(time == t)[0]
+        Nsimulation = array([data[i][ind] for i in range(n)])
         pbe_ax.semilogy(
             xi_n, Nsimulation / (l / n), "-",
             color=colors[t],
@@ -123,7 +128,7 @@ for n in nr_classes:
             label="MOC N={0} for $t={1}$".format(n, t)
         )
 
-xi_a = np.linspace(0, l, 100, endpoint=False)
+xi_a = linspace(0, l, 100, endpoint=False)
 N_analytical = dict(
     (t, zm_pure_breakup_pbe_solution(xi_a, t, l))
     for t in ts
@@ -138,8 +143,8 @@ for t in ts:
 pbe_ax.legend(loc='lower left', shadow=True)
 
 # Evalute the analytical solution for total number
-xi = np.linspace(0, l, 100)
-N_analytical = np.zeros(time.shape)
+xi = linspace(0, l, 100)
+N_analytical = zeros(time.shape)
 for i, t in enumerate(time):
     N_analytical[i] = zm_pure_breakup_total_number_solution(xi, t, l)
 total_ax.loglog(
