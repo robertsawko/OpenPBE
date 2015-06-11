@@ -1,8 +1,6 @@
 from numpy import (
     arange, array, exp, genfromtxt, linspace, nonzero,
     sqrt, piecewise, trapz, zeros)
-import matplotlib as mpl
-mpl.use("agg")
 from numpy.testing import assert_almost_equal, assert_array_less
 from os import listdir
 import re
