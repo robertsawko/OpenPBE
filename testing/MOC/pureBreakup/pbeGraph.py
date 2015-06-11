@@ -1,8 +1,8 @@
-from numpy import (
-    array, exp, genfromtxt, linspace, nonzero, sqrt, piecewise, trapz, zeros)
+from numpy import array, genfromtxt, linspace, nonzero, sqrt, zeros
 import matplotlib as mpl
 mpl.use("agg")
-
+from testConvergence import (
+    zm_pure_breakup_pbe_solution, zm_pure_breakup_total_number_solution)
 import matplotlib.pyplot as plt
 from itertools import cycle
 from os import listdir
@@ -50,34 +50,6 @@ def set_plt_params(
     plt.rcParams.update(params)
 
 
-def L2_relative_error(x, f, g):
-    return sqrt(trapz((f - g)**2, x=x)) / sqrt(trapz(f**2, x=x))
-
-
-def zm_pure_breakup_total_number_solution(x, t, l):
-    """
-    This is simply an integral of Ziff and McGrady
-    """
-    return exp(-t * l**2) \
-        + trapz(2.0 * t * l * exp(-t * x**2), x=x)
-
-
-def zm_pure_breakup_pbe_solution(x, t, l):
-    """
-    This is based on Equation 25 from Ziff and McGrady
-    """
-    return piecewise(
-        x,
-        [x < l, x == l, x > l],
-        [
-            lambda x: 2.0 * t * l * exp(-t * x**2),
-            lambda x: exp(-t * x**2),
-            lambda x: 0.0
-        ]
-
-    )
-
-
 from parameterizedVariation import nr_classes, l
 
 
@@ -98,6 +70,7 @@ colors = dict(
     [(t, next(cc)) for t in ts]
 )
 
+
 for n in nr_classes:
     # Loading only number functions for each class
     path = "testCase{0}/postProcessing/probes/0/".format(n)
@@ -117,14 +90,13 @@ for n in nr_classes:
 
     deltaX = 1.0 / n
     xi_n = linspace(deltaX, n * deltaX, n)
-
     for t in ts:
-        ind = nonzero(time == t)[0]
+        ind = nonzero(time == t)[0][0]
         Nsimulation = array([data[i][ind] for i in range(n)])
         pbe_ax.semilogy(
             xi_n, Nsimulation / (l / n), "-",
             color=colors[t],
-            alpha=n / 40.0,
+            alpha=n / nr_classes[-1],
             label="MOC N={0} for $t={1}$".format(n, t)
         )
 

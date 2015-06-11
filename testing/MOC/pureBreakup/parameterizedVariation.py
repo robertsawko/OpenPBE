@@ -2,7 +2,7 @@ from os import path
 from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 
-nr_classes = [10, 20, 40]
+nr_classes = [10, 20, 40, 80]
 l = 1
 
 if __name__ == "__main__":
