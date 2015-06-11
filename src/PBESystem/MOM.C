@@ -282,6 +282,16 @@ MOM::MOM
 {
 }
 
+void MOM::correct()
+{
+
+}
+
+const volScalarField MOM::d() const
+{
+    return d32_;
+}
+
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 tmp<volScalarField> MOM::momentSourceTerm(label momenti)

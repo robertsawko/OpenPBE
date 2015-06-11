@@ -163,10 +163,10 @@ public:
  );
 
  //- Dummy correct
- virtual void correct();
+ virtual void correct() override;
 
  ////- Return the Sauter-mean diameter
- virtual const volScalarField d() const;
+ virtual const volScalarField d() const override;
 
 
 
