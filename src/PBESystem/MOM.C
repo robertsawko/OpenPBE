@@ -508,6 +508,14 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 
 }
 
+void MOM::printAvgMaxMin(const volScalarField &v) const
+{
+    Info<< v.name() << ": avg, max,min "
+        << v.weightedAverage(phase_.U().mesh().V()).value()
+        << ", " << max(v).value()
+        << ", " << min(v).value() << endl;
+}
+
 tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 {
     //this function integrates the momentum kernel according to an assumed shape
@@ -754,7 +762,7 @@ tmp<volScalarField> MOM::gammaDistribution(const dimensionedScalar xi)
 
 void MOM::updateMoments()
 {
-    Info << "updating size moments" << endl;
+    Info<< "updating size moments" << endl;
     gamma_c0_ = m0_;
     gamma_alpha_ = ( m0_ * m2_ - pow(m1_, 2) ) 
         / (m0_ * m1_
@@ -766,24 +774,12 @@ void MOM::updateMoments()
     d32_ = m3_ * scaleD_ * scaleM3_  / m2_;
     d32_ = min(d32_,  maxD_);
     d32_ = max(d32_,  minD_);
-    Info << "d32: avg, max,min "
-        << d32_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(d32_).value()
-        << ", " << min(d32_).value() << endl;
 
-    Info << "gamma parameters:" << endl;
-    Info << "C0: avg, max,min "
-        << gamma_c0_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(gamma_c0_).value()
-        << ", " << min(gamma_c0_).value() << endl;
-    Info << "alpha: avg, max,min " 
-        << gamma_alpha_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(gamma_alpha_).value()
-        << ", " << min(gamma_alpha_).value() << endl;
-    Info << "beta: avg, max,min " 
-        << gamma_beta_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(gamma_beta_).value()
-        << ", " << min(gamma_beta_).value() << endl;
+    printAvgMaxMin(d32_);
+    Info<< "gamma parameters:" << endl;
+    printAvgMaxMin(gamma_c0_);
+    printAvgMaxMin(gamma_alpha_);
+    printAvgMaxMin(gamma_beta_);
 
     m0Source_ = momentSourceTerm(0) / scaleD_.value();
     m1Source_ = momentSourceTerm(1) / pow(scaleD_.value(), 2);
@@ -814,19 +810,10 @@ void MOM::updateMoments()
         }
     }
 
-    Info << "moment sources:" << endl;
-    Info << "m0: avg, max,min " 
-        << m0Source_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(m0Source_).value()
-        << ", " << min(m0Source_).value() << endl;
-    Info << "m1: avg, max,min " 
-        << m1Source_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(m1Source_).value()
-        << ", " << min(m1Source_).value() << endl;
-    Info << "m2: avg, max,min " 
-        << m2Source_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(m2Source_).value()
-        << ", " << min(m2Source_).value() << endl;
+    Info<< "moment sources:" << endl;
+    printAvgMaxMin(m0Source_);
+    printAvgMaxMin(m1Source_);
+    printAvgMaxMin(m2Source_);
 
     fvScalarMatrix m0Eqn
         (
@@ -877,27 +864,11 @@ void MOM::updateMoments()
     m1_ = max(m1_, dimensionedScalar("m1", m1_.dimensions(), SMALL) );
     m2_ = max(m2_, dimensionedScalar("m2", m2_.dimensions(), SMALL) );
     m3_ = max(m3_, dimensionedScalar("m3", m3_.dimensions(), SMALL) );
-    
-    Info << "m0: avg, max,min " 
-        << m0_.weightedAverage(m0_.mesh().V()).value() 
-        << ", " << max(m0_).value()
-        << ", " << min(m0_).value() << endl;
 
-    Info << "m1: avg, max,min " 
-        << m1_.weightedAverage(m1_.mesh().V()).value() 
-        << ", " << max(m1_).value()
-        << ", " << min(m1_).value() << endl;
-
-    Info << "m2: avg, max,min " 
-        << m2_.weightedAverage(m2_.mesh().V()).value() 
-        << ", " << max(m2_).value()
-        << ", " << min(m2_).value() << endl;
-
-    Info << "m3: avg, max,min " 
-        << m3_.weightedAverage(m3_.mesh().V()).value() 
-        << ", " << max(m3_).value()
-        << ", " << min(m3_).value() << endl;
-
+    printAvgMaxMin(m0_);
+    printAvgMaxMin(m1_);
+    printAvgMaxMin(m2_);
+    printAvgMaxMin(m3_);
 
     d32_ = m3_ * scaleD_ * scaleM3_ / m2_;
     //d32_ = dispersedPhase() * scaleD_ *6.0 / (m2_ * constant::mathematical::pi);
@@ -906,15 +877,9 @@ void MOM::updateMoments()
 
     expectedD_ = gamma_alpha_ * gamma_beta_ * scaleD_.value();
 
-    Info << "diameter: avg, max,min " 
-        << d32_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(d32_).value()
-        << ", " << min(d32_).value() << endl;
-    Info << "expected diameter: avg, max,min " 
-        << expectedD_.weightedAverage(phase_.U().mesh().V()).value()
-        << ", " << max(expectedD_).value()
-        << ", " << min(expectedD_).value() << endl;
-};
+    printAvgMaxMin(d32_);
+    printAvgMaxMin(expectedD_);
+}
 
 void MOM::solve()
 {

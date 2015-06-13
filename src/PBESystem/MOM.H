@@ -63,6 +63,9 @@ private:
  volScalarField m0_;
  volScalarField m1_;
  volScalarField m2_;
+
+ void printAvgMaxMin(const volScalarField& v) const;
+
  //m3_ should not be here since it is the same as alpha multiplied by constant
  //factor (in theory)
  //but convecting alpha with MULES give different results than convecting m2_
