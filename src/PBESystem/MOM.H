@@ -43,6 +43,7 @@ SourceFiles
 #define MOMPBE_H
 
 #include "PBEMethod.H"
+#include <array>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,18 +60,14 @@ class MOM : public PBEMethod
 private:
  const dictionary MOMDict_;
  const phaseModel& phase_;
- //first three moments
- volScalarField m0_;
- volScalarField m1_;
- volScalarField m2_;
-
- void printAvgMaxMin(const volScalarField& v) const;
-
+ //moments
  //m3_ should not be here since it is the same as alpha multiplied by constant
  //factor (in theory)
  //but convecting alpha with MULES give different results than convecting m2_
  //which produce error in diameter d32_ = m3 / m2
- volScalarField m3_;
+ std::array<volScalarField, 4> moments_;
+
+ void printAvgMaxMin(const volScalarField& v) const;
 
  //source terms are stored so they do not have to be recalculated in every
  //iteration of alpha sub-cycle

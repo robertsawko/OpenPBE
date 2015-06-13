@@ -61,7 +61,8 @@ MOM::MOM
     PBEMethod(pbeProperties, phase),
     MOMDict_(pbeProperties.subDict("MOMCoeffs")),
     phase_(phase),
-    m0_
+    moments_{{
+    volScalarField
     (
         IOobject
         (
@@ -73,7 +74,7 @@ MOM::MOM
         ),
         phase_.U().mesh()
     ),
-    m1_
+    volScalarField
     (
         IOobject
         (
@@ -85,7 +86,7 @@ MOM::MOM
         ),
         phase_.U().mesh()
     ),
-    m2_
+    volScalarField
     (
         IOobject
         (
@@ -97,7 +98,7 @@ MOM::MOM
         ),
         phase_.U().mesh()
     ),
-    m3_
+    volScalarField
     (
         IOobject
         (
@@ -108,7 +109,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         phase_.U().mesh()
-    ),
+    )}},
     m0Source_
     (
         IOobject
@@ -763,15 +764,15 @@ tmp<volScalarField> MOM::gammaDistribution(const dimensionedScalar xi)
 void MOM::updateMoments()
 {
     Info<< "updating size moments" << endl;
-    gamma_c0_ = m0_;
-    gamma_alpha_ = ( m0_ * m2_ - pow(m1_, 2) ) 
-        / (m0_ * m1_
+    gamma_c0_ = moments_[0];
+    gamma_alpha_ = ( moments_[0] * moments_[2] - pow(moments_[1], 2) )
+        / (moments_[0] * moments_[1]
            + dimensionedScalar("small", dimensionSet(0,1,0,0,0),SMALL ) );
-    gamma_beta_ = pow(m1_ , 2) 
-        / (m2_ * m0_ - pow(m1_,2)
+    gamma_beta_ = pow(moments_[1] , 2)
+        / (moments_[2] * moments_[0] - pow(moments_[1],2)
            + dimensionedScalar("small", dimensionSet(0,2,0,0,0),SMALL ) );
 
-    d32_ = m3_ * scaleD_ * scaleM3_  / m2_;
+    d32_ = moments_[3] * scaleD_ * scaleM3_  / moments_[2];
     d32_ = min(d32_,  maxD_);
     d32_ = max(d32_,  minD_);
 
@@ -817,9 +818,9 @@ void MOM::updateMoments()
 
     fvScalarMatrix m0Eqn
         (
-            fvm::ddt(m0_)
-            + fvm::div(phase_.phi(),m0_)
-            //+ fvm::div(limitedFlux_,m0_)
+            fvm::ddt(moments_[0])
+            + fvm::div(phase_.phi(),moments_[0])
+            //+ fvm::div(limitedFlux_,moments_[0])
             ==
             m0Source_
         ); 
@@ -828,9 +829,9 @@ void MOM::updateMoments()
 
     fvScalarMatrix m1Eqn
         (
-            fvm::ddt(m1_)
-            + fvm::div(phase_.phi(),m1_)
-            //+ fvm::div(limitedFlux_,m1_)
+            fvm::ddt(moments_[1])
+            + fvm::div(phase_.phi(),moments_[1])
+            //+ fvm::div(limitedFlux_,moments_[1])
             ==
             m1Source_
         ); 
@@ -839,9 +840,9 @@ void MOM::updateMoments()
 
     fvScalarMatrix m2Eqn
         (
-            fvm::ddt(m2_)
-            + fvm::div(phase_.phi(),m2_)
-            //+ fvm::div(limitedFlux_,m2_)
+            fvm::ddt(moments_[2])
+            + fvm::div(phase_.phi(),moments_[2])
+            //+ fvm::div(limitedFlux_,moments_[2])
             ==
             m2Source_
         ); 
@@ -850,9 +851,9 @@ void MOM::updateMoments()
 
     fvScalarMatrix m3Eqn
         (
-            fvm::ddt(m3_)
-            + fvm::div(phase_.phi(),m3_)
-            //+ fvm::div(limitedFlux_,m3_)
+            fvm::ddt(moments_[3])
+            + fvm::div(phase_.phi(),moments_[3])
+            //+ fvm::div(limitedFlux_,moments_[3])
             ==
             m3Source_
         ); 
@@ -860,18 +861,15 @@ void MOM::updateMoments()
     m3Eqn.relax();
     m3Eqn.solve();
 
-    m0_ = max(m0_, dimensionedScalar("m0", m0_.dimensions(), SMALL) );
-    m1_ = max(m1_, dimensionedScalar("m1", m1_.dimensions(), SMALL) );
-    m2_ = max(m2_, dimensionedScalar("m2", m2_.dimensions(), SMALL) );
-    m3_ = max(m3_, dimensionedScalar("m3", m3_.dimensions(), SMALL) );
+    for (auto& moment : moments_)
+    {
+        moment = max(moment, dimensionedScalar(moment.name(),
+                                               moment.dimensions(), SMALL));
+        printAvgMaxMin(moment);
+    }
 
-    printAvgMaxMin(m0_);
-    printAvgMaxMin(m1_);
-    printAvgMaxMin(m2_);
-    printAvgMaxMin(m3_);
-
-    d32_ = m3_ * scaleD_ * scaleM3_ / m2_;
-    //d32_ = dispersedPhase() * scaleD_ *6.0 / (m2_ * constant::mathematical::pi);
+    d32_ = moments_[3] * scaleD_ * scaleM3_ / moments_[2];
+    //d32_ = dispersedPhase() * scaleD_ *6.0 / (moments_[2] * constant::mathematical::pi);
     d32_ = min(d32_, maxD_);
     d32_ = max(d32_,  minD_);
 
@@ -880,125 +878,6 @@ void MOM::updateMoments()
     printAvgMaxMin(d32_);
     printAvgMaxMin(expectedD_);
 }
-
-void MOM::solve()
-{
-//    forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-//    {
-//        iter().correct();
-//    }
-
-//    const Time& runTime = phase_.U().mesh().time();
-
-//    if (nAlphaSubCycles_ > 1)
-//    {
-//        dimensionedScalar totalDeltaT = runTime.deltaT();
-
-//        /*volScalarField m0_0 = m0_.oldTime();
-//        volScalarField m1_0 = m1_.oldTime();
-//        volScalarField m2_0 = m2_.oldTime();
-//        volScalarField m3_0 = m3_.oldTime();*/
-
-//        PtrList<volScalarField> alpha0s(phases_.size());
-//        PtrList<surfaceScalarField> phiSums(phases_.size());
-
-//        int phasei = 0;
-//        forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-//        {
-//            phaseModel& phase = iter();
-//            volScalarField& alpha = phase;
-
-//            alpha0s.set
-//            (
-//                phasei,
-//                new volScalarField(alpha.oldTime())
-//            );
-
-//            phiSums.set
-//            (
-//                phasei,
-//                new surfaceScalarField
-//                (
-//                    IOobject
-//                    (
-//                        "phiSum" + alpha.name(),
-//                        runTime.timeName(),
-//                        phase_.U().mesh()
-//                    ),
-//                    phase_.U().mesh(),
-//                    dimensionedScalar("0", dimensionSet(0, 3, -1, 0, 0), 0)
-//                )
-//            );
-//            phasei++;
-//        }
-
-//        for
-//        (
-//            subCycleTime alphaSubCycle
-//            (
-//                const_cast<Time&>(runTime),
-//                nAlphaSubCycles_
-//            );
-//            !(++alphaSubCycle).end();
-//        )
-//        {
-//            //Is this in the right order? phiSums and solveAlphas
-//            solveAlphas();
-
-//            int phasei = 0;
-//            forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-//            {
-//                phiSums[phasei] +=
-//                    (runTime.deltaT() / totalDeltaT) * iter().phi();
-//                phasei++;
-//            }
-//        }
-
-//        phasei = 0;
-//        forAllIter(PtrDictionary<phaseModel>, phases_, iter)
-//        {
-//            phaseModel& phase = iter();
-//            volScalarField& alpha = phase;
-
-//            //Is this supposed to correct velocity field? I don't think this is
-//            //doing anything.
-//            phase.phi() = phiSums[phasei];
-
-//            // Correct the time index of the field
-//            // to correspond to the global time
-//            alpha.timeIndex() = runTime.timeIndex();
-
-//            /*m0_.timeIndex() = runTime.timeIndex();
-//            m1_.timeIndex() = runTime.timeIndex();
-//            m2_.timeIndex() = runTime.timeIndex();
-//            m3_.timeIndex() = runTime.timeIndex();*/
-
-//            // Reset the old-time field value
-//            alpha.oldTime() = alpha0s[phasei];
-//            alpha.oldTime().timeIndex() = runTime.timeIndex();
-
-//            /*m0_.oldTime() = m0_0;
-//            m1_.oldTime() = m1_0;
-//            m2_.oldTime() = m2_0;
-//            m3_.oldTime() = m3_0;
-//            m0_.oldTime().timeIndex() = runTime.timeIndex();
-//            m1_.oldTime().timeIndex() = runTime.timeIndex();
-//            m2_.oldTime().timeIndex() = runTime.timeIndex();
-//            m3_.oldTime().timeIndex() = runTime.timeIndex();*/
-
-//            phasei++;
-//        }
-
-//    }
-//    else
-//    {
-//        solveAlphas();
-//        //updateMoments();
-//    }
-
-    updateMoments();
-}
-
 
 
 }//end namespace PBEMethods
