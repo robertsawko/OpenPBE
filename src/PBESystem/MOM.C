@@ -25,6 +25,7 @@ License
 
 #include <string>
 #include <sstream>
+#include <cmath>
 
 #include "MOM.H"
 #include "addToRunTimeSelectionTable.H"
@@ -109,8 +110,10 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         phase_.U().mesh()
-    )}},
-    m0Source_
+    )
+    }},
+    mSources_{{
+    volScalarField
     (
         IOobject
         (
@@ -123,7 +126,7 @@ MOM::MOM
         phase_.U().mesh(),
         dimensionedScalar("m0Source", dimless / dimTime, 0.0)
     ),
-    m1Source_
+    volScalarField
     (
         IOobject
         (
@@ -136,7 +139,7 @@ MOM::MOM
         phase_.U().mesh(),
         dimensionedScalar("m1Source", dimLength / dimTime, 0.0)
     ),
-    m2Source_
+    volScalarField
     (
         IOobject
         (
@@ -149,7 +152,7 @@ MOM::MOM
         phase_.U().mesh(),
         dimensionedScalar("m2Source", pow(dimLength, 2) / dimTime, 0.0)
     ),
-    m3Source_
+    volScalarField
     (
         IOobject
         (
@@ -161,7 +164,8 @@ MOM::MOM
         ),
         phase_.U().mesh(),
         dimensionedScalar("m3Source", dimless / dimTime, 0.0)
-    ),
+    )
+    }},
     d32_
     (
         //argument set to true applies this diameter in other places in the
@@ -782,39 +786,34 @@ void MOM::updateMoments()
     printAvgMaxMin(gamma_alpha_);
     printAvgMaxMin(gamma_beta_);
 
-    m0Source_ = momentSourceTerm(0) / scaleD_.value();
-    m1Source_ = momentSourceTerm(1) / pow(scaleD_.value(), 2);
-    m2Source_ = momentSourceTerm(2) / pow(scaleD_.value(), 3);
+    mSources_[0] = momentSourceTerm(0) / scaleD_.value();
+    mSources_[1] = momentSourceTerm(1) / pow(scaleD_.value(), 2);
+    mSources_[2] = momentSourceTerm(2) / pow(scaleD_.value(), 3);
+    //TODO: Why is the last source term not scaled here?
 
     //TODO: is there a better way to assure that source terms on boundaries 
     //are equal to 0?
     //maybe using internalField() instead of the whole field somewhere?
-    m0Source_.boundaryField() = 0;
-    m1Source_.boundaryField() = 0;
-    m2Source_.boundaryField() = 0;
-    m3Source_.boundaryField() = 0;
+    //TODO: loops can likely be merged
+    for (auto& mSource : mSources_)
+        mSource.boundaryField() = 0;
 
     //fix for nan values
     forAll(phase_.U().mesh().C(), celli)
     {
-        if ( m0Source_[celli] != m0Source_[celli] )
+        for (auto& mSource : mSources_)
         {
-            m0Source_[celli] = 0.0;
-        }
-        if ( m1Source_[celli] != m1Source_[celli] )
-        {
-            m1Source_[celli] = 0.0;
-        }
-        if ( m2Source_[celli] != m2Source_[celli] )
-        {
-            m2Source_[celli] = 0.0;
+            auto& mSource_i = mSource[celli];
+            if ( std::isnan(mSource_i) )
+            {
+                mSource_i = 0.0;
+            }
         }
     }
 
     Info<< "moment sources:" << endl;
-    printAvgMaxMin(m0Source_);
-    printAvgMaxMin(m1Source_);
-    printAvgMaxMin(m2Source_);
+    for (auto& mSource : mSources_)
+        printAvgMaxMin(mSource);
 
     fvScalarMatrix m0Eqn
         (
@@ -822,7 +821,7 @@ void MOM::updateMoments()
             + fvm::div(phase_.phi(),moments_[0])
             //+ fvm::div(limitedFlux_,moments_[0])
             ==
-            m0Source_
+            mSources_[0]
         ); 
     m0Eqn.relax();
     m0Eqn.solve();
@@ -833,7 +832,7 @@ void MOM::updateMoments()
             + fvm::div(phase_.phi(),moments_[1])
             //+ fvm::div(limitedFlux_,moments_[1])
             ==
-            m1Source_
+            mSources_[1]
         ); 
     m1Eqn.relax();
     m1Eqn.solve();
@@ -844,7 +843,7 @@ void MOM::updateMoments()
             + fvm::div(phase_.phi(),moments_[2])
             //+ fvm::div(limitedFlux_,moments_[2])
             ==
-            m2Source_
+            mSources_[2]
         ); 
     m2Eqn.relax();
     m2Eqn.solve();
@@ -855,7 +854,7 @@ void MOM::updateMoments()
             + fvm::div(phase_.phi(),moments_[3])
             //+ fvm::div(limitedFlux_,moments_[3])
             ==
-            m3Source_
+            mSources_[3]
         ); 
 
     m3Eqn.relax();

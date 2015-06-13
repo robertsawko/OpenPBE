@@ -71,10 +71,9 @@ private:
 
  //source terms are stored so they do not have to be recalculated in every
  //iteration of alpha sub-cycle
- volScalarField m0Source_;
- volScalarField m1Source_;
- volScalarField m2Source_;
- volScalarField m3Source_;
+ //TODO: Is this still useful?
+ //TODO: Size should be obtained from moments_
+ std::array<volScalarField, 4> mSources_;
 
  //Sauter mean diameter
  volScalarField d32_;
