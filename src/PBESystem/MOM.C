@@ -815,50 +815,19 @@ void MOM::updateMoments()
     for (auto& mSource : mSources_)
         printAvgMaxMin(mSource);
 
-    fvScalarMatrix m0Eqn
-        (
-            fvm::ddt(moments_[0])
-            + fvm::div(phase_.phi(),moments_[0])
-            //+ fvm::div(limitedFlux_,moments_[0])
-            ==
-            mSources_[0]
-        ); 
-    m0Eqn.relax();
-    m0Eqn.solve();
-
-    fvScalarMatrix m1Eqn
-        (
-            fvm::ddt(moments_[1])
-            + fvm::div(phase_.phi(),moments_[1])
-            //+ fvm::div(limitedFlux_,moments_[1])
-            ==
-            mSources_[1]
-        ); 
-    m1Eqn.relax();
-    m1Eqn.solve();
-
-    fvScalarMatrix m2Eqn
-        (
-            fvm::ddt(moments_[2])
-            + fvm::div(phase_.phi(),moments_[2])
-            //+ fvm::div(limitedFlux_,moments_[2])
-            ==
-            mSources_[2]
-        ); 
-    m2Eqn.relax();
-    m2Eqn.solve();
-
-    fvScalarMatrix m3Eqn
-        (
-            fvm::ddt(moments_[3])
-            + fvm::div(phase_.phi(),moments_[3])
-            //+ fvm::div(limitedFlux_,moments_[3])
-            ==
-            mSources_[3]
-        ); 
-
-    m3Eqn.relax();
-    m3Eqn.solve();
+    for (std::size_t i = 0; i<moments_.size(); ++i)
+    {
+        fvScalarMatrix mEqn
+            (
+                fvm::ddt(moments_[i])
+                + fvm::div(phase_.phi(),moments_[i])
+                //+ fvm::div(limitedFlux_,moments_[i])
+                ==
+                mSources_[i]
+            );
+        mEqn.relax();
+        mEqn.solve();
+    }
 
     for (auto& moment : moments_)
     {
