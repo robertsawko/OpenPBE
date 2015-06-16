@@ -63,7 +63,7 @@ class MOM : public PBEMethod
 {
 private:
  const dictionary MOMDict_;
- const phaseModel& phase_;
+ const phaseModel& dispersedPhase_;
 
  std::array<volScalarField, 4> moments_;
 
