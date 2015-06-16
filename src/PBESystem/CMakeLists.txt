@@ -1,4 +1,4 @@
-# find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 include_directories (EIGEN3_INCLUDE_DIRS)
 include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")

@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 project (PBESolvers)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 #The build is based on OpenFOAM environmental varialbles Need to check 
 #if they are loaded and if not TODO search and load an appropriate file?
 if(DEFINED ENV{WM_PROJECT})
@@ -91,9 +93,11 @@ set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 
 #gtest for testing
 add_subdirectory(ext/gtest/)
+#find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
+find_package(Boost REQUIRED)
 
-add_subdirectory(ext/eigen3/)
+# add_subdirectory(ext/eigen3/)
 
 #Library
 add_subdirectory(src/PBESystem)
