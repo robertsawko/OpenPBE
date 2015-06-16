@@ -69,6 +69,7 @@ private:
 
  void printAvgMaxMin(const volScalarField& v) const;
 
+ const dimensionedScalar scaleD_;
  volScalarField d32_;
 
  //gamma distribution parameters
@@ -76,8 +77,6 @@ private:
  volScalarField gamma_beta_;
  volScalarField gamma_c0_;
 
- //scaling factor for diameter
- const dimensionedScalar scaleD_;
  const scalar scaleM3_;
  //number of daughter droplets
  scalar Nf_;

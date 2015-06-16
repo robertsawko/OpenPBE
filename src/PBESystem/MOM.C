@@ -112,12 +112,17 @@ MOM::MOM
         phase_.U().mesh()
     )
     }},
+    scaleD_
+    (
+        dimensionedScalar
+        (
+            "scaleDiameter",
+            dimensionSet(0,0,0,0,0),
+            MOMDict_.lookup("scaleDiameter")
+        )
+    ),
     d32_
     (
-        //argument set to true applies this diameter in other places in the
-        //solver (i.e. in drag models) leaving it empty or false prevent of
-        //usign it in different places ('debug' mode)
-        //phase_.d()
         IOobject
         (
             "diameter",
@@ -126,8 +131,7 @@ MOM::MOM
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        phase_.U().mesh(),
-        dimensionedScalar("diameter", dimLength, 0.0)
+        moments_[3] * scaleD_ * scaleM3_  / moments_[2]
     ),
     gamma_alpha_
     (
@@ -168,15 +172,6 @@ MOM::MOM
         phase_.U().mesh(),
         dimensionedScalar("c0", dimless, 0.0)
     ),
-    scaleD_
-    (
-        dimensionedScalar
-        (
-            "scaleDiameter",
-            dimensionSet(0,0,0,0,0),
-            MOMDict_.lookup("scaleDiameter")
-        )
-    ),
     scaleM3_(MOMDict_.lookupOrDefault<scalar>("scaleM3",1.0)),
     Nf_(MOMDict_.lookupOrDefault<scalar>("daughterDropletsNr",2.0)),
     maxD_
@@ -211,12 +206,7 @@ MOM::MOM
     integrationSteps_(MOMDict_.lookupOrDefault<scalar>("integrationSteps", 10)),
     bList_(integrationSteps_),
     cList_(pow(integrationSteps_, 2)),
-    gammaList_(integrationSteps_)/*,
-    limitedFlux_(phase_.phi()),
-    nAlphaSubCycles_
-    (
-        readLabel(phase_.U().mesh().solutionDict().subDict("PIMPLE").lookup("nAlphaSubCycles"))
-    )*/
+    gammaList_(integrationSteps_)
 {
 }
 
@@ -225,7 +215,125 @@ MOM::~MOM()
 }
 void MOM::correct()
 {
-    updateMoments();
+    Info<< "updating size moments" << endl;
+    gamma_c0_ = moments_[0];
+    gamma_alpha_ = ( moments_[0] * moments_[2] - pow(moments_[1], 2) )
+        / (moments_[0] * moments_[1]
+           + dimensionedScalar("small", dimensionSet(0,1,0,0,0),SMALL ) );
+    gamma_beta_ = pow(moments_[1] , 2)
+        / (moments_[2] * moments_[0] - pow(moments_[1],2)
+           + dimensionedScalar("small", dimensionSet(0,2,0,0,0),SMALL ) );
+
+    Info<< "gamma parameters:" << endl;
+    printAvgMaxMin(gamma_c0_);
+    printAvgMaxMin(gamma_alpha_);
+    printAvgMaxMin(gamma_beta_);
+
+    //TODO: get rid of 4
+    std::array<volScalarField, 4> mSources_{{
+        volScalarField
+        (
+            IOobject
+            (
+                "m0Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(0) / scaleD_.value()
+        ),
+        volScalarField
+        (
+            IOobject
+            (
+                "m1Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(1) / pow(scaleD_.value(), 2)
+        ),
+        volScalarField
+        (
+            IOobject
+            (
+                "m2Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(2) / pow(scaleD_.value(), 3)
+        ),
+        volScalarField
+        (
+            IOobject
+            (
+                "m3Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            phase_.U().mesh(),
+            dimensionedScalar("m3Source", pow(dimLength, 3) / dimTime, 0.0)
+        )
+    }};
+
+    Info<< "moment sources:" << endl;
+    //TODO: is there a better way to assure that source terms on boundaries 
+    //are equal to 0?
+    //maybe using internalField() instead of the whole field somewhere?
+    //how source terms are handled in combustion/chemistry/turbulence codes in
+    //OF
+    for (auto& mSource : mSources_)
+    {
+        mSource.boundaryField() = 0;
+
+        //fix for nan values
+        forAll(phase_.U().mesh().C(), celli)
+        {
+            auto& mSource_i = mSource[celli];
+            if ( std::isnan(mSource_i) )
+            {
+                mSource_i = 0.0;
+            }
+        }
+
+        printAvgMaxMin(mSource);
+    }
+
+    for (std::size_t i = 0; i<moments_.size(); ++i)
+    {
+        fvScalarMatrix mEqn
+        (
+            fvm::ddt(moments_[i])
+            + fvm::div(phase_.phi(),moments_[i])
+            //+ fvm::div(limitedFlux_,moments_[i])
+            ==
+            mSources_[i]
+        );
+        mEqn.relax();
+        mEqn.solve();
+    }
+
+    for (auto& moment : moments_)
+    {
+        moment = max(
+            moment,
+            dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
+        );
+        //TODO: print a warning message
+        printAvgMaxMin(moment);
+    }
+
+    d32_ = moments_[3] * scaleD_ * scaleM3_ / moments_[2];
+    d32_ = min(d32_, maxD_);
+    d32_ = max(d32_,  minD_);
+
+    printAvgMaxMin(d32_);
 }
 
 const volScalarField MOM::d() const
@@ -376,7 +484,7 @@ tmp<volScalarField> MOM::gamma(const volScalarField& x)
             phase_.U().mesh(),
             dimensionedScalar("gamma", dimless, 0.0)
         );
-    scalar pi = constant::mathematical::pi;
+    using constant::mathematical::pi;
 
     forAll(result, celli)
     {
@@ -411,132 +519,6 @@ tmp<volScalarField> MOM::gammaDistribution(const dimensionedScalar xi)
                 * (gamma(gamma_beta_) + SMALL) 
             )
         );
-}
-
-void MOM::updateMoments()
-{
-    Info<< "updating size moments" << endl;
-    gamma_c0_ = moments_[0];
-    gamma_alpha_ = ( moments_[0] * moments_[2] - pow(moments_[1], 2) )
-        / (moments_[0] * moments_[1]
-           + dimensionedScalar("small", dimensionSet(0,1,0,0,0),SMALL ) );
-    gamma_beta_ = pow(moments_[1] , 2)
-        / (moments_[2] * moments_[0] - pow(moments_[1],2)
-           + dimensionedScalar("small", dimensionSet(0,2,0,0,0),SMALL ) );
-
-    d32_ = moments_[3] * scaleD_ * scaleM3_  / moments_[2];
-    d32_ = min(d32_,  maxD_);
-    d32_ = max(d32_,  minD_);
-
-    printAvgMaxMin(d32_);
-    Info<< "gamma parameters:" << endl;
-    printAvgMaxMin(gamma_c0_);
-    printAvgMaxMin(gamma_alpha_);
-    printAvgMaxMin(gamma_beta_);
-
-    //TODO: get rid of 4
-    std::array<volScalarField, 4> mSources_{{
-        volScalarField
-        (
-            IOobject
-            (
-                "m0Source",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(0) / scaleD_.value()
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m1Source",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(1) / pow(scaleD_.value(), 2)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m2Source",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(2) / pow(scaleD_.value(), 3)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m3Source",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            phase_.U().mesh(),
-            dimensionedScalar("m3Source", pow(dimLength, 3) / dimTime, 0.0)
-        )
-    }};
-
-    Info<< "moment sources:" << endl;
-    //TODO: is there a better way to assure that source terms on boundaries 
-    //are equal to 0?
-    //maybe using internalField() instead of the whole field somewhere?
-    //how source terms are handled in combustion/chemistry/turbulence codes in
-    //OF
-    for (auto& mSource : mSources_)
-    {
-        mSource.boundaryField() = 0;
-
-        //fix for nan values
-        forAll(phase_.U().mesh().C(), celli)
-        {
-            auto& mSource_i = mSource[celli];
-            if ( std::isnan(mSource_i) )
-            {
-                mSource_i = 0.0;
-            }
-        }
-
-        printAvgMaxMin(mSource);
-    }
-
-    for (std::size_t i = 0; i<moments_.size(); ++i)
-    {
-        fvScalarMatrix mEqn
-        (
-            fvm::ddt(moments_[i])
-            + fvm::div(phase_.phi(),moments_[i])
-            //+ fvm::div(limitedFlux_,moments_[i])
-            ==
-            mSources_[i]
-        );
-        mEqn.relax();
-        mEqn.solve();
-    }
-
-    for (auto& moment : moments_)
-    {
-        moment = max(moment, dimensionedScalar(moment.name(),
-                                               moment.dimensions(), SMALL));
-        printAvgMaxMin(moment);
-    }
-
-    d32_ = moments_[3] * scaleD_ * scaleM3_ / moments_[2];
-    //d32_ = dispersedPhase() * scaleD_ *6.0 / (moments_[2] * constant::mathematical::pi);
-    d32_ = min(d32_, maxD_);
-    d32_ = max(d32_,  minD_);
-
-    printAvgMaxMin(d32_);
 }
 
 
