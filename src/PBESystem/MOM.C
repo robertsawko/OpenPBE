@@ -171,8 +171,8 @@ MOM::MOM
         //argument set to true applies this diameter in other places in the
         //solver (i.e. in drag models) leaving it empty or false prevent of
         //usign it in different places ('debug' mode)
-        phase_.d()
-        /*IOobject
+        //phase_.d()
+        IOobject
         (
             "diameter",
             phase_.U().mesh().time().timeName(),
@@ -181,7 +181,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         phase_.U().mesh(),
-        dimensionedScalar("diameter", dimless, 0.0)*/
+        dimensionedScalar("diameter", dimless, 0.0)
     ),
     expectedD_
     (
