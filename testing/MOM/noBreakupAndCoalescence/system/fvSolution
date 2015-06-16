@@ -44,7 +44,7 @@ solvers
         relTol          0;
     }
 
-    "n.*"
+    "m.*"
     {
         solver          smoothSolver;
         smoother        symGaussSeidel;

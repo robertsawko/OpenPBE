@@ -216,7 +216,7 @@ const volScalarField MOC::d() const
 {
     volScalarField sum = volumeToDiameter(xi_[0]) * classNumberDensity_[0];
     volScalarField norm = classNumberDensity_[0];
-    for(int i = 1; i < numberOfClasses_; i++)
+    for(int i = 1; i < numberOfClasses_; ++i)
     {
         sum += volumeToDiameter(xi_[i]) * classNumberDensity_[i];
         norm += classNumberDensity_[i];

@@ -20,6 +20,7 @@ set(lib_header_files
   dummy.H
   MOC.H
   MOM.H
+  PBESystems-internal.C
 )
 
 set(lib_source_files

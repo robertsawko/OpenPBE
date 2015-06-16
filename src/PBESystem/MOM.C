@@ -163,7 +163,7 @@ MOM::MOM
             IOobject::NO_WRITE
         ),
         phase_.U().mesh(),
-        dimensionedScalar("m3Source", dimless / dimTime, 0.0)
+        dimensionedScalar("m3Source", pow(dimLength, 3) / dimTime, 0.0)
     )
     }},
     d32_
@@ -181,7 +181,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         phase_.U().mesh(),
-        dimensionedScalar("diameter", dimless, 0.0)
+        dimensionedScalar("diameter", dimLength, 0.0)
     ),
     expectedD_
     (
@@ -240,7 +240,7 @@ MOM::MOM
         dimensionedScalar
         (
             "scaleDiameter",
-            dimensionSet(0,3,0,0,0),
+            dimensionSet(0,0,0,0,0),
             MOMDict_.lookup("scaleDiameter")
         )
     ),
@@ -368,6 +368,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             ) 
         );
 
+    /*
     //value of the function being integrated (for previous argument)
     volScalarField f_i0
         (
@@ -480,11 +481,11 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
                 //return coalescenceSourceTerm(momenti) + breakupSourceTerm(momenti);
                 //so breakup is calculated pravious to coalescence and there
                 //is no need to update gammaList here
-                /*gammaList_.set
-                (
-                    iter2 - 1,
-                    gammaDistribution(arg_j1  / scaleD_.value()) 
-                );*/
+                //gammaList_.set
+                //(
+                    //iter2 - 1,
+                    //gammaDistribution(arg_j1  / scaleD_.value()) 
+                //);
 
             }
 
@@ -508,6 +509,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
         sum2 = ( sum_i0 + sum ) * dx * 0.5;
         sum_i0 = sum;
     }
+    */
 
     return tmp<volScalarField>( new volScalarField(sum2));
 
@@ -563,6 +565,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             ) 
         );
 
+    /*
     //value of the function being integrated (for previous argument)
     volScalarField f_i0
     (
@@ -673,10 +676,10 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
                 Info << "Average breakup rate: " << avgBreakupRate << endl;
             }
-            /*Info << "breakup kernels:" 
-                << bList[iter -1].weightedAverage(phase_.U().mesh().V()).value()
-                << ", max: " << max(bList[iter-1].internalField())
-                << ", min: " << min(bList[iter-1]).value() << endl;*/
+            //Info << "breakup kernels:" 
+                //<< bList[iter -1].weightedAverage(phase_.U().mesh().V()).value()
+                //<< ", max: " << max(bList[iter-1].internalField())
+                //<< ", min: " << min(bList[iter-1]).value() << endl;
 
         }
 
@@ -685,14 +688,14 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             * ( pow(Nf_, ((3.0 - momenti) / 3.0)) - 1)
             * bList_[iter-1] //breakup_-> S(argField)
             * gammaList_[iter-1]; //gammaDistribution(arg_i1);
-        /*Info << "multiplier: " << 
+        Info << "multiplier: " << 
             pow(arg_i1*xiDim, momenti)
             << endl;
         Info << "multiplier2: " << 
             ( pow(Nf_, ((3.0 - momenti) / 3.0)) - 1)
-            << endl;*/
+            << endl;
         sum += (f_i1 + f_i0) * dx * 0.5 * xiDim;
-            /*Info << "f0: " 
+            Info << "f0: " 
                 << f_i0.weightedAverage(phase_.U().mesh().V()).value()
                 << ", max: " << max(f_i0.internalField())
                 << ", min: " << min(f_i0.internalField()) << endl;
@@ -703,14 +706,12 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             Info << "sum: " 
                 << sum.weightedAverage(phase_.U().mesh().V()).value()
                 << ", max: " << max(sum.internalField())
-                << ", min: " << min(sum.internalField()) << endl;*/
+                << ", min: " << min(sum.internalField()) << endl;
         //Info << max(sum.internalField()) << endl;
         f_i0 = f_i1;
     }
-
-
+    */
     return tmp<volScalarField>( new volScalarField(sum));
-
 }
 
 tmp<volScalarField> MOM::gamma(const volScalarField& x)

@@ -1,7 +1,7 @@
 #ifndef PBESystems_internal
 #define PBESystems_internal
 
-//#include "multiphaseSystem.H"
+#include "PBEMethod.H"
 
 namespace Foam
 {

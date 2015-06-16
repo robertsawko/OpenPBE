@@ -64,7 +64,7 @@ class PBEMethod
 
 protected:
 
-  // Protected data
+  // Protecte data
   //- coalescence kernel
   autoPtr<coalescenceKernel> coalescence_;
   //- breakup kernel
@@ -114,7 +114,7 @@ public:
   //- Dummy correct
   virtual void correct() = 0;
 
-  ////- Return the Sauter-mean diameter
+  ////- Return the diameter field
   virtual const volScalarField d() const = 0;
 
   ////- Read base transportProperties dictionary
