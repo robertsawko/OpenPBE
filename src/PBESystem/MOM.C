@@ -112,60 +112,6 @@ MOM::MOM
         phase_.U().mesh()
     )
     }},
-    mSources_{{
-    volScalarField
-    (
-        IOobject
-        (
-            "m0Source",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar("m0Source", dimless / dimTime, 0.0)
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m1Source",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar("m1Source", dimLength / dimTime, 0.0)
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m2Source",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar("m2Source", pow(dimLength, 2) / dimTime, 0.0)
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m3Source",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar("m3Source", pow(dimLength, 3) / dimTime, 0.0)
-    )
-    }},
     d32_
     (
         //argument set to true applies this diameter in other places in the
@@ -182,19 +128,6 @@ MOM::MOM
         ),
         phase_.U().mesh(),
         dimensionedScalar("diameter", dimLength, 0.0)
-    ),
-    expectedD_
-    (
-        IOobject
-        (
-            "expectedDiameter",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar("expectedDiameter", dimLength, 0.0)
     ),
     gamma_alpha_
     (
@@ -287,6 +220,9 @@ MOM::MOM
 {
 }
 
+MOM::~MOM()
+{
+}
 void MOM::correct()
 {
     updateMoments();
@@ -368,149 +304,6 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             ) 
         );
 
-    /*
-    //value of the function being integrated (for previous argument)
-    volScalarField f_i0
-        (
-            IOobject
-            (
-                "f_i0",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            phase_.U().mesh(),
-            dimensionedScalar
-            (
-                "f_i0", 
-                pow(dimLength, momenti - 2) / dimTime,
-                0
-            ) 
-        );
-    //value of the function being integrated (for current argument)
-    volScalarField f_i1
-        (
-            IOobject
-            (
-                "f_i1",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            phase_.U().mesh(),
-            dimensionedScalar
-            (
-                "f_i1", 
-                pow(dimLength, momenti - 2) / dimTime,
-                0
-            ) 
-        );
-    
-    //in this method argument of integral is a single scalar value
-    //this field extrapolates scalar argument to volScalarField
-    //so it can be passed to 'S' method of breakup model
-    volScalarField argField
-        (
-            IOobject
-            (
-                "arg",
-                phase_.U().mesh().time().timeName(),
-                phase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            phase_.U().mesh(),
-            dimensionedScalar
-            (
-                "arg", 
-                dimLength,
-                0
-            ) 
-        );
-    volScalarField argField2(argField);
-
-
-    if (momenti == 0){
-        //TODO: see next one, few lines below
-        Info << "number of integration steps for coalescence module: " 
-            << maxIter <<  " x " << maxIter << endl;
-    }
-
-    scalar avgCoalescenceRate = 0.0;
-
-    for (label iter = 1; iter <= maxIter; iter++)
-    {
-        arg_i1 = iter * dx;
-        argField = arg_i1;
-        sum = dimensionedScalar("zero",pow(dimLength, momenti - 1) / dimTime , 0.0);
-
-        for (label iter2 = 1; iter2 <= maxIter; iter2++)
-        {
-            arg_j1 = iter2 * dx;
-            argField2 = arg_j1;
-
-            if (momenti == 0){
-                //TODO: can it be done better?
-                //can we buffer breakup and gamma values insted of calculating them
-                //few time without messing with the class structure?
-                //
-                //it could have been list of list but one long list is slightly
-                //more convinient to use in this case
-                cList_.set
-                    (
-                        (iter - 1)* maxIter + (iter2 - 1),
-                        coalescence_-> S(argField, argField2)
-                    );
-                avgCoalescenceRate += 
-                    cList_[(iter-1)*maxIter + (iter2 - 1)].weightedAverage
-                    (
-                        phase_.U().mesh().V()
-                    ).value()
-                    / pow(maxIter,2);
-                if(iter2 == maxIter && iter==maxIter){
-
-                    Info << "Average coalescence rate: " << avgCoalescenceRate << endl;
-
-                }
-                //in sourceTerm method we have:
-                //return coalescenceSourceTerm(momenti) + breakupSourceTerm(momenti);
-                //so breakup is calculated pravious to coalescence and there
-                //is no need to update gammaList here
-                //gammaList_.set
-                //(
-                    //iter2 - 1,
-                    //gammaDistribution(arg_j1  / scaleD_.value()) 
-                //);
-
-            }
-
-            f_i1 =
-                (
-                    pow
-                    (
-                        pow(arg_i1, 3) + pow(arg_j1, 3),
-                        momenti / 3.0
-                    )
-                    - pow(arg_i1, momenti)
-                    - pow(arg_j1, momenti)
-                )
-                * cList_[(iter-1)*maxIter + (iter2 - 1)]//coalescence_ -> S(argField, argField2)  
-                * gammaList_[iter-1] //gammaDistribution(arg_i1)
-                * gammaList_[iter2-1] * xiDim;//gammaDistribution(arg_j1);
-            sum += (f_i1 + f_i0) * dx * 0.5;
-            f_i0 = f_i1;
-        }
-
-        sum2 = ( sum_i0 + sum ) * dx * 0.5;
-        sum_i0 = sum;
-    }
-    */
-
     return tmp<volScalarField>( new volScalarField(sum2));
 
 }
@@ -565,152 +358,6 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             ) 
         );
 
-    /*
-    //value of the function being integrated (for previous argument)
-    volScalarField f_i0
-    (
-        IOobject
-        (
-            "f_i0",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar
-        (
-            "f_i0", 
-            pow(dimLength, momenti - 1) /dimTime,
-            0
-        ) 
-    );
-    //value of the function being integrated (for current argument)
-    volScalarField f_i1
-    (
-        IOobject
-        (
-            "f_i1",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar
-        (
-            "f_i1", 
-            pow(dimLength, momenti - 1) /dimTime,
-            0
-        ) 
-    );
-    
-    //in this method argument of integral is a single scalar value
-    //this field extrapolates scalar argument to volScalarField
-    //so it can be passed to 'S' method of breakup model
-    volScalarField argField
-    (
-        IOobject
-        (
-            "arg",
-            phase_.U().mesh().time().timeName(),
-            phase_.U().mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
-        phase_.U().mesh(),
-        dimensionedScalar
-        (
-            "arg", 
-            dimLength,
-            0
-        ) 
-    );
-
-    dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
-
-    scalar avgBreakupRate = 0.0;
-
-    scalar maxGamma = 0;
-    if (momenti==0){
-        //TODO: see next one, few lines below
-        Info << "number of integration steps for breakup module: " 
-            << maxIter << endl;
-    }
-    for (label iter = 1; iter <= maxIter; iter++){
-        arg_i1 = iter * dx;
-        argField = arg_i1 * xiDim;
-
-        if (momenti == 0){
-            //TODO: can it be done better?
-            //can we buffer breakup and gamma values insted of calculating them
-            //few time without messing with the class structure?
-            bList_.set
-            (
-                iter - 1,
-                breakup_-> S(argField)
-            );
-
-            avgBreakupRate += 
-                bList_[iter-1].weightedAverage(phase_.U().mesh().V()).value()
-                / maxIter;
-
-            gammaList_.set
-            (
-                iter - 1,
-                gammaDistribution(arg_i1 / scaleD_.value()) 
-            );
-
-            maxGamma = max(maxGamma, gammaList_[iter-1].weightedAverage(phase_.U().mesh().V()).value() );
-
-            if (iter == maxIter)
-            {
-               Info << "Gamma distribution values for maximum considered diameter: " 
-                    << gammaList_[iter -1].weightedAverage(phase_.U().mesh().V()).value()
-                    << ", max: " << max(gammaList_[iter-1].internalField())
-                    << ", min: " << min(gammaList_[iter-1]).value() << endl;
-                Info << "Maximum value for the distribution is: " << maxGamma << endl;
-
-                Info << "Average breakup rate: " << avgBreakupRate << endl;
-            }
-            //Info << "breakup kernels:" 
-                //<< bList[iter -1].weightedAverage(phase_.U().mesh().V()).value()
-                //<< ", max: " << max(bList[iter-1].internalField())
-                //<< ", min: " << min(bList[iter-1]).value() << endl;
-
-        }
-
-        f_i1 =
-            pow(arg_i1*xiDim, momenti)
-            * ( pow(Nf_, ((3.0 - momenti) / 3.0)) - 1)
-            * bList_[iter-1] //breakup_-> S(argField)
-            * gammaList_[iter-1]; //gammaDistribution(arg_i1);
-        Info << "multiplier: " << 
-            pow(arg_i1*xiDim, momenti)
-            << endl;
-        Info << "multiplier2: " << 
-            ( pow(Nf_, ((3.0 - momenti) / 3.0)) - 1)
-            << endl;
-        sum += (f_i1 + f_i0) * dx * 0.5 * xiDim;
-            Info << "f0: " 
-                << f_i0.weightedAverage(phase_.U().mesh().V()).value()
-                << ", max: " << max(f_i0.internalField())
-                << ", min: " << min(f_i0.internalField()) << endl;
-            Info << "f1: " 
-                << f_i1.weightedAverage(phase_.U().mesh().V()).value()
-                << ", max: " << max(f_i1.internalField())
-                << ", min: " << min(f_i1.internalField()) << endl;
-            Info << "sum: " 
-                << sum.weightedAverage(phase_.U().mesh().V()).value()
-                << ", max: " << max(sum.internalField())
-                << ", min: " << min(sum.internalField()) << endl;
-        //Info << max(sum.internalField()) << endl;
-        f_i0 = f_i1;
-    }
-    */
     return tmp<volScalarField>( new volScalarField(sum));
 }
 
@@ -787,22 +434,71 @@ void MOM::updateMoments()
     printAvgMaxMin(gamma_alpha_);
     printAvgMaxMin(gamma_beta_);
 
-    mSources_[0] = momentSourceTerm(0) / scaleD_.value();
-    mSources_[1] = momentSourceTerm(1) / pow(scaleD_.value(), 2);
-    mSources_[2] = momentSourceTerm(2) / pow(scaleD_.value(), 3);
-    //TODO: Why is the last source term not scaled here?
+    //TODO: get rid of 4
+    std::array<volScalarField, 4> mSources_{{
+        volScalarField
+        (
+            IOobject
+            (
+                "m0Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(0) / scaleD_.value()
+        ),
+        volScalarField
+        (
+            IOobject
+            (
+                "m1Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(1) / pow(scaleD_.value(), 2)
+        ),
+        volScalarField
+        (
+            IOobject
+            (
+                "m2Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(2) / pow(scaleD_.value(), 3)
+        ),
+        volScalarField
+        (
+            IOobject
+            (
+                "m3Source",
+                phase_.U().mesh().time().timeName(),
+                phase_.U().mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            phase_.U().mesh(),
+            dimensionedScalar("m3Source", pow(dimLength, 3) / dimTime, 0.0)
+        )
+    }};
 
+    Info<< "moment sources:" << endl;
     //TODO: is there a better way to assure that source terms on boundaries 
     //are equal to 0?
     //maybe using internalField() instead of the whole field somewhere?
-    //TODO: loops can likely be merged
+    //how source terms are handled in combustion/chemistry/turbulence codes in
+    //OF
     for (auto& mSource : mSources_)
+    {
         mSource.boundaryField() = 0;
 
-    //fix for nan values
-    forAll(phase_.U().mesh().C(), celli)
-    {
-        for (auto& mSource : mSources_)
+        //fix for nan values
+        forAll(phase_.U().mesh().C(), celli)
         {
             auto& mSource_i = mSource[celli];
             if ( std::isnan(mSource_i) )
@@ -810,22 +506,20 @@ void MOM::updateMoments()
                 mSource_i = 0.0;
             }
         }
-    }
 
-    Info<< "moment sources:" << endl;
-    for (auto& mSource : mSources_)
         printAvgMaxMin(mSource);
+    }
 
     for (std::size_t i = 0; i<moments_.size(); ++i)
     {
         fvScalarMatrix mEqn
-            (
-                fvm::ddt(moments_[i])
-                + fvm::div(phase_.phi(),moments_[i])
-                //+ fvm::div(limitedFlux_,moments_[i])
-                ==
-                mSources_[i]
-            );
+        (
+            fvm::ddt(moments_[i])
+            + fvm::div(phase_.phi(),moments_[i])
+            //+ fvm::div(limitedFlux_,moments_[i])
+            ==
+            mSources_[i]
+        );
         mEqn.relax();
         mEqn.solve();
     }
@@ -842,10 +536,7 @@ void MOM::updateMoments()
     d32_ = min(d32_, maxD_);
     d32_ = max(d32_,  minD_);
 
-    expectedD_ = gamma_alpha_ * gamma_beta_ * scaleD_.value();
-
     printAvgMaxMin(d32_);
-    printAvgMaxMin(expectedD_);
 }
 
 

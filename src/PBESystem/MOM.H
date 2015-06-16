@@ -27,6 +27,10 @@ Class
 Description
     Incompressible multi-phase mixture with built in solution for the
     phase fractions with interface compression for interface-capturing.
+    m3_ should not be here since it is the same as alpha multiplied by constant
+    factor (in theory)
+    but convecting alpha with MULES give different results than convecting m2_
+    which produce error in diameter d32_ = m3 / m2
 
     Derived from transportModel so that it can be unsed in conjunction with
     the incompressible turbulence models.
@@ -60,25 +64,12 @@ class MOM : public PBEMethod
 private:
  const dictionary MOMDict_;
  const phaseModel& phase_;
- //moments
- //m3_ should not be here since it is the same as alpha multiplied by constant
- //factor (in theory)
- //but convecting alpha with MULES give different results than convecting m2_
- //which produce error in diameter d32_ = m3 / m2
+
  std::array<volScalarField, 4> moments_;
 
  void printAvgMaxMin(const volScalarField& v) const;
 
- //source terms are stored so they do not have to be recalculated in every
- //iteration of alpha sub-cycle
- //TODO: Is this still useful?
- //TODO: Size should be obtained from moments_
- std::array<volScalarField, 4> mSources_;
-
- //Sauter mean diameter
  volScalarField d32_;
- //expected diameter TODO: it's only for debugging purposes; to be removed later
- volScalarField expectedD_;
 
  //gamma distribution parameters
  volScalarField gamma_alpha_;
@@ -170,9 +161,7 @@ public:
 
 
  //- Destructor
- virtual ~MOM()
- {}
-
+ virtual ~MOM();
 
  // Member Functions
 };
