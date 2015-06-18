@@ -48,6 +48,7 @@ SourceFiles
 
 #include "PBEMethod.H"
 #include <array>
+#include <gsl/gsl_integration.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -118,14 +119,8 @@ private:
  void updateMoments();
  //overwrites virtual solve from multiphaseSystem
  void solve();
-
- // Private member functions
  
- //- Return gamma function values of given diameter field
- tmp<volScalarField> gamma(const volScalarField& x);
- 
- //- Return gamma distribution values for a given diameter
- tmp<volScalarField> gammaDistribution(const dimensionedScalar xi);
+ gsl_integration_workspace* integrationWorkspace_;
 
 protected:
  // Protected data

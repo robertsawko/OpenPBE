@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 project (PBESolvers)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
 #The build is based on OpenFOAM environmental varialbles Need to check 
 #if they are loaded and if not TODO search and load an appropriate file?
 if(DEFINED ENV{WM_PROJECT})

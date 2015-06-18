@@ -27,6 +27,9 @@ License
 #include <sstream>
 #include <cmath>
 
+#include <boost/math/distributions/gamma.hpp>
+#include <cassert>
+
 #include "MOM.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -206,12 +209,14 @@ MOM::MOM
     integrationSteps_(MOMDict_.lookupOrDefault<scalar>("integrationSteps", 10)),
     bList_(integrationSteps_),
     cList_(pow(integrationSteps_, 2)),
-    gammaList_(integrationSteps_)
+    gammaList_(integrationSteps_),
+    integrationWorkspace_(gsl_integration_workspace_alloc(1000))
 {
 }
 
 MOM::~MOM()
 {
+    gsl_integration_workspace_free(integrationWorkspace_);
 }
 void MOM::correct()
 {
@@ -424,29 +429,37 @@ void MOM::printAvgMaxMin(const volScalarField &v) const
         << ", " << min(v).value() << endl;
 }
 
+using gammaDistribution = boost::math::gamma_distribution<>;
+
+struct ParameterPack
+{
+    double d, m0;
+    breakupKernel& source;
+    int k;
+    gammaDistribution& gamma;
+};
+
+
+double f(double x, void * params)
+{
+    using boost::math::pdf;
+
+    auto parameterPack = static_cast<ParameterPack*>(params);
+    assert(parameterPack != nullptr);
+
+    return pow(parameterPack->d, parameterPack->k) *
+           parameterPack->source.S(x).value() *
+           parameterPack->m0 *
+           pdf(parameterPack->gamma, x);
+}
+
+
+
 tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 {
-    //this function integrates the momentum kernel according to an assumed shape
-    //of the distribution (gamma distribution with method of moments estimator
-    //describing the shape with three independent parameters related to first
-    //three moments (m0,m1,m2)
-    
-    //numerical integration is performed so integration limits must be assumed
-    //integral is calculated on interval 0 < d < maxDiameterMultiplicator * (mean d32)
-    //TODO: is there a beter way to identify integral limits?
-    //integration step is calculated according to prescribed number of
-    //integration steps
-
-    scalar d32Mean = max(d32_.weightedAverage(dispersedPhase_.U().mesh().V()).value(), SMALL);
-    scalar maxArg = maxDiameterMultiplicator_ * d32Mean ;
-    label maxIter = integrationSteps_;
-    scalar dx = maxArg / integrationSteps_;
-
-    scalar arg_i1 = 0.0;
-    label iterator = 0;
 
     //value of the integral
-    volScalarField sum
+    volScalarField toReturn
         (
             IOobject
             (
@@ -466,60 +479,81 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             ) 
         );
 
-    return tmp<volScalarField>( new volScalarField(sum));
-}
-
-tmp<volScalarField> MOM::gamma(const volScalarField& x)
-{
-    volScalarField result
-        (
-            IOobject
-            (
-                "gamma",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            dispersedPhase_.U().mesh(),
-            dimensionedScalar("gamma", dimless, 0.0)
-        );
-    using constant::mathematical::pi;
-
-    forAll(result, celli)
+    forAll(dispersedPhase_, celli)
     {
-        if (x[celli] < 0.5)
-        {
-            result[celli] = 
-                pi / (sin(pi * x[celli]) * internal::gamma(1 - x[celli]));
-        }
-        else
-        {
-            result[celli] = internal::gamma(x[celli]);
-        }
+        gammaDistribution gamma(gamma_alpha_[celli],gamma_beta_[celli]);
+        gsl_function F;
+        F.function = &f;
+        ParameterPack parameterPack{
+            d32_[celli],
+            moments_[0][celli],
+            breakup_(),
+            momenti,
+            gamma
+        };
+        F.params = &gamma;
+
+        double result, error;
+
+        gsl_integration_qagiu(&F, 0, 0, 1e-7, 1000, integrationWorkspace_, &result, &error);
+
+        toReturn[celli] = result;
     }
-    return tmp<volScalarField>( new volScalarField(result));
+
+    return tmp<volScalarField>( new volScalarField(toReturn));
 }
 
+//tmp<volScalarField> MOM::gamma(const volScalarField& x)
+//{
+//    volScalarField result
+//        (
+//            IOobject
+//            (
+//                "gamma",
+//                dispersedPhase_.U().mesh().time().timeName(),
+//                dispersedPhase_.U().mesh(),
+//                IOobject::NO_READ,
+//                IOobject::NO_WRITE
+//            ),
+//            dispersedPhase_.U().mesh(),
+//            dimensionedScalar("gamma", dimless, 0.0)
+//        );
+//    using constant::mathematical::pi;
 
-tmp<volScalarField> MOM::gammaDistribution(const dimensionedScalar xi)
-{
-	gamma_c0_ = max(SMALL, gamma_c0_);
-	gamma_alpha_ = max(minGammaAlpha_, gamma_alpha_);
-	gamma_beta_ = max(SMALL, gamma_beta_);
-	gamma_beta_ = min(maxGammaBeta_, gamma_beta_);
+//    forAll(result, celli)
+//    {
+//        if (x[celli] < 0.5)
+//        {
+//            result[celli] =
+//                pi / (sin(pi * x[celli]) * internal::gamma(1 - x[celli]));
+//        }
+//        else
+//        {
+//            result[celli] = internal::gamma(x[celli]);
+//        }
+//    }
+//    return tmp<volScalarField>( new volScalarField(result));
+//}
 
-	return tmp<volScalarField>
-        (
-            gamma_c0_ * pow(xi, gamma_beta_ - 1) 
-            * pow(constant::mathematical::e, - xi / gamma_alpha_ )
-            / 
-            (
-                pow(gamma_alpha_, gamma_beta_) 
-                * (gamma(gamma_beta_) + SMALL) 
-            )
-        );
-}
+
+//tmp<volScalarField> MOM::gammaDistribution(const dimensionedScalar xi)
+//{
+//	gamma_c0_ = max(SMALL, gamma_c0_);
+//	gamma_alpha_ = max(minGammaAlpha_, gamma_alpha_);
+//	gamma_beta_ = max(SMALL, gamma_beta_);
+//	gamma_beta_ = min(maxGammaBeta_, gamma_beta_);
+
+//	return tmp<volScalarField>
+//        (
+//            gamma_c0_ * pow(xi, gamma_beta_ - 1)
+//            * pow(constant::mathematical::e, - xi / gamma_alpha_ )
+//            /
+//            (
+//                pow(gamma_alpha_, gamma_beta_)
+//                * (gamma(gamma_beta_) + SMALL)
+//            )
+//        );
+//}
 
 
 }//end namespace PBEMethods
