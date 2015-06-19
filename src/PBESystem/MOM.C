@@ -124,6 +124,7 @@ MOM::MOM
             MOMDict_.lookup("scaleDiameter")
         )
     ),
+    scaleM3_(MOMDict_.lookupOrDefault<scalar>("scaleM3",1.0)),
     d32_
     (
         IOobject
@@ -134,7 +135,7 @@ MOM::MOM
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        moments_[3] * scaleD_ * scaleM3_  / moments_[2]
+        moments_[3] * scaleD_ * scaleM3_ / moments_[2]
     ),
     gamma_alpha_
     (
@@ -175,7 +176,6 @@ MOM::MOM
         dispersedPhase_.U().mesh(),
         dimensionedScalar("c0", dimless, 0.0)
     ),
-    scaleM3_(MOMDict_.lookupOrDefault<scalar>("scaleM3",1.0)),
     Nf_(MOMDict_.lookupOrDefault<scalar>("daughterDropletsNr",2.0)),
     maxD_
     (
@@ -447,10 +447,10 @@ double f(double x, void * params)
     auto parameterPack = static_cast<ParameterPack*>(params);
     assert(parameterPack != nullptr);
 
-    return pow(parameterPack->d, parameterPack->k) *
-           parameterPack->source.S(x).value() *
-           parameterPack->m0 *
-           pdf(parameterPack->gamma, x);
+    return pow(parameterPack->d, parameterPack->k)
+        * parameterPack->source.S(x).value()
+        * parameterPack->m0
+        * pdf(parameterPack->gamma, x);
 }
 
 
