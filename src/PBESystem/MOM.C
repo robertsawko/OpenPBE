@@ -491,7 +491,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             momenti,
             gamma
         };
-        F.params = &gamma;
+        F.params = &parameterPack;
 
         double result, error;
 
