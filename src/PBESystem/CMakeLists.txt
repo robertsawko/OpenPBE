@@ -10,6 +10,7 @@ include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
 set(lib_header_files
   coalescenceKernels/coalescenceKernel.H
   coalescenceKernels/noCoalescence.H
+  coalescenceKernels/constantCoalescence.H
   breakupKernels/binaryBreakup.H
   breakupKernels/breakupKernel.H
   breakupKernels/noBreakup.H
@@ -24,6 +25,7 @@ set(lib_header_files
 set(lib_source_files
   coalescenceKernels/coalescenceKernel.C
   coalescenceKernels/noCoalescence.C
+  coalescenceKernels/constantCoalescence.C
   breakupKernels/binaryBreakup.C
   breakupKernels/breakupKernel.C
   breakupKernels/noBreakup.C

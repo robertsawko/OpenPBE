@@ -23,43 +23,49 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "noBreakup.H"
+#include "constantCoalescence.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
-namespace breakupKernels
+namespace coalescenceKernels
 {
-defineTypeNameAndDebug(noBreakup, 0);
+defineTypeNameAndDebug(constantCoalescence, 0);
 addToRunTimeSelectionTable
 (
-    breakupKernel,
-    noBreakup,
+    coalescenceKernel,
+    constantCoalescence,
     dictionary
 );
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-noBreakup::noBreakup
+constantCoalescence::constantCoalescence
 (
-    const dictionary& breakupDict,
+    const dictionary& coalescenceDict,
     const phaseModel& dispersedPhase
 )
 :
-   breakupKernel(breakupDict, dispersedPhase)
+    coalescenceKernel(coalescenceDict, dispersedPhase),
+    constant_(readScalar(coalescenceDict.lookup("constant")))
+   
 {
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 //
-noBreakup::~noBreakup()
+constantCoalescence::~constantCoalescence()
 {}
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-tmp<volScalarField> noBreakup::S(const volScalarField& xi) const
+tmp<volScalarField> constantCoalescence::S
+(
+    const volScalarField& xi1,
+    const volScalarField& xi2
+) const
 {
     return tmp<volScalarField>
     (
@@ -68,23 +74,26 @@ tmp<volScalarField> noBreakup::S(const volScalarField& xi) const
             IOobject
             (
                 "S",
-                xi.mesh().time().timeName(),
-                xi.mesh(),
+                xi1.mesh().time().timeName(),
+                xi1.mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            xi.mesh(),
-            dimensionedScalar("S", dimless / dimTime, 0) 
+            xi1.mesh(),
+            dimensionedScalar("S", dimless/dimTime, constant_) 
         )
     );
 }
 
-dimensionedScalar noBreakup::S(const dimensionedScalar& xi) const
+const dimensionedScalar constantCoalescence::S
+(
+    const dimensionedScalar& xi1,
+    const dimensionedScalar& xi2
+) const
 {
-    return dimensionedScalar("S", dimless / dimTime, 0);
+    return dimensionedScalar("S", dimless/dimTime, constant_);
 }
-
-} //End namespace breakupKernels
+} //End namespace coalescenceKernels
 } //End namespace Foam
 // ************************************************************************* //
