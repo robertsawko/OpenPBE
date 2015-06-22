@@ -527,58 +527,6 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
     return tmp<volScalarField>( new volScalarField(toReturn));
 }
 
-//tmp<volScalarField> MOM::gamma(const volScalarField& x)
-//{
-//    volScalarField result
-//        (
-//            IOobject
-//            (
-//                "gamma",
-//                dispersedPhase_.U().mesh().time().timeName(),
-//                dispersedPhase_.U().mesh(),
-//                IOobject::NO_READ,
-//                IOobject::NO_WRITE
-//            ),
-//            dispersedPhase_.U().mesh(),
-//            dimensionedScalar("gamma", dimless, 0.0)
-//        );
-//    using constant::mathematical::pi;
-
-//    forAll(result, celli)
-//    {
-//        if (x[celli] < 0.5)
-//        {
-//            result[celli] =
-//                pi / (sin(pi * x[celli]) * internal::gamma(1 - x[celli]));
-//        }
-//        else
-//        {
-//            result[celli] = internal::gamma(x[celli]);
-//        }
-//    }
-//    return tmp<volScalarField>( new volScalarField(result));
-//}
-
-
-//tmp<volScalarField> MOM::gammaDistribution(const dimensionedScalar xi)
-//{
-//	gamma_c0_ = max(SMALL, gamma_c0_);
-//	gamma_alpha_ = max(minGammaAlpha_, gamma_alpha_);
-//	gamma_beta_ = max(SMALL, gamma_beta_);
-//	gamma_beta_ = min(maxGammaBeta_, gamma_beta_);
-
-//	return tmp<volScalarField>
-//        (
-//            gamma_c0_ * pow(xi, gamma_beta_ - 1)
-//            * pow(constant::mathematical::e, - xi / gamma_alpha_ )
-//            /
-//            (
-//                pow(gamma_alpha_, gamma_beta_)
-//                * (gamma(gamma_beta_) + SMALL)
-//            )
-//        );
-//}
-
 
 }//end namespace PBEMethods
 }//end namespace Foam

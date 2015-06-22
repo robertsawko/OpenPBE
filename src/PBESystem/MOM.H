@@ -110,9 +110,6 @@ private:
  //- Return a source term due to coalescence
  tmp<volScalarField> momentSourceTerm(label momenti);
 
- //- Sub-cycle number
- //label nAlphaSubCycles_;
-
  // Private member functions
  
  //- Update values of moments and diameter
@@ -122,18 +119,6 @@ private:
  
  gsl_integration_workspace* integrationWorkspace_;
 
-protected:
- // Protected data
-
- // Protected member functions
-
- //! Solve the PBE and convect the classes
- /*!
-  *  Method of classes will only add the source terms
-  *  *\author Robert Sawko
-  *\return void
-  */
- void solveAlphas();
 public:
  TypeName("methodOfMoments");
 
