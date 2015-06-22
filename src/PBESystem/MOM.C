@@ -433,27 +433,50 @@ using gammaDistribution = boost::math::gamma_distribution<>;
 
 struct ParameterPack
 {
-    double d, m0;
+    double d, m0, daughterPDF; //TODO: use daugherPDF class
     breakupKernel& source;
     int k;
     gammaDistribution& gamma;
 };
 
-
-double f(double x, void * params)
+double breakupBirthIntegrand(double x, void* params)
 {
     using boost::math::pdf;
 
     auto parameterPack = static_cast<ParameterPack*>(params);
     assert(parameterPack != nullptr);
 
-    return pow(parameterPack->d, parameterPack->k)
+    return parameterPack->daughterPDF
         * parameterPack->source.S(x).value()
         * parameterPack->m0
         * pdf(parameterPack->gamma, x);
 }
 
+double breakupSource(double x, void* params)
+{
+    auto integrationWorkspace = gsl_integration_workspace_alloc(1000);
 
+    auto parameterPack = static_cast<ParameterPack*>(params);
+    assert(parameterPack != nullptr);
+
+    scalar breakupDeath = parameterPack->source.S(x).value()
+            * parameterPack->m0
+            * pdf(parameterPack->gamma, x);
+
+    double breakupBirth, breakupBirthError;
+
+    gsl_function F;
+    F.function = &breakupBirthIntegrand;
+    F.params = parameterPack;
+
+    gsl_integration_qagiu(&F, x, 0, 1e-7, 1000,
+                          integrationWorkspace, &breakupBirth, &breakupBirthError);
+
+    gsl_integration_workspace_free(integrationWorkspace);
+
+    return pow(x, parameterPack->k)
+            * (breakupBirth - breakupDeath);
+}
 
 tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 {
@@ -483,10 +506,11 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
     {
         gammaDistribution gamma(gamma_alpha_[celli],gamma_beta_[celli]);
         gsl_function F;
-        F.function = &f;
+        F.function = &breakupSource;
         ParameterPack parameterPack{
             d32_[celli],
             moments_[0][celli],
+            Nf_,
             breakup_(),
             momenti,
             gamma
