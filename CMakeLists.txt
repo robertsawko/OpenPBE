@@ -80,7 +80,7 @@ enable_testing()
 
 #option (UseOldLibs "Use old libraries" OFF)
 #General includes required by all code
-include_directories ("${PROJECT_SOURCE_DIR}/src/multiphaseTurbulence/turbulenceModel")
+#include_directories ("${PROJECT_SOURCE_DIR}/src/multiphaseTurbulence/turbulenceModel")
 include_directories ("$ENV{FOAM_SRC}/OpenFOAM/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude")
 
@@ -96,6 +96,10 @@ add_subdirectory(ext/gtest/)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_subdirectory(ext/eigen3/)
-
 #Library
 add_subdirectory(src/PBESystem)
+
+
+#unit tests
+find_package (Threads)
+add_subdirectory(tests)
