@@ -1,5 +1,6 @@
 set(test_SRCS
     breakup.cpp
+    integration.cpp
 )
 
 include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")
