@@ -25,6 +25,7 @@ set(lib_header_files
   MOC.H
   MOM.H
   PBESystems-internal.C
+  Integrator.H
 )
 
 set(lib_source_files
