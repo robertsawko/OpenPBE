@@ -48,7 +48,6 @@ SourceFiles
 
 #include "PBEMethod.H"
 #include <array>
-#include <gsl/gsl_integration.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -116,8 +115,6 @@ private:
  void updateMoments();
  //overwrites virtual solve from multiphaseSystem
  void solve();
- 
- gsl_integration_workspace* integrationWorkspace_;
 
 public:
  TypeName("methodOfMoments");
