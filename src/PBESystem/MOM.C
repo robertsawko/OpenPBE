@@ -458,17 +458,20 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        gammaDistribution gamma(gamma_alpha_[celli],gamma_beta_[celli]);
+        gammaDistribution gamma(gamma_alpha_[celli], gamma_beta_[celli]);
 
         auto m0 = moments_[0][celli];
 
         auto breakupSourceIntegrand = [&](double xi){
             scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
 
-            auto breakupBirthIntegrand = [&](double xi){
-                return Nf_ * breakup_->S(xi).value() * m0 * pdf(gamma, xi);
+            auto breakupBirthIntegrand = [&, xi](double xi_prime){
+                if (xi_prime > xi)
+                    return 2.0 / xi_prime //daughterParticleDistribution_->beta(xi_prime, xi).value()
+                        * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
+                else
+                    return 0.0;
             };
-
 
             double breakupBirth = integrate(breakupBirthIntegrand, xi);
 
