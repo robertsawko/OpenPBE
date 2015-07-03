@@ -1,7 +1,7 @@
 # from os import path
 from PyFoam.Execution.BasicRunner import BasicRunner
 
-from setup_cases import pbe_grids
+from setupCases import pbe_grids
 
 if __name__ == "__main__":
 
