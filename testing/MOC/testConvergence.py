@@ -112,7 +112,7 @@ def test_coalescence_convergence():
         L2_pbe_errors[k] = L2_relative_error(
             xi_n,
             Nsimulation / cc.dv,
-            scott_pbe_solution3(xi_n, T, cc.C, 2.0 * cc.v0, cc.N0)
+            scott_pbe_solution3(xi_n, T, C=cc.C, xi0=2.0 * cc.v0, N0=cc.N0)
         )
 
     check_error_convergence(L2_pbe_errors)
