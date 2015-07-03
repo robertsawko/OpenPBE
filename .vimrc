@@ -22,7 +22,7 @@ set tags+=~/.vim/tags/of22
 
 "wildignre allows us to ignore some files when searching and opening from
 "within vim
-set wildignore=*.o,*.obj,.git,lnInclude,linux64GccDPOpt,tags,*.dep,gmon.out,doc,build
+set wildignore+=*.o,*.obj,.git,lnInclude,linux64GccDPOpt,tags,*.dep,gmon.out,doc,build
 
 "Compilation
 set makeprg=cd\ build;make
