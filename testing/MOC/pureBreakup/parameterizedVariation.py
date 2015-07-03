@@ -3,20 +3,19 @@ from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 
 nr_classes = [10, 20, 40, 80]
-l = 1
+l = 1.0
 
 if __name__ == "__main__":
 
     templateCase = SolutionDirectory(
         "parameterized", archive=None, paraviewLink=False)
 
-
     for nC in nr_classes:
         case = templateCase.cloneCase("testCase" + str(nC))
         phaseProperties = ParsedParameterFile(
             path.join(case.name, "constant", "phaseProperties"))
         phaseProperties["air"]["PBEDiameterCoeffs"]["MOCCoeffs"]["numberOfClasses"] = nC
-        phaseProperties["air"]["PBEDiameterCoeffs"]["MOCCoeffs"]["xi1"] = 1.0 / nC
+        phaseProperties["air"]["PBEDiameterCoeffs"]["MOCCoeffs"]["xi1"] = l / nC
 
         # manually fix bad pyfoam parsing
         phaseProperties["blending"]["default"]["type"] = "none"
@@ -31,7 +30,6 @@ if __name__ == "__main__":
         n0.header["object"] = "n" + str(nC - 1)
         n0.writeFileAs(path.join(case.name, "0", "n" + str(nC - 1)))
 
-        #ipdb.set_trace()
         controlDict = ParsedParameterFile(
             path.join(case.name, "system", "controlDict")
         )

@@ -1,0 +1,4 @@
+pure_br*
+pure_coal*
+*.pyc
+PlyParser_FoamFileParser_parsetab.py
