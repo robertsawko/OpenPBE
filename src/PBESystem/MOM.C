@@ -106,17 +106,7 @@ MOM::MOM
         dispersedPhase_.U().mesh()
     )
     }},
-    scaleD_
-    (
-        dimensionedScalar
-        (
-            "scaleDiameter",
-            dimensionSet(0,0,0,0,0),
-            MOMDict_.lookup("scaleDiameter")
-        )
-    ),
-    scaleM3_(MOMDict_.lookupOrDefault<scalar>("scaleM3",1.0)),
-    d32_
+    d_
     (
         IOobject
         (
@@ -182,7 +172,7 @@ MOM::MOM
         dimensionedScalar
         (
             "minDiameter",
-            dimLength, 
+            dimLength,
             MOMDict_.lookup("minDiameter")
         )
     ),
@@ -267,7 +257,7 @@ void MOM::correct()
     }};
 
     Info<< "moment sources:" << endl;
-    //TODO: is there a better way to assure that source terms on boundaries 
+    //TODO: is there a better way to assure that source terms on boundaries
     //are equal to 0?
     //maybe using internalField() instead of the whole field somewhere?
     //how source terms are handled in combustion/chemistry/turbulence codes in
@@ -313,16 +303,16 @@ void MOM::correct()
         printAvgMaxMin(moment);
     }
 
-    d32_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
-    d32_ = min(d32_, maxD_);
-    d32_ = max(d32_,  minD_);
+    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
+    d_ = min(d_, maxD_);
+    d_ = max(d_,  minD_);
 
-    printAvgMaxMin(d32_);
+    printAvgMaxMin(d_);
 }
 
 const volScalarField MOM::d() const
 {
-    return d32_;
+    return d_;
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -330,11 +320,11 @@ const volScalarField MOM::d() const
 tmp<volScalarField> MOM::momentSourceTerm(label momenti)
 {
     volScalarField bS = breakupSourceTerm(momenti);
-    volScalarField cS = coalescenceSourceTerm(momenti) / scaleD_.value();
-    Info << "breakup (moment "
-        << momenti << ") " << bS.weightedAverage(dispersedPhase_.U().mesh().V()).value() << endl;
-    Info << "coalescence (moment "
-        << momenti << ") " << cS.weightedAverage(dispersedPhase_.U().mesh().V()).value() << endl;
+    volScalarField cS = coalescenceSourceTerm(momenti);
+    Info<< "breakup (moment " << momenti << ") "
+        << bS.weightedAverage(dispersedPhase_.U().mesh().V()).value() << endl;
+    Info<< "coalescence (moment " << momenti << ") "
+        << cS.weightedAverage(dispersedPhase_.U().mesh().V()).value() << endl;
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
@@ -343,8 +333,8 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 {
     dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
 
-    scalar d32Mean = max( d32_.weightedAverage(dispersedPhase_.U().mesh().V()).value() , SMALL);
-    scalar maxArg = maxDiameterMultiplicator_ * d32Mean ;
+    scalar dMean = max(d_.weightedAverage(dispersedPhase_.U().mesh().V()).value(), SMALL);
+    scalar maxArg = maxDiameterMultiplicator_ * dMean ;
     label maxIter = integrationSteps_;
     dimensionedScalar dx = xiDim * maxArg / integrationSteps_;
 

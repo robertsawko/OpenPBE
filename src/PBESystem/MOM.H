@@ -69,9 +69,7 @@ private:
 
  void printAvgMaxMin(const volScalarField& v) const;
 
- const dimensionedScalar scaleD_;
- const scalar scaleM3_;
- volScalarField d32_;
+ volScalarField d_;
 
  //gamma distribution parameters
  volScalarField gamma_alpha_;
