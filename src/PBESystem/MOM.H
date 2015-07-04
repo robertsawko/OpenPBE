@@ -65,7 +65,7 @@ private:
  const dictionary MOMDict_;
  const phaseModel& dispersedPhase_;
 
- std::array<volScalarField, 4> moments_;
+ std::array<volScalarField, 3> moments_;
 
  void printAvgMaxMin(const volScalarField& v) const;
 

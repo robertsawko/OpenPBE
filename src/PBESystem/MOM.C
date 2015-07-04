@@ -40,6 +40,7 @@ License
 #include "fvcAverage.H"
 #include "fvm.H"
 #include "Integrator.H"
+#include "mathematicalConstants.H"
 
 namespace Foam
 {
@@ -56,6 +57,7 @@ addToRunTimeSelectionTable(PBEMethod, MOM, dictionary);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+using constant::mathematical::pi;
 
 MOM::MOM
 (
@@ -102,18 +104,6 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         dispersedPhase_.U().mesh()
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m3",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        dispersedPhase_.U().mesh()
     )
     }},
     scaleD_
@@ -136,8 +126,8 @@ MOM::MOM
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        moments_[3] * scaleD_ * scaleM3_ / moments_[2]
-    ),
+        pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0)
+    ) ,
     gamma_alpha_
     (
         IOobject
@@ -149,7 +139,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         dispersedPhase_.U().mesh(),
-        dimensionedScalar("gamma_alpha", dimLength, 0.0)
+        dimensionedScalar("gamma_alpha", dimVolume, 0.0)
     ),
     gamma_beta_
     (
@@ -224,18 +214,18 @@ void MOM::correct()
     gamma_c0_ = moments_[0];
     gamma_alpha_ = ( moments_[0] * moments_[2] - pow(moments_[1], 2) )
         / (moments_[0] * moments_[1]
-           + dimensionedScalar("small", dimensionSet(0,1,0,0,0), SMALL));
+           + dimensionedScalar("small", dimensionSet(0,3,0,0,0), SMALL));
     gamma_beta_ = pow(moments_[1] , 2)
         / (moments_[2] * moments_[0] - pow(moments_[1],2)
-           + dimensionedScalar("small", dimensionSet(0,2,0,0,0), SMALL));
+           + dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL));
 
     Info<< "gamma parameters:" << endl;
     printAvgMaxMin(gamma_c0_);
     printAvgMaxMin(gamma_alpha_);
     printAvgMaxMin(gamma_beta_);
 
-    //TODO: get rid of 4
-    std::array<volScalarField, 4> mSources_{{
+    //TODO: get rid of 3
+    std::array<volScalarField, 3> mSources_{{
         volScalarField
         (
             IOobject
@@ -247,6 +237,8 @@ void MOM::correct()
                 IOobject::AUTO_WRITE
             ),
             momentSourceTerm(0)
+            //dispersedPhase_.U().mesh(),
+            //dimensionedScalar("m3Source", dimVolume / dimTime, 0.0)
         ),
         volScalarField
         (
@@ -271,19 +263,6 @@ void MOM::correct()
                 IOobject::AUTO_WRITE
             ),
             momentSourceTerm(2)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m3Source",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            dispersedPhase_.U().mesh(),
-            dimensionedScalar("m3Source", pow(dimLength, 3) / dimTime, 0.0)
         )
     }};
 
@@ -334,7 +313,7 @@ void MOM::correct()
         printAvgMaxMin(moment);
     }
 
-    d32_ = moments_[3] * scaleD_ * scaleM3_ / moments_[2];
+    d32_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
     d32_ = min(d32_, maxD_);
     d32_ = max(d32_,  minD_);
 
@@ -379,7 +358,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
         (
             IOobject
             (
-                "Sbr",
+                "sum",
                 dispersedPhase_.U().mesh().time().timeName(),
                 dispersedPhase_.U().mesh(),
                 IOobject::NO_READ,
@@ -389,8 +368,8 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             dispersedPhase_.U().mesh(),
             dimensionedScalar
             (
-                "Sbr", 
-                pow(dimLength, momenti - 1) / dimTime,
+                "sum", 
+                pow(dimVolume, momenti - 1) / dimTime,
                 0
             ) 
         );
@@ -401,7 +380,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
         (
             IOobject
             (
-                "Sbr",
+                "Scoal",
                 dispersedPhase_.U().mesh().time().timeName(),
                 dispersedPhase_.U().mesh(),
                 IOobject::NO_READ,
@@ -411,8 +390,8 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             dispersedPhase_.U().mesh(),
             dimensionedScalar
             (
-                "Sbr", 
-                pow(dimLength, momenti) / dimTime,
+                "Scoal", 
+                pow(dimVolume, momenti) / dimTime,
                 0
             ) 
         );
@@ -451,7 +430,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             dimensionedScalar
             (
                 "Sbr", 
-                pow(dimLength, momenti) /dimTime,
+                pow(dimVolume, momenti) /dimTime,
                 0
             ) 
         );
