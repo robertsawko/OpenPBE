@@ -68,42 +68,43 @@ MOM::MOM
     PBEMethod(pbeProperties, phase),
     MOMDict_(pbeProperties.subDict("MOMCoeffs")),
     dispersedPhase_(phase),
+    mesh_(dispersedPhase_.U().mesh()),
     moments_{{
     volScalarField
     (
         IOobject
         (
             "m0",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        dispersedPhase_.U().mesh()
+        mesh_
     ),
     volScalarField
     (
         IOobject
         (
             "m1",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        dispersedPhase_.U().mesh()
+        mesh_
     ),
     volScalarField
     (
         IOobject
         (
             "m2",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        dispersedPhase_.U().mesh()
+        mesh_
     )
     }},
     d_
@@ -111,8 +112,8 @@ MOM::MOM
         IOobject
         (
             "diameter",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
@@ -123,12 +124,12 @@ MOM::MOM
         IOobject
         (
             "gamma_alpha",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        dispersedPhase_.U().mesh(),
+        mesh_,
         dimensionedScalar("gamma_alpha", dimVolume, 0.0)
     ),
     gamma_beta_
@@ -136,12 +137,12 @@ MOM::MOM
         IOobject
         (
             "gamma_beta",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        dispersedPhase_.U().mesh(),
+        mesh_,
         dimensionedScalar("gamma_beta", dimless, 0.0)
     ),
     gamma_c0_
@@ -149,12 +150,12 @@ MOM::MOM
         IOobject
         (
             "gamma_c0",
-            dispersedPhase_.U().mesh().time().timeName(),
-            dispersedPhase_.U().mesh(),
+            mesh_.time().timeName(),
+            mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        dispersedPhase_.U().mesh(),
+        mesh_,
         dimensionedScalar("c0", dimless, 0.0)
     ),
     Nf_(MOMDict_.lookupOrDefault<scalar>("daughterDropletsNr",2.0)),
@@ -221,8 +222,8 @@ void MOM::correct()
             IOobject
             (
                 "m0Source",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
+                mesh_.time().timeName(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
@@ -235,8 +236,8 @@ void MOM::correct()
             IOobject
             (
                 "m1Source",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
+                mesh_.time().timeName(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
@@ -247,8 +248,8 @@ void MOM::correct()
             IOobject
             (
                 "m2Source",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
+                mesh_.time().timeName(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
@@ -267,7 +268,7 @@ void MOM::correct()
         mSource.boundaryField() = 0;
 
         //fix for nan values
-        forAll(dispersedPhase_.U().mesh().C(), celli)
+        forAll(mesh_.C(), celli)
         {
             auto& mSource_i = mSource[celli];
             if ( std::isnan(mSource_i) )
@@ -322,9 +323,9 @@ tmp<volScalarField> MOM::momentSourceTerm(label momenti)
     volScalarField bS = breakupSourceTerm(momenti);
     volScalarField cS = coalescenceSourceTerm(momenti);
     Info<< "breakup (moment " << momenti << ") "
-        << bS.weightedAverage(dispersedPhase_.U().mesh().V()).value() << endl;
+        << bS.weightedAverage(mesh_.V()).value() << endl;
     Info<< "coalescence (moment " << momenti << ") "
-        << cS.weightedAverage(dispersedPhase_.U().mesh().V()).value() << endl;
+        << cS.weightedAverage(mesh_.V()).value() << endl;
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
@@ -333,7 +334,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 {
     dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
 
-    scalar dMean = max(d_.weightedAverage(dispersedPhase_.U().mesh().V()).value(), SMALL);
+    scalar dMean = max(d_.weightedAverage(mesh_.V()).value(), SMALL);
     scalar maxArg = maxDiameterMultiplicator_ * dMean ;
     label maxIter = integrationSteps_;
     dimensionedScalar dx = xiDim * maxArg / integrationSteps_;
@@ -349,13 +350,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "sum",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
+                mesh_.time().timeName(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            dispersedPhase_.U().mesh(),
+            mesh_,
             dimensionedScalar
             (
                 "sum", 
@@ -371,13 +372,13 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             IOobject
             (
                 "Scoal",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
+                mesh_.time().timeName(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            dispersedPhase_.U().mesh(),
+            mesh_,
             dimensionedScalar
             (
                 "Scoal", 
@@ -393,7 +394,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 void MOM::printAvgMaxMin(const volScalarField &v) const
 {
     Info<< v.name() << ": avg, max,min "
-        << v.weightedAverage(dispersedPhase_.U().mesh().V()).value()
+        << v.weightedAverage(mesh_.V()).value()
         << ", " << max(v).value()
         << ", " << min(v).value() << endl;
 }
@@ -410,13 +411,13 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             IOobject
             (
                 "Sbr",
-                dispersedPhase_.U().mesh().time().timeName(),
-                dispersedPhase_.U().mesh(),
+                mesh_.time().timeName(),
+                mesh_,
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            dispersedPhase_.U().mesh(),
+            mesh_,
             dimensionedScalar
             (
                 "Sbr", 
