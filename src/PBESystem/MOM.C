@@ -117,7 +117,7 @@ MOM::MOM
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0)
+        pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
     ) ,
     gamma_alpha_
     (
@@ -436,9 +436,6 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
 
             auto breakupBirthIntegrand = [&, xi](double xi_prime){
-                scalar a = daughterParticleDistribution_->beta(xi, xi_prime).value()
-                    * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
-
                 return daughterParticleDistribution_->beta(xi, xi_prime).value()
                     * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
             };
