@@ -10,7 +10,7 @@ FoamFile
  object m2;
 }
 
-dimensions [ 0 2 0 0 0 0 0 ];
+dimensions [ 0 6 0 0 0 0 0 ];
 
 internalField uniform 1;
 

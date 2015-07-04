@@ -36,7 +36,7 @@ air
           scaleM3	1;			//default 1.0, additional scaling factor for third moment only
     }
     coalescenceKernel noCoalescence;
-    breakupKernel binaryBreakup;
+    breakupKernel noBreakup;
     daughterParticleDistribution uniformBinaryBreakup;
     noCoalescenceCoeffs
     {
