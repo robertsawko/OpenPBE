@@ -77,7 +77,7 @@ tmp<volScalarField> uniformBinaryBreakup::beta
                 IOobject::NO_WRITE,
                 false
             ),
-            2.0 / xi2
+            2.0 / xi2 * pos(xi2 - xi1)
         )
     );
 }
@@ -88,7 +88,7 @@ const dimensionedScalar uniformBinaryBreakup::beta
     const dimensionedScalar& xi2
 ) const
 {
-    return dimensionedScalar("beta", 2.0 / xi2);
+    return dimensionedScalar("beta", 2.0 / xi2)  * pos(xi2 - xi1);
 }
 } //End namespace daughterParticleDistributions
 } //End namespace Foam
