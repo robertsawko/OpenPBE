@@ -224,10 +224,10 @@ void MOM::correct()
     gamma_c0_ = moments_[0];
     gamma_alpha_ = ( moments_[0] * moments_[2] - pow(moments_[1], 2) )
         / (moments_[0] * moments_[1]
-           + dimensionedScalar("small", dimensionSet(0,1,0,0,0),SMALL ) );
+           + dimensionedScalar("small", dimensionSet(0,1,0,0,0), SMALL));
     gamma_beta_ = pow(moments_[1] , 2)
         / (moments_[2] * moments_[0] - pow(moments_[1],2)
-           + dimensionedScalar("small", dimensionSet(0,2,0,0,0),SMALL ) );
+           + dimensionedScalar("small", dimensionSet(0,2,0,0,0), SMALL));
 
     Info<< "gamma parameters:" << endl;
     printAvgMaxMin(gamma_c0_);
@@ -246,7 +246,7 @@ void MOM::correct()
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            momentSourceTerm(0) / scaleD_.value()
+            momentSourceTerm(0)
         ),
         volScalarField
         (
@@ -258,7 +258,7 @@ void MOM::correct()
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            momentSourceTerm(1) / pow(scaleD_.value(), 2)
+            momentSourceTerm(1)
         ),
         volScalarField
         (
@@ -270,7 +270,7 @@ void MOM::correct()
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            momentSourceTerm(2) / pow(scaleD_.value(), 3)
+            momentSourceTerm(2)
         ),
         volScalarField
         (
@@ -466,18 +466,18 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
             scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
 
             auto breakupBirthIntegrand = [&, xi](double xi_prime){
-                if (xi_prime > xi)
-                    return 2.0 / xi_prime //daughterParticleDistribution_->beta(xi_prime, xi).value()
-                        * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
-                else
-                    return 0.0;
+                scalar a = daughterParticleDistribution_->beta(xi, xi_prime).value()
+                    * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
+
+                return daughterParticleDistribution_->beta(xi, xi_prime).value()
+                    * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
             };
 
             double breakupBirth = integrate(breakupBirthIntegrand, xi);
 
             return pow(xi, momenti) * (breakupBirth - breakupDeath);
         };
-
+        
         toReturn[celli] = integrate(breakupSourceIntegrand, 0.);
     }
 
