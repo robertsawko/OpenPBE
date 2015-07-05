@@ -95,7 +95,7 @@ MOC::MOC
         xi_.set
         (
             i,
-            new dimensionedScalar(xiName.str(), deltaXi_ * i)
+            new dimensionedScalar(xiName.str(), deltaXi_ * (i + 1))
         );
         Info<< className.str().c_str() << " has volume " << xi_[i]
             << endl;
