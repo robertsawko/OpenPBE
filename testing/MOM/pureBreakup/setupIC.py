@@ -22,7 +22,7 @@ if __name__ == "__main__":
     for i in range(class_number):
         n0.header["object"] = "n" + str(i)
         n0["internalField"].setUniform(
-            m0 * (prob.cdf(v[i]) - prob.cdf(v[i] - dv)) / dv
+            m0 * (prob.cdf(v[i]) - prob.cdf(v[i] - dv))
         )
         n0.writeFileAs(path.join(case.name, "0", "n" + str(i)))
 

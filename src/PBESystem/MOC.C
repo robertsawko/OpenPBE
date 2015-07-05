@@ -178,7 +178,7 @@ volScalarField MOC::breakupSourceTerm(label i)
         ) 
     );
     breakupField -=
-        breakup_().S( xi_[i]) * classNumberDensity_[i];
+        breakup_().S(xi_[i]) * classNumberDensity_[i];
 
     for (label j = i + 1; j < numberOfClasses_; ++j)
         // deltaXi comes from the application of mean value theorem on the
@@ -193,17 +193,20 @@ volScalarField MOC::breakupSourceTerm(label i)
 void MOC::correct()
 {
     const fvMesh& m = classNumberDensity_[0].mesh();
+    PtrList<volScalarField> S(numberOfClasses_);
 
-    forAll(classNumberDensity_, k)
-    {
+    forAll(classNumberDensity_, k){
+        S.set(k, classSourceTerm(k));
+    }
+
+    forAll(classNumberDensity_, k){
         surfaceScalarField phi = fvc::interpolate(classVelocity_[k]) & m.Sf();
-        volScalarField S = classSourceTerm(k);
         solve(
             fvm::ddt(classNumberDensity_[k])
             + 
             fvm::div(phi, classNumberDensity_[k], "div(U,nk)")
             ==
-            S
+            S[k]
         );
     }
 }

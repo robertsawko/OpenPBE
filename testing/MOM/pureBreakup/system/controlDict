@@ -18,7 +18,7 @@ startTime 0;
 
 stopAt endTime;
 
-endTime 10;
+endTime 0.01;
 
 deltaT 1e-4;
 
@@ -61,19 +61,7 @@ functions
     name probes; 	// Write at same frequency as fields
     outputControl timeStep;
     outputInterval 10; 	// Fields to be probed
-    fields
-      (
-        n0
-        n1
-        n2
-        n3
-        n4
-        n5
-        n6
-        n7
-        n8
-        n9
-      );
+    fields 3(m0 m1 m2);
     probeLocations
       (
         (0.5 0.5 0.5)

@@ -16,8 +16,8 @@ data = dict(
     ) for c in classes
 )
 
-Ninit = m0 * (prob.cdf(v) - prob.cdf(v - dv)) / dv
-Nend = array([data[i][-1] for i in range(class_number)]) / dv
+NDFinit = m0 * (prob.cdf(v) - prob.cdf(v - dv)) / dv
+NDFend = array([data[i][-1] for i in range(class_number)]) / dv
 
 
 def calculate_moment(N, k=0):
@@ -27,11 +27,11 @@ fig = plt.figure()
 ax = fig.gca()
 plt.xlabel("Drop volume")
 plt.ylabel("Number density")
-ax.plot(v, Ninit)
-ax.plot(v, Nend)
+ax.plot(v, NDFinit)
+ax.plot(v, NDFend)
 fig.savefig("pbe.pdf", bbox_inches='tight')
 
 for k in range(3):
     print(k)
-    print(calculate_moment(Ninit, k))
-    print(calculate_moment(Nend, k))
+    print(calculate_moment(NDFinit, k))
+    print(calculate_moment(NDFend, k))
