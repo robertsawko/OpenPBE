@@ -4,11 +4,11 @@ from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 from scipy.stats import gamma
 
-class_number = 80
-vmax = 20.0
+class_number = 160
+vmax = 1
 dv = vmax / class_number
 m0 = 2
-prob = gamma(a=7.5, scale=1.0)
+prob = gamma(a=50, scale=1.0e-2)
 v = dv + dv * arange(class_number)
 
 if __name__ == "__main__":

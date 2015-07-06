@@ -130,7 +130,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_alpha", dimVolume, 0.0)
+        dimensionedScalar("gamma_alpha", dimless, 0.0)
     ),
     gamma_beta_
     (
@@ -143,7 +143,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_beta", dimless, 0.0)
+        dimensionedScalar("gamma_beta", dimless / dimVolume, 0.0)
     ),
     gamma_c0_
     (
@@ -203,13 +203,17 @@ void MOM::correct()
 {
     Info<< "updating size moments" << endl;
     gamma_c0_ = moments_[0];
-    gamma_alpha_ = ( moments_[0] * moments_[2] - pow(moments_[1], 2) )
-        / (moments_[0] * moments_[1]
-           + dimensionedScalar("small", dimensionSet(0,3,0,0,0), SMALL));
-    gamma_beta_ = pow(moments_[1] , 2)
+    gamma_alpha_ = pow(moments_[1] , 2)
         / (moments_[2] * moments_[0] - pow(moments_[1],2)
            + dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL));
 
+    gamma_beta_ = (moments_[0] * moments_[1]) 
+        / max(
+            moments_[0] * moments_[2] - pow(moments_[1], 2), 
+            dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL)
+        );
+    
+    
     Info<< "gamma parameters:" << endl;
     printAvgMaxMin(gamma_c0_);
     printAvgMaxMin(gamma_alpha_);
