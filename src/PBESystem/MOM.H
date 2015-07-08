@@ -73,8 +73,8 @@ private:
  volScalarField d_;
 
  //gamma distribution parameters
- volScalarField gamma_alpha_;
- volScalarField gamma_beta_;
+ volScalarField gamma_k_;
+ volScalarField gamma_theta_;
  volScalarField gamma_c0_;
 
  //number of daughter droplets
