@@ -119,31 +119,31 @@ MOM::MOM
         ),
         pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
     ) ,
-    gamma_alpha_
+    gamma_k_
     (
         IOobject
         (
-            "gamma_alpha",
+            "gamma_k",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_alpha", dimless, 0.0)
+        dimensionedScalar("gamma_k", dimless, 0.0)
     ),
-    gamma_beta_
+    gamma_theta_
     (
         IOobject
         (
-            "gamma_beta",
+            "gamma_theta",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_beta", dimless / dimVolume, 0.0)
+        dimensionedScalar("gamma_theta", dimless / dimVolume, 0.0)
     ),
     gamma_c0_
     (
@@ -203,11 +203,11 @@ void MOM::correct()
 {
     Info<< "updating size moments" << endl;
     gamma_c0_ = moments_[0];
-    gamma_alpha_ = pow(moments_[1] , 2)
+    gamma_k_ = pow(moments_[1] , 2)
         / (moments_[2] * moments_[0] - pow(moments_[1],2)
            + dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL));
 
-    gamma_beta_ = (moments_[0] * moments_[1]) 
+    gamma_theta_ = (moments_[0] * moments_[1]) 
         / max(
             moments_[0] * moments_[2] - pow(moments_[1], 2), 
             dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL)
@@ -216,8 +216,8 @@ void MOM::correct()
     
     Info<< "gamma parameters:" << endl;
     printAvgMaxMin(gamma_c0_);
-    printAvgMaxMin(gamma_alpha_);
-    printAvgMaxMin(gamma_beta_);
+    printAvgMaxMin(gamma_k_);
+    printAvgMaxMin(gamma_theta_);
 
     //TODO: get rid of 3
     std::array<volScalarField, 3> mSources_{{
@@ -432,7 +432,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        gammaDistribution gamma(gamma_alpha_[celli], gamma_beta_[celli]);
+        gammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
         auto m0 = moments_[0][celli];
 
