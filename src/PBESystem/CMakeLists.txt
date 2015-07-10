@@ -1,8 +1,6 @@
-# find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
 find_package(GSL REQUIRED)
 
-include_directories (EIGEN3_INCLUDE_DIRS)
 include_directories (${Boost_INCLUDE_DIRS})
 include_directories (${GSL_INCLUDE_DIR})
 include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")
