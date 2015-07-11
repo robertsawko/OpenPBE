@@ -77,30 +77,6 @@ private:
  volScalarField gamma_theta_;
  volScalarField gamma_c0_;
 
- //number of daughter droplets
- scalar Nf_;
- //maximum diameter
- dimensionedScalar maxD_;
- //minimum diameter
- dimensionedScalar minD_;
- //minimum alpha parameter
- dimensionedScalar minGammaAlpha_;
- //maximum beta parameter
- scalar maxGammaBeta_;
- //parameters of numerical integration
- scalar maxDiameterMultiplicator_;
- //how many step to perform in numerical integration of source terms
- label integrationSteps_;
-
- // values of breakup and coalescence kernels
- PtrList<volScalarField> bList_;
- PtrList<volScalarField> cList_;
- // values of gamma distribution
- PtrList<volScalarField> gammaList_;
-
- //used to copy flux calculated in solveAlphas() to updateMoments() method
- //surfaceScalarField limitedFlux_;
-
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);
  //- Return a source term due to coalescence

@@ -143,7 +143,7 @@ MOM::MOM
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_theta", dimless / dimVolume, 0.0)
+        dimensionedScalar("gamma_theta", dimVolume, 0.0)
     ),
     gamma_c0_
     (
@@ -157,41 +157,7 @@ MOM::MOM
         ),
         mesh_,
         dimensionedScalar("c0", dimless, 0.0)
-    ),
-    Nf_(MOMDict_.lookupOrDefault<scalar>("daughterDropletsNr",2.0)),
-    maxD_
-    (
-        dimensionedScalar
-        (
-            "maxDiameter",
-            dimLength,
-            MOMDict_.lookup("maxDiameter")
-        )
-    ),
-    minD_
-    (
-        dimensionedScalar
-        (
-            "minDiameter",
-            dimLength,
-            MOMDict_.lookup("minDiameter")
-        )
-    ),
-    minGammaAlpha_
-    (
-        "minGammaAlpha",
-        dimLength,
-        MOMDict_.lookupOrDefault<scalar>("minGammaAlpha", 1e-05)
-    ),
-    maxGammaBeta_(MOMDict_.lookupOrDefault<scalar>("maxGammaBeta", 10.0)),
-    maxDiameterMultiplicator_
-    (
-        MOMDict_.lookupOrDefault<scalar>("maxDiameterMultiplicator", 10.0)
-    ),
-    integrationSteps_(MOMDict_.lookupOrDefault<scalar>("integrationSteps", 10)),
-    bList_(integrationSteps_),
-    cList_(pow(integrationSteps_, 2)),
-    gammaList_(integrationSteps_)
+    )
 {
 }
 
@@ -205,14 +171,15 @@ void MOM::correct()
     gamma_c0_ = moments_[0];
     gamma_k_ = pow(moments_[1] , 2)
         / (moments_[2] * moments_[0] - pow(moments_[1],2)
-           + dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL));
+           + dimensionedScalar("small", dimensionSet(0, 6, 0, 0, 0), SMALL));
 
-    gamma_theta_ = (moments_[0] * moments_[1]) 
-        / max(
-            moments_[0] * moments_[2] - pow(moments_[1], 2), 
-            dimensionedScalar("small", dimensionSet(0,6,0,0,0), SMALL)
+    gamma_theta_ =
+        (moments_[0] * moments_[2] - pow(moments_[1], 2))
+        /
+        max(
+            moments_[0] * moments_[1],
+            dimensionedScalar("small", dimensionSet(0,3,0,0,0), SMALL)
         );
-    
     
     Info<< "gamma parameters:" << endl;
     printAvgMaxMin(gamma_c0_);
@@ -309,8 +276,6 @@ void MOM::correct()
     }
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
-    d_ = min(d_, maxD_);
-    d_ = max(d_,  minD_);
 
     printAvgMaxMin(d_);
 }
@@ -336,6 +301,8 @@ tmp<volScalarField> MOM::momentSourceTerm(label momenti)
 
 tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 {
+
+    /*
     dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
 
     scalar dMean = max(d_.weightedAverage(mesh_.V()).value(), SMALL);
@@ -371,6 +338,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
     volScalarField sum_i0(sum);
 
 
+    */
     volScalarField sum2
         (
             IOobject
