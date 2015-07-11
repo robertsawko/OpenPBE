@@ -199,8 +199,6 @@ void MOM::correct()
                 IOobject::AUTO_WRITE
             ),
             momentSourceTerm(0)
-            //dispersedPhase_.U().mesh(),
-            //dimensionedScalar("m3Source", dimVolume / dimTime, 0.0)
         ),
         volScalarField
         (
@@ -379,24 +377,24 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
     //value of the integral
     volScalarField toReturn
+    (
+        IOobject
         (
-            IOobject
-            (
-                "Sbr",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
+            "Sbr",
+            mesh_.time().timeName(),
             mesh_,
-            dimensionedScalar
-            (
-                "Sbr", 
-                pow(dimVolume, momenti) /dimTime,
-                0
-            ) 
-        );
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            false
+        ),
+        mesh_,
+        dimensionedScalar
+        (
+            "Sbr", 
+            pow(dimVolume, momenti) /dimTime,
+            0
+        ) 
+    );
 
     forAll(dispersedPhase_, celli)
     {
