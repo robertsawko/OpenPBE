@@ -4,22 +4,25 @@ import matplotlib as mpl
 mpl.use("agg")
 import matplotlib.pyplot as plt
 
-path = "./MOC{0}/postProcessing/probes/0/".format(class_number)
 
-MOCdata = genfromtxt(path + 'n0')
+def read_data_from_probes(path, variable_name, number_of_probes):
+    data = genfromtxt(path + variable_name + '0')
+    for k in range(1, number_of_probes):
+        data = column_stack(
+            (data, genfromtxt(
+                "{0}{1}{2}".format(path, variable_name, k))[:, 1])
+        )
 
-for k in range(1, class_number):
-    MOCdata = column_stack(
-        (MOCdata, genfromtxt(path + 'n{0}'.format(k))[:, 1])
-    )
+    return data
 
-path = "./postProcessing/probes/0/"
 
-MOMdata = genfromtxt(path + 'm0', usecols=1)
-for k in range(1, 3):
-    MOMdata = column_stack(
-        (MOMdata, genfromtxt(path + 'm{0}'.format(k))[:, 1])
-    )
+MOCdata = read_data_from_probes(
+    "./MOC{0}/postProcessing/probes/0/".format(class_number),
+    'n', class_number)
+
+MOMdata = read_data_from_probes(
+    "./postProcessing/probes/0/", 'm', 3
+)
 
 NDFinit = m0 * (prob.cdf(v) - prob.cdf(v - dv)) / dv
 NDFend = MOCdata[-1][1:] / dv
@@ -56,15 +59,17 @@ for n in range(MOCdata.shape[0]):
         )
     )
 
-
-
+print(MOC_moments[0, :])
+fig = plt.figure()
+plt.xlabel('Time [s]')
+plt.ylabel('Moment error [%]')
+ax = fig.gca()
+lines = []
 for k in range(3):
-    fig = plt.figure()
-    ax = fig.gca()
-    plt.xlabel('Time [s]')
-    # plt.ylabel('Moment {0}'.format(k))
-    ax.plot(time, MOC_moments[:, k])
-    ax.plot(time[1:], MOMdata[:, k])
-    fig.savefig('moment{0}.pdf'.format(k), bbox_inches='tight')
-
-
+    error = \
+        abs(MOC_moments[1:, k] - MOMdata[:, k + 1]) \
+        / MOMdata[:, k + 1] * 100
+    l, = ax.plot(time[1:], error)
+    lines.append(l)
+ax.legend(lines, ["$m_0$", "$m_1$", "$m_2$"], loc='upper left')
+fig.savefig('moment_errors.pdf'.format(k), bbox_inches='tight')
