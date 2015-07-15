@@ -27,6 +27,10 @@ Class
 Description
     Incompressible multi-phase mixture with built in solution for the
     phase fractions with interface compression for interface-capturing.
+    m3_ should not be here since it is the same as alpha multiplied by constant
+    factor (in theory)
+    but convecting alpha with MULES give different results than convecting m2_
+    which produce error in diameter d32_ = m3 / m2
 
     Derived from transportModel so that it can be unsed in conjunction with
     the incompressible turbulence models.
@@ -42,75 +46,36 @@ SourceFiles
 #ifndef MOMPBE_H
 #define MOMPBE_H
 
-#include "PBESystem.H"
+#include "PBEMethod.H"
+#include <array>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace PBESystems
+namespace PBEMethods
 {
 /*---------------------------------------------------------------------------*\
                       Class MOM Declaration
 \*---------------------------------------------------------------------------*/
 
-class MOM : public PBESystem
+class MOM : public PBEMethod
 {
 private:
  const dictionary MOMDict_;
- //first three moments
- volScalarField m0_;
- volScalarField m1_;
- volScalarField m2_;
- //m3_ should not be here since it is the same as alpha multiplied by constant
- //factor (in theory)
- //but convecting alpha with MULES give different results than convecting m2_
- //which produce error in diameter d32_ = m3 / m2
- volScalarField m3_;
+ const phaseModel& dispersedPhase_;
+ const fvMesh& mesh_;
 
- //source terms are stored so they do not have to be recalculated in every
- //iteration of alpha sub-cycle
- volScalarField m0Source_;
- volScalarField m1Source_;
- volScalarField m2Source_;
- volScalarField m3Source_;
+ std::array<volScalarField, 3> moments_;
 
- //Sauter mean diameter
- volScalarField& d32_;
- //expected diameter TODO: it's only for debugging purposes; to be removed later
- volScalarField expectedD_;
+ void printAvgMaxMin(const volScalarField& v) const;
+
+ volScalarField d_;
 
  //gamma distribution parameters
- volScalarField gamma_alpha_;
- volScalarField gamma_beta_;
+ volScalarField gamma_k_;
+ volScalarField gamma_theta_;
  volScalarField gamma_c0_;
-
- //scaling factor for diameter
- const dimensionedScalar scaleD_;
- const scalar scaleM3_;
- //number of daughter droplets
- scalar Nf_;
- //maximum diameter
- dimensionedScalar maxD_;
- //minimum diameter
- dimensionedScalar minD_;
- //minimum alpha parameter
- dimensionedScalar minGammaAlpha_;
- //maximum beta parameter
- scalar maxGammaBeta_;
- //parameters of numerical integration
- scalar maxDiameterMultiplicator_;
- //how many step to perform in numerical integration of source terms
- label integrationSteps_;
-
- // values of breakup and coalescence kernels
- PtrList<volScalarField> bList_;
- PtrList<volScalarField> cList_;
- // values of gamma distribution
- PtrList<volScalarField> gammaList_;
-
- //used to copy flux calculated in solveAlphas() to updateMoments() method
- surfaceScalarField limitedFlux_;
 
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);
@@ -119,9 +84,6 @@ private:
  //- Return a source term due to coalescence
  tmp<volScalarField> momentSourceTerm(label momenti);
 
- //- Sub-cycle number
- label nAlphaSubCycles_;
-
  // Private member functions
  
  //- Update values of moments and diameter
@@ -129,26 +91,6 @@ private:
  //overwrites virtual solve from multiphaseSystem
  void solve();
 
- // Private member functions
- 
- //- Return gamma function values of given diameter field
- tmp<volScalarField> gamma(const volScalarField& x);
- 
- //- Return gamma distribution values for a given diameter
- tmp<volScalarField> gammaDistribution(const dimensionedScalar xi);
-
-protected:
- // Protected data
-
- // Protected member functions
-
- //! Solve the PBE and convect the classes
- /*!
-  *  Method of classes will only add the source terms
-  *  *\author Robert Sawko
-  *\return void
-  */
- void solveAlphas();
 public:
  TypeName("methodOfMoments");
 
@@ -157,15 +99,20 @@ public:
  //- Construct from components
  MOM
  (
-     const volVectorField& U,
-     const surfaceScalarField& phi
+     const dictionary& pbeProperties,
+     const phaseModel& phase
  );
+
+ //- Dummy correct
+ virtual void correct() override;
+
+ ////- Return the Sauter-mean diameter
+ virtual const volScalarField d() const override;
+
 
 
  //- Destructor
- virtual ~MOM()
- {}
-
+ virtual ~MOM();
 
  // Member Functions
 };
@@ -173,7 +120,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace PBESystems
+} // End namespace PBEMethods
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1,6 +1,10 @@
 find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED)
+find_package(GSL REQUIRED)
 
 include_directories (EIGEN3_INCLUDE_DIRS)
+include_directories (${Boost_INCLUDE_DIRS})
+include_directories (${GSL_INCLUDE_DIR})
 include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/transportModels/incompressible/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/transportModels/compressible/lnInclude")
@@ -20,6 +24,9 @@ set(lib_header_files
   PBEMethod.H
   dummy.H
   MOC.H
+  MOM.H
+  PBESystems-internal.C
+  Integrator.H
 )
 
 set(lib_source_files
@@ -35,9 +42,11 @@ set(lib_source_files
   PBEMethod.C
   dummy.C
   MOC.C
+  MOM.C
 )
 
 add_library(PBE SHARED ${lib_header_files} ${lib_source_files})
+target_link_libraries(PBE ${GSL_LIBRARIES})
 
 set_target_properties (PBE PROPERTIES LIBRARY_OUTPUT_DIRECTORY
   "$ENV{FOAM_USER_LIBBIN}")

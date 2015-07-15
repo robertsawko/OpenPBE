@@ -41,6 +41,14 @@ defineRunTimeSelectionTable(breakupKernel, dictionary);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+Foam::breakupKernel::breakupKernel():
+    breakupDict_(),
+    continuousPhase_(nullptr),
+    dispersedPhase_(nullptr)
+{
+
+}
+
 Foam::breakupKernel::breakupKernel
 (
     const dictionary& breakupDict,
@@ -48,8 +56,8 @@ Foam::breakupKernel::breakupKernel
 ) 
 :
     breakupDict_(breakupDict),
-    continuousPhase_(dispersedPhase.otherPhase()),
-    dispersedPhase_(dispersedPhase)
+    continuousPhase_(&dispersedPhase.otherPhase()),
+    dispersedPhase_(&dispersedPhase)
 {
 };
 

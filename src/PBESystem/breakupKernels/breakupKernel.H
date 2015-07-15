@@ -64,8 +64,8 @@ class breakupKernel
   // Protected data
  protected:
   dictionary breakupDict_;
-  const phaseModel& continuousPhase_;
-  const phaseModel& dispersedPhase_;
+  const phaseModel* continuousPhase_;
+  const phaseModel* dispersedPhase_;
 
  public:
   TypeName("breakupKernel");
@@ -90,7 +90,7 @@ class breakupKernel
   // Constructors
 
   //- Construct null
-  //breakupKernel();
+  breakupKernel();
 
   //- Construct from components
   breakupKernel

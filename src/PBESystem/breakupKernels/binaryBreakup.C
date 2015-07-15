@@ -41,6 +41,13 @@ addToRunTimeSelectionTable
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+binaryBreakup::binaryBreakup()
+:
+    breakupKernel(),
+    consistency_("c", dimensionSet(0, -6, -1, 0, 0, 0, 0), 1.0)
+{
+}
+
 binaryBreakup::binaryBreakup
 (
     const dictionary& breakupDict,

@@ -78,6 +78,8 @@ class binaryBreakup
 
   // Constructors
 
+  binaryBreakup();
+
   binaryBreakup
   (
       const dictionary& breakupDict,
