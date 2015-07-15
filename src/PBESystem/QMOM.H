@@ -50,6 +50,8 @@ SourceFiles
 #include <array>
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
+#include <iostream>
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //
@@ -75,7 +77,7 @@ pair wheeler_inversion(const VectorXd& moments)
     for(int k = 1; k < N; ++k){
         int Ncol = 2 * (N - k);
         sigma.block(k + 1, k, 1, Ncol)
-            = sigma.block(k, k + 1, 1, Ncol + 1)
+            = sigma.block(k, k + 1, 1, Ncol)
             - a(k - 1) * sigma.block(k, k, 1, Ncol)
             - b(k - 1) * sigma.block(k - 1, k, 1, Ncol);
 
@@ -86,12 +88,12 @@ pair wheeler_inversion(const VectorXd& moments)
         b(k) = sigma(k+1, k) / sigma(k, k-1);
     }
     
-    VectorXd b_diag = b.array().abs().sqrt(); //-Eigen::sqrt(Eigen::abs(b));
+    VectorXd b_diag = - b.array().abs().sqrt(); //-Eigen::sqrt(Eigen::abs(b));
     //TODO: find a tridiagonal representation
     MatrixXd jacobi = a.asDiagonal();
     for(int i = 0; i < b_diag.size() - 1; ++i){
-        jacobi(i, i + 1) = b_diag(i);
-        jacobi(i + 1, i) = b_diag(i);
+        jacobi(i, i + 1) = b_diag(i + 1);
+        jacobi(i + 1, i) = b_diag(i + 1);
     }
 
     // eigval, eigvec = np.linalg.eig(jacobi)
@@ -99,18 +101,8 @@ pair wheeler_inversion(const VectorXd& moments)
 
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigenresult(jacobi);
     VectorXd abcissas = eigenresult.eigenvalues();
-    VectorXd weights = moments(0) * eigenresult.eigenvectors().col(0).array().pow(2);
+    VectorXd weights = moments(0) * eigenresult.eigenvectors().row(0).array().pow(2);
 
-
-    //calculate weights and abcissas from the coefficients
-
-    /*
-        double w1 = 1 / (2 * sqrt(6) + pow(2, 1.5) * sqrt(3) + 12);
-        double w2 = 1 / (12 - 2 * sqrt(6) - pow(2, 1.5) * sqrt(3));
-        VectorXd weights(4), abcissas(4);
-        weights <<  w1, w2, w2, w1;
-        abcissas << 2.6656, 4.2580, 5.7420, 7.3344;
-    */
     return pair{abcissas, weights};
 };
 

@@ -30,7 +30,7 @@ TEST(qmom, wheeler_test){
 
     auto p = wheeler_inversion(moments);
     
-    ASSERT_DOUBLE_EQ((p.abcissas - abcissas).norm(), 0.);
-    ASSERT_DOUBLE_EQ((p.weights - weights).norm(), 0.);
+    ASSERT_NEAR((p.abcissas - abcissas).norm(), 0, 1e-4);
+    ASSERT_NEAR((p.weights - weights).norm(), 0, 1e-4);
 
 }
