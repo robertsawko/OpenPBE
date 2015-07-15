@@ -21,22 +21,14 @@ air
   diameterModel PBEDiameter;
   PBEDiameterCoeffs
   {
-    method methodOfMoments;
-    MOMCoeffs
+    method methodOfClasses;
+    MOCCoeffs
     {
-          scaleDiameter 	0.001; 		//scaling factor or diameter
-          maxDiameter		0.006;		//maximum allowed diameter
-          minDiameter		0.0001;		//minimum allowed diameter
-          //--------------------------parameters with default values
-          maxGammaBeta	65.0; 			//default 10, maximum allowed beta parameter in gamma distribution
-          minGammaAlpha	1e-04; 			//default 1e-05; minimum allowed alpha parameter in gamma distribution
-          maxDiameterMultiplicator	3; 	//default 10, integration is from zero to maxD = maxDiameterMultiplicator * mean diameter
-          integrationSteps		20; 	//default 10, numer of integration steps for numerical integration of source terms
-          //daughterDropletsNr	2; 		//default 2, number of daughter droplets
-          scaleM3	1;			//default 1.0, additional scaling factor for third moment only
+      numberOfClasses 80;
+      xi1 0.0125;
     }
     coalescenceKernel noCoalescence;
-    breakupKernel noBreakup;
+    breakupKernel binaryBreakup;
     daughterParticleDistribution uniformBinaryBreakup;
     noCoalescenceCoeffs
     {

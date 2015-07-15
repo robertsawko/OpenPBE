@@ -7,12 +7,12 @@ FoamFile
  format ascii;
  class volScalarField;
  location "0";
- object m3;
+ object n0;
 }
 
-dimensions [ 0 3 0 0 0 0 0 ];
+dimensions [ 0 0 0 0 0 0 0 ];
 
-internalField uniform 1;
+internalField uniform 0;
 
 boundaryField
 {

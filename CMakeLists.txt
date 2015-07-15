@@ -98,6 +98,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 add_subdirectory(ext/eigen3/)
 #Library
 add_subdirectory(src/PBESystem)
+add_subdirectory(applications/PBEFoam)
 
 
 #unit tests
