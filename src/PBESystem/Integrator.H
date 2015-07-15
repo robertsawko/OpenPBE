@@ -18,7 +18,7 @@ double integrate(F f, double lower_bound)
     gslFunction.params = &f;
 
     double result, error;
-    gsl_integration_qagiu(&gslFunction, lower_bound, 1e-3, 0, 1000, integrationWorkspace,
+    gsl_integration_qagiu(&gslFunction, lower_bound, 1e-7, 0, 1000, integrationWorkspace,
                           &result, &error);
 
     gsl_integration_workspace_free(integrationWorkspace);
