@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <cmath>
-#include "../src/PBESystem/Integrator.H"
+#include "Integrator.H"
 
 
 TEST(Integration, exponential_inverse){

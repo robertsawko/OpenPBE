@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../src/PBESystem/breakupKernels/binaryBreakup.H"
+#include "breakupKernels/binaryBreakup.H"
 
 TEST(BreakupKernel, source){
     Foam::dimensionedScalar xi(

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
-// #include <cmath>
 #include "scalar.H"
-#include "../src/PBESystem/QMOM.H"
+#include "QMOM.H"
 #include <Eigen/Dense>
 
 /*
@@ -11,9 +10,6 @@ Daniele L. Marchisio, Rodney O. Fox "Computational Models for Polydisperse
 Particulate and Multiphase Systems", Cambridge University Press 2013
 */
 
-//using Foam::sqrt;
-//using Foam::pow;
-//using Foam::scalar;
 using Eigen::VectorXd;
 
 
