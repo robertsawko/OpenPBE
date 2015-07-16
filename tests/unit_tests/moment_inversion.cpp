@@ -12,7 +12,6 @@ Particulate and Multiphase Systems", Cambridge University Press 2013
 
 using Eigen::VectorXd;
 
-
 TEST(qmom, wheeler_test){
 
     VectorXd moments(8);
@@ -28,5 +27,4 @@ TEST(qmom, wheeler_test){
     
     ASSERT_NEAR((p.abcissas - abcissas).norm(), 0, 1e-4);
     ASSERT_NEAR((p.weights - weights).norm(), 0, 1e-4);
-
 }
