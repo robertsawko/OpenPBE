@@ -108,3 +108,9 @@ add_subdirectory(applications/PBEFoam)
 #unit tests
 find_package (Threads)
 add_subdirectory(tests)
+
+#benchmarks
+set(CMAKE_BUILD_TYPE Release)
+add_subdirectory(ext/benchmark)
+set(GBENCH_INCLUDE_DIRS ext/benchmark/src)
+add_subdirectory(benchmarks)
