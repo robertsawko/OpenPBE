@@ -116,5 +116,5 @@ add_subdirectory(tests)
 #benchmarks
 set(CMAKE_BUILD_TYPE Release)
 add_subdirectory(ext/benchmark)
-set(GBENCH_INCLUDE_DIRS ext/benchmark/src)
+set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
 add_subdirectory(benchmarks)
