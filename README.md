@@ -11,9 +11,17 @@
 ## Build
 
 ```bash
+# Clone the project
+
 # Load OpenFOAM 2.3.1 environment
 
 cd <project_dir>
+
+# Donload benchmark
+git submodule init
+git submodule update 
+
+# Build the project
 mkdir build
 cmake ../
 make #alternatively make -j 4 for parallell build
