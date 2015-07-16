@@ -1,18 +1,14 @@
 #include <benchmark/benchmark.h>
+#include "../src/PBESystem/QMOM.H"
+#include <Eigen/Dense>
 
-static void BM_StringCreation(benchmark::State& state) {
-  while (state.KeepRunning())
-    std::string empty_string;
+static void BM_Wheeler(benchmark::State& state) {
+    VectorXd moments(8);
+    moments << 1, 5, 26, 140, 778, 4450, 26140, 157400;
+    while (state.KeepRunning())
+        wheeler_inversion(moments);
 }
-// Register the function as a benchmark
-BENCHMARK(BM_StringCreation);
 
-// Define another benchmark
-static void BM_StringCopy(benchmark::State& state) {
-  std::string x = "hello";
-  while (state.KeepRunning())
-    std::string copy(x);
-}
-BENCHMARK(BM_StringCopy);
+BENCHMARK(BM_Wheeler);
 
 BENCHMARK_MAIN();
