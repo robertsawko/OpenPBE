@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6)
-project (PBESolvers)
+project (PBESolvers CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -53,32 +53,6 @@ macro (TARGET_LINK_OPENFOAM_USERLIB arg1 arg2)
   #message("Using ${${arg2}_LIB}")
   target_link_libraries(${arg1} ${${arg2}_LIB})
 endmacro (TARGET_LINK_OPENFOAM_USERLIB)
-
-
-macro (ADD_MY_TEST testname executable)
-  add_test(
-      NAME ${testname}
-      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${testname}"
-      COMMAND ${executable}
-  )
-
-  add_custom_command(
-      TARGET ${executable}
-      PRE_BUILD
-      COMMAND mkdir -p ${testname}
-      COMMAND cp -r ${PROJECT_SOURCE_DIR}/testing/${testname}/* ${testname}
-      COMMENT "Creating and copying directories for ${testname}"
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  )
-
-  add_custom_command(
-      TARGET ${executable}
-      POST_BUILD
-      COMMAND blockMesh &> log.blockMesh
-      COMMENT "Running blockMesh in ${CMAKE_CURRENT_BINARY_DIR}/${testname}"
-      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${testname}
-  )
-endmacro (ADD_MY_TEST)
 
 enable_testing()
 

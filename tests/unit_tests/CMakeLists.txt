@@ -1,9 +1,3 @@
-set(test_SRCS
-    breakup.cpp
-    integration.cpp
-    moment_inversion.cpp
-)
-
 include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")
 include_directories(${GTEST_INCLUDE_DIRS})
 include_directories ("$ENV{FOAM_SRC}/transportModels/incompressible/lnInclude")
@@ -11,18 +5,27 @@ include_directories ("$ENV{FOAM_SRC}/transportModels/compressible/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
 include_directories ("${PROJECT_SOURCE_DIR}/src/PBESystem")
-add_executable(unit_tests ${test_SRCS})
 
-# target_link_openfoam_userlib(unit_tests PBE)
-target_link_libraries(unit_tests PBE)
-target_link_openfoam_libraries(unit_tests compressibleTwoPhaseSystem
-  compressibleEulerianInterfacialModels compressibleTurbulenceModels
-  incompressibleTurbulenceModels phaseCompressibleTurbulenceModels
-fvOptions)
+function (ADD_UNIT_TEST testname executable sourcefile)
 
-target_link_libraries(unit_tests ${CMAKE_BINARY_DIR}/ext/gtest/src/googletest-build/libgtest_main.a)
-target_link_libraries(unit_tests ${CMAKE_BINARY_DIR}/ext/gtest/src/googletest-build/libgtest.a)
-target_link_libraries(unit_tests ${CMAKE_THREAD_LIBS_INIT})
+  set(sources ${sourcefile})
+  add_executable(${executable} ${sources})
 
-add_test(binary_breakup_value_test unit_tests)
+  target_link_libraries(${executable} PBE)
+  target_link_openfoam_libraries(${executable} compressibleTwoPhaseSystem
+    compressibleEulerianInterfacialModels compressibleTurbulenceModels
+    incompressibleTurbulenceModels phaseCompressibleTurbulenceModels
+    fvOptions)
+
+  target_link_libraries(${executable} ${CMAKE_BINARY_DIR}/ext/gtest/src/googletest-build/libgtest_main.a)
+  target_link_libraries(${executable} ${CMAKE_BINARY_DIR}/ext/gtest/src/googletest-build/libgtest.a)
+  target_link_libraries(${executable} ${CMAKE_THREAD_LIBS_INIT})
+
+  add_test(${testname} ${executable})
+endfunction (ADD_UNIT_TEST)
+
+add_unit_test(breakup_unittest breakup_test breakup.cpp integration.cpp)
+add_unit_test(numerical_integration_unittest integration_test integration.cpp)
+add_unit_test(moment_inversion_unittestest moment_inversion_test moment_inversion.cpp)
+
 

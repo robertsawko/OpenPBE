@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "breakupKernels/binaryBreakup.H"
 
-TEST(BreakupKernel, source){
+TEST(GSL_integrator, source){
     Foam::dimensionedScalar xi(
         "a_class", Foam::dimensionSet(0, 3, 0, 0, 0), 6);
     Foam::dimensionedScalar result(
