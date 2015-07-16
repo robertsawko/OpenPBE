@@ -269,9 +269,6 @@ void QMOM::printAvgMaxMin(const volScalarField &v) const
         << ", " << min(v).value() << endl;
 }
 
-using gammaDistribution = boost::math::gamma_distribution<>;
-using boost::math::pdf;
-
 tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
 {
 
@@ -296,27 +293,29 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
             ) 
         );
 
-//    forAll(dispersedPhase_, celli)
-//    {
-//        gammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
+    forAll(dispersedPhase_, celli)
+    {
+        VectorXd momentVector(moments_.size());
+        for (int i=0; i<momentVector.size(); ++i)
+            momentVector[i] = moments_[i][celli];
 
-//        auto m0 = moments_[0][celli];
+        auto quadrature = wheeler_inversion(momentVector);
+        auto m0 = moments_[0][celli];
 
-//        auto breakupSourceIntegrand = [&](double xi){
-//            scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
+        auto g = [&](double xi_alpha)
+        {
+            return breakup_->S(xi_alpha).value() * m0;
+        };
 
-//            auto breakupBirthIntegrand = [&, xi](double xi_prime){
-//                return daughterParticleDistribution_->beta(xi, xi_prime).value()
-//                    * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
-//            };
+        int N = quadrature.abcissas.size();
+        double result = 0.;
 
-//            double breakupBirth = integrate(breakupBirthIntegrand, xi);
+        for (int i=0; i<N; ++i){
+            result += quadrature.weights[i] * g(quadrature.abcissas[i]);
+        }
 
-//            return pow(xi, momenti) * (breakupBirth - breakupDeath);
-//        };
-        
-//        toReturn[celli] = integrate(breakupSourceIntegrand, 0.);
-//    }
+        toReturn[celli] = result;
+    }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
 }
