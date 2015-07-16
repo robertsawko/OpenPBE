@@ -14,6 +14,9 @@ else()
   return()
 endif()
 
+find_package(Eigen3 REQUIRED)
+include_directories (${EIGEN3_INCLUDE_DIR})
+
 #TODO Is there a better way to break lines?
 set(CMAKE_CXX_FLAGS "-g -m64 -Dlinux64 -DWM_DP") 
 #g++ will inform you of unused typedefs and we want to suppress this as there
@@ -24,7 +27,8 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNoRepository -ftemplate-depth-100")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNoRepository -ftemplate-depth-100")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Xlinker --add-needed -Xlinker --no-as-needed")
 else ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_HAS_TR1_TUPLE=0 -wd327,654,819,1125,1476,1505,1572 -xSSE3 -O2 -no-prec-div  -DNoRepository")

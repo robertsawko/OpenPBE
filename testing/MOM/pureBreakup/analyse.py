@@ -1,4 +1,4 @@
-from numpy import genfromtxt, array, dot, column_stack, vstack, append
+from numpy import genfromtxt, array, dot, column_stack, vstack, append, linspace
 from setupIC import class_number, v, dv, m0, prob
 import matplotlib as mpl
 mpl.use("agg")
@@ -27,11 +27,14 @@ MOMdata = read_data_from_probes(
 NDFinit = m0 * (prob.cdf(v) - prob.cdf(v - dv)) / dv
 NDFend = MOCdata[-1][1:] / dv
 time = append([0.0], MOCdata[:, 0])
+m = MOMdata[-1, :]
+k = m[1]**2 / (m[2] * m[0] - m[1]**2)
+theta = m[0] * m[1] / (m[0] * m[2] - m[1]**2)
 
+from scipy.stats import gamma
+prob_MOM = gamma(a=k, scale=theta)
 
-def calculate_moment(N, k=0):
-    return dot(v**k, N) * dv
-
+NDFMOM = m[0] * (prob_MOM.pdf(v) - prob_MOM.cdf(v - dv)) / dv
 
 fig = plt.figure()
 ax = fig.gca()
@@ -39,7 +42,12 @@ plt.xlabel("Drop volume")
 plt.ylabel("Number density")
 ax.plot(v, NDFinit)
 ax.plot(v, NDFend)
+ax.plot(v, NDFMOM)
 fig.savefig("pbe.pdf", bbox_inches='tight')
+
+
+def calculate_moment(N, k=0):
+    return dot(v**k, N) * dv
 
 MOC_moments = array([calculate_moment(NDFinit, k) for k in range(3)])
 for n in range(MOCdata.shape[0]):
