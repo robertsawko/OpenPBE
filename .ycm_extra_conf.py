@@ -70,7 +70,7 @@ flags = [
     '-I' + foam_app + '/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/'\
     + 'lnInclude',
     '-I' + foam_src + '/transportModels/incompressible/lnInclude',
-    '-I' + foam_src + 'finiteVolume/lnInclude',
+    '-I' + foam_src + '/finiteVolume/lnInclude',
     '-I' + foam_src + '/fvOptions/lnInclude',
     '-I' + foam_src + '/OpenFOAM/lnInclude',
     '-I./src/PBESystem/',
