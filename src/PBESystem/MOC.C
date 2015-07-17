@@ -144,12 +144,12 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
     coalescenceField *= classNumberDensity_[i];
 
-    //TODO: Fix the odd and even controversy
+    //-1 in pairs account for zero-based numbering
     for(int j = 0; j < i; ++j)
     {
         coalescenceField +=
-            0.5 * coalescence_().S(xi_[i - j], xi_[j])
-            * classNumberDensity_[i - j] * classNumberDensity_[j];
+            0.5 * coalescence_().S(xi_[i - j - 1], xi_[j])
+            * classNumberDensity_[i - j - 1] * classNumberDensity_[j];
     }
 
     return coalescenceField;
@@ -173,7 +173,7 @@ volScalarField MOC::breakupSourceTerm(label i)
         dimensionedScalar
         (
             "Sbr", 
-            classNumberDensity_[i].dimensions()/dimTime,
+            classNumberDensity_[i].dimensions() / dimTime,
             0.0
         ) 
     );
