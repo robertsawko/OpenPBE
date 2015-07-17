@@ -15,9 +15,9 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-phases (air water);
+phases (oil water);
 
-air
+oil
 {
     diameterModel   PBEDiameter;
     PBEDiameterCoeffs
@@ -56,8 +56,8 @@ blending
     {
         type            linear;
         residualAlpha 1;
-        maxFullyDispersedAlpha.air 0.3;
-        maxPartlyDispersedAlpha.air 0.5;
+        maxFullyDispersedAlpha.oil 0.3;
+        maxPartlyDispersedAlpha.oil 0.5;
         maxFullyDispersedAlpha.water 0.3;
         maxPartlyDispersedAlpha.water 0.5;
     }
@@ -65,18 +65,18 @@ blending
 
 sigma
 (
-    (air and water)     0.07
+    (oil and water)     0.07
 );
 
 aspectRatio
 (
-    (air in water)
+    (oil in water)
     {
         type            constant;
         E0              1.0;
     }
 
-    (water in air)
+    (water in oil)
     {
         type            constant;
         E0              1.0;
@@ -85,7 +85,7 @@ aspectRatio
 
 drag
 (
-    (air in water)
+    (oil in water)
     {
         type            SchillerNaumann;
         residualAlpha   1e-6;
@@ -96,7 +96,7 @@ drag
         }
     }
 
-    (water in air)
+    (water in oil)
     {
         type            SchillerNaumann;
         residualAlpha   1e-6;
@@ -107,7 +107,7 @@ drag
         }
     }
 
-    (air and water)
+    (oil and water)
     {
         type            segregated;
         residualAlpha   1e-6;
@@ -122,13 +122,13 @@ drag
 
 virtualMass
 (
-    (air in water)
+    (oil in water)
     {
         type            constantCoefficient;
         Cvm             0.5;
     }
 
-    (water in air)
+    (water in oil)
     {
         type            constantCoefficient;
         Cvm             0.5;
@@ -137,13 +137,13 @@ virtualMass
 
 heatTransfer
 (
-    (air in water)
+    (oil in water)
     {
         type            RanzMarshall;
         residualAlpha   1e-4;
     }
 
-    (water in air)
+    (water in oil)
     {
         type            RanzMarshall;
         residualAlpha   1e-4;

@@ -9,41 +9,37 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      thermophysicalProperties.air;
+    class       volScalarField;
+    object      kappai.oil;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-thermoType
+dimensions          [0 -1 0 0 0 0 0];
+
+internalField       uniform 2000;
+
+boundaryField
 {
-    type            heRhoThermo;
-    mixture         pureMixture;
-    transport       const;
-    thermo          hConst;
-    equationOfState perfectGas;
-    specie          specie;
-    energy          sensibleInternalEnergy;
+    walls
+    {
+        type               zeroGradient;
+    }
+    outlet
+    {
+        type               inletOutlet;
+        phi                phi.oil;
+        inletValue         $internalField;
+        value              $internalField;
+    }
+    inlet
+    {
+        type               fixedValue;
+        value              $internalField;
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
 }
 
-mixture
-{
-    specie
-    {
-        nMoles      1;
-        molWeight   28.9;
-    }
-    thermodynamics
-    {
-        Cp          1007;
-        Hf          0;
-    }
-    transport
-    {
-        mu          1.84e-05;
-        Pr          0.7;
-    }
-}
-
-
-// ************************************************************************* //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -8,38 +8,38 @@
 FoamFile
 {
     version     2.0;
-    format      ascii;
-    class       volScalarField;
-    object      kappai.air;
+    format      binary;
+    class       volVectorField;
+    object      U.oil;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions          [0 -1 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField       uniform 2000;
+internalField   uniform (0.1 0 0);
 
 boundaryField
 {
-    walls
-    {
-        type               zeroGradient;
-    }
-    outlet
-    {
-        type               inletOutlet;
-        phi                phi.air;
-        inletValue         $internalField;
-        value              $internalField;
-    }
     inlet
     {
         type               fixedValue;
         value              $internalField;
     }
+    outlet
+    {
+        type               pressureInletOutletVelocity;
+        phi                phi.oil;
+        value              $internalField;
+    }
+    walls
+    {
+        type               fixedValue;
+        value              uniform (0 0 0);
+    }
     frontAndBack
     {
-        type            empty;
+        type               empty;
     }
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// ************************************************************************* //
