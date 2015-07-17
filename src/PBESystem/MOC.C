@@ -280,8 +280,8 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
             Nk,
             phi,
             phiNkCorr,
-            zeroField(), //TODO: one of these is a source term
-            zeroField(),
+            zeroField(), //implicit source?
+            S[k], 
             maxNk,
             0,
             3,
@@ -315,8 +315,8 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
             geometricOneField(),
             Nk,
             phiNk,
-            zeroField(), //TODO: One of these is a source term
-            zeroField()
+            zeroField(), //implicit source?
+            S[k]
         );
 
         Info<< Nk.name() << " volume average, min, max = "
