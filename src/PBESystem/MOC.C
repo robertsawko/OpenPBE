@@ -60,7 +60,7 @@ MOC::MOC
     classVelocity_(numberOfClasses_),
     deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
     xi_(numberOfClasses_),
-    usingMULES_(pbeProperties.found("usingMULES"))
+    usingMULES_(MOCDict_.found("usingMULES"))
 {
     Info << "Creating " << numberOfClasses_ << " class";
     //Taking pedantry one step too far!
