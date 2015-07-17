@@ -271,6 +271,7 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
             }
         }
         */
+        scalar maxNk = max(phase_ * mesh.V() / xi_[k]).value();
 
         MULES::limit
         (
@@ -281,7 +282,7 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
             phiNkCorr,
             zeroField(), //TODO: one of these is a source term
             zeroField(),
-            1e5, //TODO: this limiter is clearly wrong
+            maxNk,
             0,
             3,
             true
