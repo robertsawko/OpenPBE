@@ -30,6 +30,7 @@ License
 #include "MOC.H"
 #include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
+#include "MULES.H"
 
 
 namespace Foam
@@ -58,7 +59,8 @@ MOC::MOC
     classNumberDensity_(numberOfClasses_),
     classVelocity_(numberOfClasses_),
     deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
-    xi_(numberOfClasses_)
+    xi_(numberOfClasses_),
+    usingMULES_(MOCDict_.found("usingMULES"))
 {
     Info << "Creating " << numberOfClasses_ << " class";
     //Taking pedantry one step too far!
@@ -144,12 +146,12 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
     coalescenceField *= classNumberDensity_[i];
 
-    //TODO: Fix the odd and even controversy
+    //-1 in pairs account for zero-based numbering
     for(int j = 0; j < i; ++j)
     {
         coalescenceField +=
-            0.5 * coalescence_().S(xi_[i - j], xi_[j])
-            * classNumberDensity_[i - j] * classNumberDensity_[j];
+            0.5 * coalescence_().S(xi_[i - j - 1], xi_[j])
+            * classNumberDensity_[i - j - 1] * classNumberDensity_[j];
     }
 
     return coalescenceField;
@@ -173,7 +175,7 @@ volScalarField MOC::breakupSourceTerm(label i)
         dimensionedScalar
         (
             "Sbr", 
-            classNumberDensity_[i].dimensions()/dimTime,
+            classNumberDensity_[i].dimensions() / dimTime,
             0.0
         ) 
     );
@@ -190,24 +192,140 @@ volScalarField MOC::breakupSourceTerm(label i)
     return breakupField;
 }
 
-void MOC::correct()
-{
-    const fvMesh& m = classNumberDensity_[0].mesh();
-    PtrList<volScalarField> S(numberOfClasses_);
+void MOC::correct(){
 
+    PtrList<volScalarField> S(numberOfClasses_);
     forAll(classNumberDensity_, k){
         S.set(k, classSourceTerm(k));
     }
 
+    if(usingMULES_)
+        solveWithMULES(S);
+    else
+        solveWithFVM(S);
+}
+
+void MOC::solveWithFVM(const PtrList<volScalarField>& S){
+    const fvMesh& mesh = classNumberDensity_[0].mesh();
+
     forAll(classNumberDensity_, k){
-        surfaceScalarField phi = fvc::interpolate(classVelocity_[k]) & m.Sf();
-        solve(
+        surfaceScalarField phi = fvc::interpolate(classVelocity_[k]) & mesh.Sf();
+        fvScalarMatrix nEqn
+        (
             fvm::ddt(classNumberDensity_[k])
             + 
             fvm::div(phi, classNumberDensity_[k], "div(U,nk)")
             ==
             S[k]
         );
+        nEqn.relax();
+        nEqn.solve();
+    }
+}
+
+void MOC::solveWithMULES(const PtrList<volScalarField>& S){
+    const fvMesh& mesh = classNumberDensity_[0].mesh();
+    const surfaceScalarField& phi = phase_.phi();
+    PtrList<surfaceScalarField> phiNkCorrs(classNumberDensity_.size());
+
+    forAll(classNumberDensity_, k)
+    {
+        volScalarField& Nk = classNumberDensity_[k];
+
+        phiNkCorrs.set
+        (
+            k,
+            new surfaceScalarField
+            (
+                "phi" + Nk.name() + "Corr",
+                fvc::flux
+                (
+                    phi,
+                    Nk,
+                    "div(phi," + Nk.name() + ')'
+                )
+            )
+        );
+
+        surfaceScalarField& phiNkCorr = phiNkCorrs[k];
+
+        /*
+        // Ensure that the flux at inflow BCs is preserved
+        forAll(phiNkCorr.boundaryField(), patchi)
+        {
+            fvsPatchScalarField& phiNkCorrp =
+                phiNkCorr.boundaryField()[patchi];
+
+            if (!phiNkCorrp.coupled())
+            {
+                const scalarField& phi1p = phase1.phi().boundaryField()[patchi];
+                const scalarField& alpha1p = alpha1.boundaryField()[patchi];
+
+                forAll(phiAlphaCorrp, facei)
+                {
+                    if (phi1p[facei] < 0)
+                    {
+                        phiAlphaCorrp[facei] = alpha1p[facei]*phi1p[facei];
+                    }
+                }
+            }
+        }
+        */
+        scalar maxNk = max(phase_ * mesh.V() / xi_[k]).value();
+
+        MULES::limit
+        (
+            1.0 / mesh.time().deltaT().value(),
+            geometricOneField(),
+            Nk,
+            phi,
+            phiNkCorr,
+            zeroField(), //implicit source?
+            S[k], 
+            maxNk,
+            0,
+            3,
+            true
+        );
+    }
+
+    MULES::limitSum(phiNkCorrs);
+
+    volScalarField sumNk
+    (
+        IOobject
+        (
+            "sumNk",
+            mesh.time().timeName(),
+            mesh
+        ),
+        mesh,
+        dimensionedScalar("sumNk", dimless, 0)
+    );
+
+    forAll(classNumberDensity_, k)
+    {
+        volScalarField& Nk = classNumberDensity_[k];
+
+        surfaceScalarField& phiNk = phiNkCorrs[k];
+        phiNk += upwind<scalar>(mesh, phi).flux(Nk);
+
+        MULES::explicitSolve
+        (
+            geometricOneField(),
+            Nk,
+            phiNk,
+            zeroField(), //implicit source?
+            S[k]
+        );
+
+        Info<< Nk.name() << " volume average, min, max = "
+            << Nk.weightedAverage(mesh.V()).value()
+            << ' ' << min(Nk).value()
+            << ' ' << max(Nk).value()
+            << endl;
+
+        sumNk += Nk;
     }
 }
 

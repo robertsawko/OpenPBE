@@ -17,7 +17,7 @@ FoamFile
 
 solvers
 {
-    alpha.air
+    alpha.oil
     {
         nAlphaCorr      1;
         nAlphaSubCycles 2;
@@ -46,7 +46,8 @@ solvers
 
     "n.*"
     {
-        solver          smoothSolver;
+        solver          PBiCG;
+        preconditioner  DILU;
         smoother        symGaussSeidel;
         tolerance       1e-5;
         relTol          0;
@@ -74,9 +75,9 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors 3;
-    nCorrectors      1;
-    nNonOrthogonalCorrectors 0;
+    nOuterCorrectors 1;
+    nCorrectors      3;
+    nNonOrthogonalCorrectors 1;
 }
 
 relaxationFactors

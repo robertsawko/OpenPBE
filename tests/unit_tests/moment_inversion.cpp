@@ -17,8 +17,8 @@ TEST(wheeler_inversion, example31){
     VectorXd moments(8);
     moments << 1, 5, 26, 140, 778, 4450, 26140, 157400;
     // Analytical solution
-    double w1 = 1 / (2 * sqrt(6) + pow(2, 1.5) * sqrt(3) + 12);
-    double w2 = 1 / (12 - 2 * sqrt(6) - pow(2, 1.5) * sqrt(3));
+    double w1 = 1 / (4 * sqrt(6) + 12);
+    double w2 = 1 / (12 - 4 * sqrt(6));
     VectorXd weights(4), abcissas(4);
     weights <<  w1, w2, w2, w1;
     abcissas << 2.6656, 4.2580, 5.7420, 7.3344;
@@ -33,11 +33,11 @@ TEST(wheeler_inversion, example32){
 
     VectorXd moments(8);
     moments << 1, 0, 1, 0, 3, 0, 15, 0;
+    // Analytical solution
     double xi1 = sqrt(sqrt(6) + 3);
     double xi2 = sqrt(3 - sqrt(6));
-    // Analytical solution
-    double w1 = 1 / (2 * sqrt(6) + pow(2, 1.5) * sqrt(3) + 12); 
-    double w2 = 1 / (12 - 2 * sqrt(6) - pow(2, 1.5) * sqrt(3)); 
+    double w1 = 1 / (4 * sqrt(6) + 12); 
+    double w2 = 1 / (12 - 4 * sqrt(6)); 
     VectorXd weights(4), abcissas(4);
     weights <<  w1, w2, w2, w1;
     abcissas << -xi1, -xi2, xi2, xi1;

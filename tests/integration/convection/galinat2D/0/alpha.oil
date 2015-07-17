@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      alpha.air;
+    object      alpha.oil;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -24,14 +24,14 @@ boundaryField
     inlet
     {
         type            fixedValue;
-        value           uniform 0.5;
+        value           uniform 0.015;
     }
     outlet
     {
         type            inletOutlet;
-        phi             phi.air;
-        inletValue      uniform 1;
-        value           uniform 1;
+        phi             phi.oil;
+        inletValue      uniform 0;
+        value           uniform 0;
     }
     walls
     {

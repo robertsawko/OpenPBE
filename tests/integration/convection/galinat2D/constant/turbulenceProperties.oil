@@ -9,21 +9,12 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    object      kappai.air;
+    class       dictionary;
+    location    "constant";
+    object      turbulenceProperties.oil;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions          [0 -1 0 0 0 0 0];
+simulationType  laminar;
 
-internalField       uniform 2000;
-
-boundaryField
-{
-    walls
-    {
-        type               zeroGradient;
-    }
-}
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// ************************************************************************* //

@@ -76,6 +76,8 @@ private:
  //- diameters for each class 
  PtrList<dimensionedScalar> xi_;
 
+ bool usingMULES_;
+
  //TODO: combine volScalarField with
  
  //- Return a source term due to breakup
@@ -84,6 +86,9 @@ private:
  volScalarField coalescenceSourceTerm(label classi);
  //- Return a source term due to coalescence
  volScalarField classSourceTerm(label classi);
+
+ void solveWithFVM(const PtrList<volScalarField>& sources);
+ void solveWithMULES(const PtrList<volScalarField>& sources);
 
 protected:
  // Protected data
