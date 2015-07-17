@@ -45,7 +45,8 @@ Foam::PBEMethod::PBEMethod(
     breakup_(breakupKernel::New(pbeProperties, phase)),
     daughterParticleDistribution_(
         daughterParticleDistribution::New(pbeProperties)
-    ) 
+    ),
+    phase_(phase)
 {
     //TODO add some error checking. Do phases exist etc.
 }

@@ -71,6 +71,7 @@ protected:
   autoPtr<breakupKernel> breakup_;
   //- breakup kernel
   autoPtr<daughterParticleDistribution> daughterParticleDistribution_;
+  const phaseModel& phase_;
 
 public:
 
