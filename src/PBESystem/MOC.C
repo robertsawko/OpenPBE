@@ -59,7 +59,8 @@ MOC::MOC
     classNumberDensity_(numberOfClasses_),
     classVelocity_(numberOfClasses_),
     deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
-    xi_(numberOfClasses_)
+    xi_(numberOfClasses_),
+    usingMULES_(pbeProperties.found("usingMULES"))
 {
     Info << "Creating " << numberOfClasses_ << " class";
     //Taking pedantry one step too far!
@@ -198,7 +199,10 @@ void MOC::correct(){
         S.set(k, classSourceTerm(k));
     }
 
-    solveWithFVM(S);
+    if(usingMULES_)
+        solveWithMULES(S);
+    else
+        solveWithFVM(S);
 }
 
 void MOC::solveWithFVM(const PtrList<volScalarField>& S){

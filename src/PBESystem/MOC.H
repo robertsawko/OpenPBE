@@ -76,6 +76,8 @@ private:
  //- diameters for each class 
  PtrList<dimensionedScalar> xi_;
 
+ bool usingMULES_;
+
  //TODO: combine volScalarField with
  
  //- Return a source term due to breakup
