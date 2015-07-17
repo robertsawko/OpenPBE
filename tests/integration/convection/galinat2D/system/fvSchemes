@@ -29,13 +29,13 @@ divSchemes
 {
     default                         none;
 
-    div(phi,alpha.air)              Gauss vanLeer;
-    div(phir,alpha.air)             Gauss vanLeer;
+    div(phi,alpha.oil)              Gauss vanLeer;
+    div(phir,alpha.oil)             Gauss vanLeer;
 
     "div\(alphaRhoPhi.*,U.*\)"      Gauss limitedLinearV 1;
     "div\(phi.*,U.*\)"              Gauss limitedLinearV 1;
 
-    div(phi.air,kappai.air)         Gauss vanLeer;
+    div(phi.oil,kappai.oil)         Gauss vanLeer;
 
     "div\(alphaRhoPhi.*,(h|e).*\)"  Gauss limitedLinear 1;
     "div\(alphaRhoPhi.*,K.*\)"      Gauss limitedLinear 1;
