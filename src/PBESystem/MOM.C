@@ -330,6 +330,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
         auto deathIntegrand = [&](double xi){
 
             auto deathInnerIntegrand = [&](double xi_prime){
+
                 return coalescence_->S(xi, xi_prime).value() *
                        m0 * pdf(gamma, xi_prime);
             };
@@ -338,7 +339,21 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
                    integrate(deathInnerIntegrand, 0.);
         };
 
-        toReturn[celli] = integrate(deathIntegrand, 0.);
+        auto birthIntegrand = [&](double xi){
+
+            auto birthInnerIntegrand = [&](double xi_prime){
+
+                return coalescence_->S(xi, xi_prime).value() *
+                       pow(pow(xi_prime, 3) + pow(xi, 3), momenti/3.) *
+                       m0 * pdf(gamma, xi_prime);
+            };
+
+            return m0 * pdf(gamma, xi) *
+                   integrate(birthInnerIntegrand, 0.);
+        };
+
+        toReturn[celli] = integrate(birthIntegrand, 0.)/2. -
+                          integrate(deathIntegrand, 0.);
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
