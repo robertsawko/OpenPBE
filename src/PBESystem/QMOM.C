@@ -300,18 +300,17 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
             momentVector[i] = moments_[i][celli];
 
         auto quadrature = wheeler_inversion(momentVector);
-
-        //get rid of this
-        auto g = [&](double xi_alpha)
-        {
-            return pow(xi_alpha, momenti)*breakup_->S(xi_alpha).value();
-        };
-
         int N = quadrature.abcissas.size();
+
         double death = 0.;
 
-        for (int i=0; i<N; ++i)
-            death += quadrature.weights[i] * g(quadrature.abcissas[i]);
+        for (int i=0; i<N; ++i){
+            double xi_alpha = quadrature.abcissas[i];
+
+            death += quadrature.weights[i] *
+                     pow(xi_alpha, momenti) *
+                     breakup_->S(xi_alpha).value();
+        }
 
         auto birthIntegrand = [&](double xi){
             double result = 0.;
