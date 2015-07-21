@@ -296,69 +296,52 @@ tmp<volScalarField> MOM::momentSourceTerm(label momenti)
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
+using GammaDistribution = boost::math::gamma_distribution<>;
+using boost::math::pdf;
 
 tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 {
-
-    /*
-    dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
-
-    scalar dMean = max(d_.weightedAverage(mesh_.V()).value(), SMALL);
-    scalar maxArg = maxDiameterMultiplicator_ * dMean ;
-    label maxIter = integrationSteps_;
-    dimensionedScalar dx = xiDim * maxArg / integrationSteps_;
-
-    dimensionedScalar arg_i1 = xiDim;
-    dimensionedScalar arg_j1 = xiDim;
-    label iterator = 0;
-    label iterator2 = 0;
-
-    //value of the integral
-    volScalarField sum
+    volScalarField toReturn
+    (
+        IOobject
         (
-            IOobject
-            (
-                "sum",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
+            "Sbc",
+            mesh_.time().timeName(),
             mesh_,
-            dimensionedScalar
-            (
-                "sum", 
-                pow(dimVolume, momenti - 1) / dimTime,
-                0
-            ) 
-        );
-    volScalarField sum_i0(sum);
-
-
-    */
-    volScalarField sum2
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            false
+        ),
+        mesh_,
+        dimensionedScalar
         (
-            IOobject
-            (
-                "Scoal",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            mesh_,
-            dimensionedScalar
-            (
-                "Scoal", 
-                pow(dimVolume, momenti) / dimTime,
-                0
-            ) 
-        );
+            "Sbc",
+            pow(dimVolume, momenti) /dimTime,
+            0
+        )
+    );
 
-    return tmp<volScalarField>( new volScalarField(sum2));
+    forAll(dispersedPhase_, celli)
+    {
+        GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
+        auto m0 = moments_[0][celli];
+
+        auto deathIntegrand = [&](double xi){
+
+            auto deathInnerIntegrand = [&](double xi_prime){
+                return coalescence_->S(xi, xi_prime).value() *
+                       m0 * pdf(gamma, xi_prime);
+            };
+
+            return pow(xi, momenti) * m0 * pdf(gamma, xi) *
+                   integrate(deathInnerIntegrand, 0.);
+        };
+
+        toReturn[celli] = integrate(deathIntegrand, 0.);
+    }
+
+    return tmp<volScalarField>( new volScalarField(toReturn));
 }
 
 void MOM::printAvgMaxMin(const volScalarField &v) const
@@ -369,13 +352,8 @@ void MOM::printAvgMaxMin(const volScalarField &v) const
         << ", " << min(v).value() << endl;
 }
 
-using gammaDistribution = boost::math::gamma_distribution<>;
-using boost::math::pdf;
-
 tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 {
-
-    //value of the integral
     volScalarField toReturn
     (
         IOobject
@@ -398,14 +376,14 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        gammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
+        GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
         auto m0 = moments_[0][celli];
 
         auto breakupSourceIntegrand = [&](double xi){
             scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
 
-            auto breakupBirthIntegrand = [&, xi](double xi_prime){
+            auto breakupBirthIntegrand = [&](double xi_prime){
                 return daughterParticleDistribution_->beta(xi, xi_prime).value()
                     * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
             };
