@@ -214,12 +214,11 @@ tmp<volScalarField> QMOM::momentSourceTerm(label momenti)
 
 tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
 {
-    //value of the integral
-    volScalarField sum
+    volScalarField toReturn
             (
                 IOobject
                 (
-                    "sum",
+                    "Sc",
                     mesh_.time().timeName(),
                     mesh_,
                     IOobject::NO_READ,
@@ -229,35 +228,41 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
                 mesh_,
                 dimensionedScalar
                 (
-                    "sum",
+                    "Sc",
                     pow(dimVolume, momenti - 1) / dimTime,
                     0
                     )
                 );
-    volScalarField sum_i0(sum);
 
+    forAll(dispersedPhase_, celli)
+    {
+        VectorXd momentVector(moments_.size());
+        for (int i=0; i<momentVector.size(); ++i)
+            momentVector[i] = moments_[i][celli];
 
-    volScalarField sum2
-            (
-                IOobject
-                (
-                    "Scoal",
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE,
-                    false
-                    ),
-                mesh_,
-                dimensionedScalar
-                (
-                    "Scoal",
-                    pow(dimVolume, momenti) / dimTime,
-                    0
-                    )
-                );
+        auto quadrature = wheeler_inversion(momentVector);
+        int N = quadrature.abcissas.size();
 
-    return tmp<volScalarField>( new volScalarField(sum2));
+        double death = 0.;
+
+        for (int i=0; i<N; ++i){
+            double xi_i = quadrature.abcissas[i];
+            double innerTerm = 0.;
+
+            for (int j=0; j<N; ++j){
+                double xi_j = quadrature.abcissas[j];
+
+                innerTerm += quadrature.weights[j] *
+                             coalescence_->S(xi_i, xi_j).value();
+            }
+            death += pow(xi_i, momenti) *
+                     quadrature.weights[i] *
+                     innerTerm;
+        }
+        toReturn[celli] = -death;
+    }
+
+    return tmp<volScalarField>( new volScalarField(toReturn));
 
 }
 
@@ -308,8 +313,8 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
             double xi_alpha = quadrature.abcissas[i];
 
             death += quadrature.weights[i] *
-                     pow(xi_alpha, momenti) *
-                     breakup_->S(xi_alpha).value();
+                    pow(xi_alpha, momenti) *
+                    breakup_->S(xi_alpha).value();
         }
 
         auto birthIntegrand = [&](double xi){
@@ -319,9 +324,9 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
                 double xi_alpha = quadrature.abcissas[i];
 
                 result += quadrature.weights[i] *
-                          breakup_->S(xi_alpha).value() *
-                          daughterParticleDistribution_->
-                              beta(xi,xi_alpha).value();
+                        breakup_->S(xi_alpha).value() *
+                        daughterParticleDistribution_->
+                        beta(xi,xi_alpha).value();
             }
 
             return pow(xi, momenti)*result;
