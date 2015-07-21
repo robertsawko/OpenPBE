@@ -61,63 +61,63 @@ using constant::mathematical::pi;
 
 QMOM::QMOM
 (
-    const dictionary& pbeProperties,
-    const phaseModel& phase
-)
-:
-    PBEMethod(pbeProperties, phase),
-    QMOMDict_(pbeProperties.subDict("QMOMCoeffs")),
-    dispersedPhase_(phase),
-    mesh_(dispersedPhase_.U().mesh()),
-    moments_{{
-    volScalarField
-    (
-        IOobject
-        (
-            "m0",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m1",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m2",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    )
-    }},
-    d_
-    (
-        IOobject
-        (
-            "diameter",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
+        const dictionary& pbeProperties,
+        const phaseModel& phase
+        )
+    :
+      PBEMethod(pbeProperties, phase),
+      QMOMDict_(pbeProperties.subDict("QMOMCoeffs")),
+      dispersedPhase_(phase),
+      mesh_(dispersedPhase_.U().mesh()),
+      moments_{{
+               volScalarField
+               (
+                   IOobject
+                   (
+                       "m0",
+                       mesh_.time().timeName(),
+                       mesh_,
+                       IOobject::MUST_READ,
+                       IOobject::AUTO_WRITE
+                       ),
+                   mesh_
+                   ),
+               volScalarField
+               (
+                   IOobject
+                   (
+                       "m1",
+                       mesh_.time().timeName(),
+                       mesh_,
+                       IOobject::MUST_READ,
+                       IOobject::AUTO_WRITE
+                       ),
+                   mesh_
+                   ),
+               volScalarField
+               (
+                   IOobject
+                   (
+                       "m2",
+                       mesh_.time().timeName(),
+                       mesh_,
+                       IOobject::MUST_READ,
+                       IOobject::AUTO_WRITE
+                       ),
+                   mesh_
+                   )
+}},
+      d_
+      (
+          IOobject
+          (
+              "diameter",
+              mesh_.time().timeName(),
+              mesh_,
+              IOobject::NO_READ,
+              IOobject::AUTO_WRITE
+              ),
+          pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
     )
 {
 }
@@ -140,9 +140,9 @@ void QMOM::correct()
                         mesh_,
                         IOobject::NO_READ,
                         IOobject::AUTO_WRITE
-                    ),
+                        ),
                     momentSourceTerm(i)
-                );
+                    );
     }
 
     Info<< "moment sources:" << endl;
@@ -166,12 +166,12 @@ void QMOM::correct()
     for (std::size_t i = 0; i<moments_.size(); ++i)
     {
         fvScalarMatrix mEqn
-        (
-            fvm::ddt(moments_[i])
-            + fvm::div(dispersedPhase_.phi(),moments_[i])
-            ==
-            mSources_[i]
-        );
+                (
+                    fvm::ddt(moments_[i])
+                    + fvm::div(dispersedPhase_.phi(),moments_[i])
+                    ==
+                    mSources_[i]
+                    );
         mEqn.relax();
         mEqn.solve();
     }
@@ -179,9 +179,9 @@ void QMOM::correct()
     for (auto& moment : moments_)
     {
         moment = max(
-            moment,
-            dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
-        );
+                    moment,
+                    dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
+                    );
         //TODO: print a warning message
         printAvgMaxMin(moment);
     }
@@ -216,46 +216,46 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
 {
     //value of the integral
     volScalarField sum
-        (
-            IOobject
             (
-                "sum",
-                mesh_.time().timeName(),
+                IOobject
+                (
+                    "sum",
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE,
+                    false
+                    ),
                 mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            mesh_,
-            dimensionedScalar
-            (
-                "sum", 
-                pow(dimVolume, momenti - 1) / dimTime,
-                0
-            ) 
-        );
+                dimensionedScalar
+                (
+                    "sum",
+                    pow(dimVolume, momenti - 1) / dimTime,
+                    0
+                    )
+                );
     volScalarField sum_i0(sum);
 
 
     volScalarField sum2
-        (
-            IOobject
             (
-                "Scoal",
-                mesh_.time().timeName(),
+                IOobject
+                (
+                    "Scoal",
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE,
+                    false
+                    ),
                 mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            mesh_,
-            dimensionedScalar
-            (
-                "Scoal", 
-                pow(dimVolume, momenti) / dimTime,
-                0
-            ) 
-        );
+                dimensionedScalar
+                (
+                    "Scoal",
+                    pow(dimVolume, momenti) / dimTime,
+                    0
+                    )
+                );
 
     return tmp<volScalarField>( new volScalarField(sum2));
 
@@ -274,24 +274,24 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
 
     //value of the integral
     volScalarField toReturn
-        (
-            IOobject
             (
-                "Sbr",
-                mesh_.time().timeName(),
+                IOobject
+                (
+                    "Sbr",
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE,
+                    false
+                    ),
                 mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            mesh_,
-            dimensionedScalar
-            (
-                "Sbr", 
-                pow(dimVolume, momenti) /dimTime,
-                0
-            ) 
-        );
+                dimensionedScalar
+                (
+                    "Sbr",
+                    pow(dimVolume, momenti) /dimTime,
+                    0
+                    )
+                );
 
     forAll(dispersedPhase_, celli)
     {
@@ -301,18 +301,37 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
 
         auto quadrature = wheeler_inversion(momentVector);
 
+        //get rid of this
         auto g = [&](double xi_alpha)
         {
-            return pow(xi_alpha, monenti)*breakup_->S(xi_alpha).value();
+            return pow(xi_alpha, momenti)*breakup_->S(xi_alpha).value();
         };
 
         int N = quadrature.abcissas.size();
-        double result = 0.;
+        double death = 0.;
 
         for (int i=0; i<N; ++i)
-            result += quadrature.weights[i] * g(quadrature.abcissas[i]);
+            death += quadrature.weights[i] * g(quadrature.abcissas[i]);
 
-        toReturn[celli] = result;
+        auto birthIntegrand = [&](double xi){
+            double result = 0.;
+
+            for (int i=0;i<N; ++i){
+                double xi_alpha = quadrature.abcissas[i];
+
+                result += quadrature.weights[i] *
+                          breakup_->S(xi_alpha).value() *
+                          daughterParticleDistribution_->
+                              beta(xi,xi_alpha).value();
+            }
+
+            return pow(xi, momenti)*result;
+        };
+
+        auto birth = integrate(birthIntegrand, 0.);
+
+        toReturn[celli] = birth - death;
+
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
