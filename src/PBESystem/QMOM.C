@@ -243,23 +243,31 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
         auto quadrature = wheeler_inversion(momentVector);
         int N = quadrature.abcissas.size();
 
-        double death = 0.;
+        double death{0.}, birth{0.};
 
         for (int i=0; i<N; ++i){
             double xi_i = quadrature.abcissas[i];
-            double innerTerm = 0.;
+            double innerDeathTerm{0.}, innerBirthTerm{0.};
 
             for (int j=0; j<N; ++j){
                 double xi_j = quadrature.abcissas[j];
 
-                innerTerm += quadrature.weights[j] *
+                innerDeathTerm += quadrature.weights[j] *
                              coalescence_->S(xi_i, xi_j).value();
+
+                innerBirthTerm += quadrature.weights[j] *
+                        pow(pow(xi_i, 3) + pow(xi_j, 3), momenti/3.) *
+                        coalescence_->S(xi_i, xi_j).value();
             }
+
             death += pow(xi_i, momenti) *
                      quadrature.weights[i] *
-                     innerTerm;
+                     innerDeathTerm;
+
+            birth += quadrature.weights[i] *
+                     innerBirthTerm;
         }
-        toReturn[celli] = -death;
+        toReturn[celli] = birth/2. - death;
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
