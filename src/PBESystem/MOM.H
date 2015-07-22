@@ -68,8 +68,6 @@ private:
 
  std::array<volScalarField, 3> moments_;
 
- void printAvgMaxMin(const volScalarField& v) const;
-
  volScalarField d_;
 
  //gamma distribution parameters

@@ -41,6 +41,7 @@ License
 #include "fvm.H"
 #include "Integrator.H"
 #include "mathematicalConstants.H"
+#include "Utility.H"
 
 namespace Foam
 {
@@ -160,7 +161,7 @@ void QMOM::correct()
             }
         }
 
-        printAvgMaxMin(mSource);
+        printAvgMaxMin(mesh_, mSource);
     }
 
     for (std::size_t i = 0; i<moments_.size(); ++i)
@@ -183,14 +184,14 @@ void QMOM::correct()
                     dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
                     );
         //TODO: print a warning message
-        printAvgMaxMin(moment);
+        printAvgMaxMin(mesh_, moment);
     }
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
     //clamp d_ here?
 
 
-    printAvgMaxMin(d_);
+    printAvgMaxMin(mesh_, d_);
 }
 
 const volScalarField QMOM::d() const
@@ -272,14 +273,6 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
 
     return tmp<volScalarField>( new volScalarField(toReturn));
 
-}
-
-void QMOM::printAvgMaxMin(const volScalarField &v) const
-{
-    Info<< v.name() << ": avg, max,min "
-        << v.weightedAverage(mesh_.V()).value()
-        << ", " << max(v).value()
-        << ", " << min(v).value() << endl;
 }
 
 tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)

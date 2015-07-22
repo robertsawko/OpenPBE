@@ -139,7 +139,6 @@ private:
  //overwrites virtual solve from multiphaseSystem
  void solve();
 
- void printAvgMaxMin(const volScalarField &v) const;
 public:
  TypeName("methodOfMoments");
 

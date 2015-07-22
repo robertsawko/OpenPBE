@@ -41,6 +41,7 @@ License
 #include "fvm.H"
 #include "Integrator.H"
 #include "mathematicalConstants.H"
+#include "Utility.H"
 
 namespace Foam
 {
@@ -182,9 +183,9 @@ void MOM::correct()
         );
     
     Info<< "gamma parameters:" << endl;
-    printAvgMaxMin(gamma_c0_);
-    printAvgMaxMin(gamma_k_);
-    printAvgMaxMin(gamma_theta_);
+    printAvgMaxMin(mesh_, gamma_c0_);
+    printAvgMaxMin(mesh_, gamma_k_);
+    printAvgMaxMin(mesh_, gamma_theta_);
 
     //TODO: get rid of 3
     std::array<volScalarField, 3> mSources_{{
@@ -246,7 +247,7 @@ void MOM::correct()
             }
         }
 
-        printAvgMaxMin(mSource);
+        printAvgMaxMin(mesh_, mSource);
     }
 
     for (std::size_t i = 0; i<moments_.size(); ++i)
@@ -270,12 +271,12 @@ void MOM::correct()
             dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
         );
         //TODO: print a warning message
-        printAvgMaxMin(moment);
+        printAvgMaxMin(mesh_, moment);
     }
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
 
-    printAvgMaxMin(d_);
+    printAvgMaxMin(mesh_, d_);
 }
 
 const volScalarField MOM::d() const
@@ -357,14 +358,6 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
-}
-
-void MOM::printAvgMaxMin(const volScalarField &v) const
-{
-    Info<< v.name() << ": avg, max,min "
-        << v.weightedAverage(mesh_.V()).value()
-        << ", " << max(v).value()
-        << ", " << min(v).value() << endl;
 }
 
 tmp<volScalarField> MOM::breakupSourceTerm(label momenti)

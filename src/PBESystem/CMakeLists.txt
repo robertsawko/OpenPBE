@@ -25,6 +25,7 @@ set(lib_header_files
   QMOM.H
   PBESystems-internal.C
   Integrator.H
+  Utility.H
 )
 
 set(lib_source_files
@@ -41,6 +42,7 @@ set(lib_source_files
   MOC.C
   MOM.C
   QMOM.C
+  Utility.C
 )
 
 add_library(PBE SHARED ${lib_header_files} ${lib_source_files})
