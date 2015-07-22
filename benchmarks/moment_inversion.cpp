@@ -10,5 +10,3 @@ static void BM_Wheeler(benchmark::State& state) {
 }
 
 BENCHMARK(BM_Wheeler);
-
-BENCHMARK_MAIN();
