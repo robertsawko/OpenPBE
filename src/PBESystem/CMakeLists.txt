@@ -23,7 +23,6 @@ set(lib_header_files
   MOC.H
   MOM.H
   QMOM.H
-  PBESystems-internal.C
   Integrator.H
   Utility.H
 )

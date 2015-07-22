@@ -33,7 +33,6 @@ License
 #include "QMOM.H"
 #include "addToRunTimeSelectionTable.H"
 
-#include "PBESystems-internal.H"
 #include "fvScalarMatrix.H"
 #include "fvcSnGrad.H"
 #include "fvcFlux.H"
