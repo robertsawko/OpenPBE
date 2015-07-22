@@ -44,10 +44,10 @@ SourceFiles
 
 #include <Eigen/Dense>
 
-struct pair{
+struct Quadrature{
     Eigen::VectorXd abcissas, weights;
 };
 
-pair wheeler_inversion(const Eigen::VectorXd& moments);
+Quadrature wheeler_inversion(const Eigen::VectorXd& moments);
 
 #endif

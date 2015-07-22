@@ -6,7 +6,7 @@
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 
-pair wheeler_inversion(const VectorXd &moments)
+Quadrature wheeler_inversion(const VectorXd &moments)
 {
     int N = moments.size() / 2;  // number of nodes of the quadrature approximation
 
@@ -47,5 +47,5 @@ pair wheeler_inversion(const VectorXd &moments)
     VectorXd abcissas = eigenresult.eigenvalues();
     VectorXd weights = moments(0) * eigenresult.eigenvectors().row(0).array().pow(2);
 
-    return pair{abcissas, weights};
+    return {abcissas, weights};
 }
