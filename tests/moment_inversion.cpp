@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 // #include <cmath>
 #include "scalar.H"
-#include "../src/PBESystem/QMOM.H"
+#include "../src/PBESystem/MomentInversion.H"
 #include <Eigen/Dense>
 
 /*

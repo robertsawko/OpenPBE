@@ -41,6 +41,7 @@ License
 #include "Integrator.H"
 #include "mathematicalConstants.H"
 #include "Utility.H"
+#include "MomentInversion.H"
 
 namespace Foam
 {
@@ -236,7 +237,7 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        VectorXd momentVector(moments_.size());
+        Eigen::VectorXd momentVector(moments_.size());
         for (int i=0; i<momentVector.size(); ++i)
             momentVector[i] = moments_[i][celli];
 
@@ -300,7 +301,7 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        VectorXd momentVector(moments_.size());
+        Eigen::VectorXd momentVector(moments_.size());
         for (int i=0; i<momentVector.size(); ++i)
             momentVector[i] = moments_[i][celli];
 
