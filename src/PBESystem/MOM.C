@@ -301,7 +301,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
             auto birthInnerIntegrand = [&](double xi_prime){
 
                 return coalescence_->S(xi, xi_prime).value() *
-                       pow(pow(xi_prime, 3) + pow(xi, 3), momenti/3.) *
+                       pow(xi_prime + xi, momenti) *
                        m0 * pdf(gamma, xi_prime);
             };
 
