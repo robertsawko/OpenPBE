@@ -99,7 +99,6 @@ set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 add_subdirectory(ext/gtest/)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_subdirectory(ext/eigen3/)
 #Library
 add_subdirectory(src/PBESystem)
 add_subdirectory(applications/PBEFoam)
