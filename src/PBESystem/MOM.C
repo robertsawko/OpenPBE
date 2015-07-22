@@ -69,44 +69,7 @@ MOM::MOM
     MOMDict_(pbeProperties.subDict("MOMCoeffs")),
     dispersedPhase_(phase),
     mesh_(dispersedPhase_.U().mesh()),
-    moments_{{
-    volScalarField
-    (
-        IOobject
-        (
-            "m0",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m1",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m2",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    )
-    }},
+    moments_(),
     d_
     (
         IOobject
@@ -117,7 +80,8 @@ MOM::MOM
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
+        mesh_,
+        dimensionedScalar("diameter", dimLength, 0.0)
     ) ,
     gamma_k_
     (
@@ -159,6 +123,22 @@ MOM::MOM
         dimensionedScalar("c0", dimless, 0.0)
     )
 {
+    for (std::size_t i = 0; i<3; ++i){
+        moments_.emplace_back
+                (
+                    IOobject
+                    (
+                        "m" + std::to_string(i),
+                        mesh_.time().timeName(),
+                        mesh_,
+                        IOobject::MUST_READ,
+                        IOobject::AUTO_WRITE
+                    ),
+                    mesh_
+                );
+    }
+
+    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
 }
 
 MOM::~MOM()
@@ -186,45 +166,22 @@ void MOM::correct()
     printAvgMaxMin(mesh_, gamma_k_);
     printAvgMaxMin(mesh_, gamma_theta_);
 
-    //TODO: get rid of 3
-    std::array<volScalarField, 3> mSources_{{
-        volScalarField
-        (
-            IOobject
-            (
-                "m0Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(0)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m1Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(1)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m2Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(2)
-        )
-    }};
+    std::vector<volScalarField> mSources_;
+
+    for (std::size_t i = 0; i<moments_.size(); ++i){
+        mSources_.emplace_back
+                (
+                    IOobject
+                    (
+                        "m" + std::to_string(i) + "Source",
+                        mesh_.time().timeName(),
+                        mesh_,
+                        IOobject::NO_READ,
+                        IOobject::AUTO_WRITE
+                        ),
+                    momentSourceTerm(i)
+                    );
+    }
 
     Info<< "moment sources:" << endl;
     //TODO: is there a better way to assure that source terms on boundaries

@@ -47,7 +47,6 @@ SourceFiles
 #define QMOMPBE_H
 
 #include "PBEMethod.H"
-#include <array>
 #include <iostream>
 
 

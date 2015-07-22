@@ -70,44 +70,7 @@ QMOM::QMOM
       QMOMDict_(pbeProperties.subDict("QMOMCoeffs")),
       dispersedPhase_(phase),
       mesh_(dispersedPhase_.U().mesh()),
-      moments_{{
-               volScalarField
-               (
-                   IOobject
-                   (
-                       "m0",
-                       mesh_.time().timeName(),
-                       mesh_,
-                       IOobject::MUST_READ,
-                       IOobject::AUTO_WRITE
-                       ),
-                   mesh_
-                   ),
-               volScalarField
-               (
-                   IOobject
-                   (
-                       "m1",
-                       mesh_.time().timeName(),
-                       mesh_,
-                       IOobject::MUST_READ,
-                       IOobject::AUTO_WRITE
-                       ),
-                   mesh_
-                   ),
-               volScalarField
-               (
-                   IOobject
-                   (
-                       "m2",
-                       mesh_.time().timeName(),
-                       mesh_,
-                       IOobject::MUST_READ,
-                       IOobject::AUTO_WRITE
-                       ),
-                   mesh_
-                   )
-}},
+      moments_(),
       d_
       (
           IOobject
@@ -118,9 +81,26 @@ QMOM::QMOM
               IOobject::NO_READ,
               IOobject::AUTO_WRITE
               ),
-          pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
+          mesh_,
+          dimensionedScalar("diameter", dimLength, 0.0)
     )
 {
+    for (std::size_t i = 0; i<3; ++i){
+        moments_.emplace_back
+                (
+                    IOobject
+                    (
+                        "m" + std::to_string(i),
+                        mesh_.time().timeName(),
+                        mesh_,
+                        IOobject::MUST_READ,
+                        IOobject::AUTO_WRITE
+                    ),
+                    mesh_
+                );
+    }
+
+    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
 }
 
 QMOM::~QMOM()
