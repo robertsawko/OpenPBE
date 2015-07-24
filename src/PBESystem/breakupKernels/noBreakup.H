@@ -86,8 +86,6 @@ class noBreakup
 
   // Member Functions
 
-  tmp<volScalarField> S(const volScalarField& xi) const;
-
   dimensionedScalar S(const dimensionedScalar& xi) const;
 };
 

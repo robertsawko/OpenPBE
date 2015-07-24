@@ -113,9 +113,6 @@ class breakupKernel
   // Member Functions
 
   //- Source function for the breakup kernel used in PBE
-  virtual tmp<volScalarField> S(const volScalarField& xi) const = 0;
-
-  //- Source function for the breakup kernel used in PBE
   virtual dimensionedScalar S(const dimensionedScalar& xi) const = 0;
 };
 

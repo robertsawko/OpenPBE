@@ -72,25 +72,6 @@ dimensionedScalar binaryBreakup::S(const dimensionedScalar& xi) const
     return consistency_ * pow(xi, 2);
 }
 
-tmp<volScalarField> binaryBreakup::S(const volScalarField& xi) const
-{
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "bRate",
-                xi.mesh().time().timeName(),
-                xi.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            consistency_ * pow(xi, 2)
-        )
-    );
-}
-
 } //End namespace breakupKernels
 } //End namespace Foam
 // ************************************************************************* //

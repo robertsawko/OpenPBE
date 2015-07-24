@@ -59,27 +59,6 @@ noBreakup::~noBreakup()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-tmp<volScalarField> noBreakup::S(const volScalarField& xi) const
-{
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "S",
-                xi.mesh().time().timeName(),
-                xi.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            xi.mesh(),
-            dimensionedScalar("S", dimless / dimTime, 0) 
-        )
-    );
-}
-
 dimensionedScalar noBreakup::S(const dimensionedScalar& xi) const
 {
     return dimensionedScalar("S", dimless / dimTime, 0);
