@@ -1,5 +1,7 @@
 set(benchmark_SRCS
     moment_inversion.cpp
+    integration.cpp
+    main.cpp
 )
 
 include_directories ("$ENV{FOAM_APP}/solvers/multiphase/twoPhaseEulerFoam/twoPhaseSystem/lnInclude")

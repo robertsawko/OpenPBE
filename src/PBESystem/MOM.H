@@ -47,7 +47,6 @@ SourceFiles
 #define MOMPBE_H
 
 #include "PBEMethod.H"
-#include <array>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,9 +65,7 @@ private:
  const phaseModel& dispersedPhase_;
  const fvMesh& mesh_;
 
- std::array<volScalarField, 3> moments_;
-
- void printAvgMaxMin(const volScalarField& v) const;
+ std::vector<volScalarField> moments_;
 
  volScalarField d_;
 

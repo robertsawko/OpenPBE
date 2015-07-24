@@ -33,7 +33,6 @@ License
 #include "MOM.H"
 #include "addToRunTimeSelectionTable.H"
 
-#include "PBESystems-internal.H"
 #include "fvScalarMatrix.H"
 #include "fvcSnGrad.H"
 #include "fvcFlux.H"
@@ -41,6 +40,7 @@ License
 #include "fvm.H"
 #include "Integrator.H"
 #include "mathematicalConstants.H"
+#include "Utility.H"
 
 namespace Foam
 {
@@ -69,44 +69,7 @@ MOM::MOM
     MOMDict_(pbeProperties.subDict("MOMCoeffs")),
     dispersedPhase_(phase),
     mesh_(dispersedPhase_.U().mesh()),
-    moments_{{
-    volScalarField
-    (
-        IOobject
-        (
-            "m0",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m1",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    ),
-    volScalarField
-    (
-        IOobject
-        (
-            "m2",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    )
-    }},
+    moments_(),
     d_
     (
         IOobject
@@ -117,7 +80,8 @@ MOM::MOM
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0)
+        mesh_,
+        dimensionedScalar("diameter", dimLength, 0.0)
     ) ,
     gamma_k_
     (
@@ -159,6 +123,22 @@ MOM::MOM
         dimensionedScalar("c0", dimless, 0.0)
     )
 {
+    for (std::size_t i = 0; i<3; ++i){
+        moments_.emplace_back
+                (
+                    IOobject
+                    (
+                        "m" + std::to_string(i),
+                        mesh_.time().timeName(),
+                        mesh_,
+                        IOobject::MUST_READ,
+                        IOobject::AUTO_WRITE
+                    ),
+                    mesh_
+                );
+    }
+
+    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
 }
 
 MOM::~MOM()
@@ -182,49 +162,26 @@ void MOM::correct()
         );
     
     Info<< "gamma parameters:" << endl;
-    printAvgMaxMin(gamma_c0_);
-    printAvgMaxMin(gamma_k_);
-    printAvgMaxMin(gamma_theta_);
+    printAvgMaxMin(mesh_, gamma_c0_);
+    printAvgMaxMin(mesh_, gamma_k_);
+    printAvgMaxMin(mesh_, gamma_theta_);
 
-    //TODO: get rid of 3
-    std::array<volScalarField, 3> mSources_{{
-        volScalarField
-        (
-            IOobject
-            (
-                "m0Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(0)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m1Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(1)
-        ),
-        volScalarField
-        (
-            IOobject
-            (
-                "m2Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(2)
-        )
-    }};
+    std::vector<volScalarField> mSources_;
+
+    for (std::size_t i = 0; i<moments_.size(); ++i){
+        mSources_.emplace_back
+                (
+                    IOobject
+                    (
+                        "m" + std::to_string(i) + "Source",
+                        mesh_.time().timeName(),
+                        mesh_,
+                        IOobject::NO_READ,
+                        IOobject::AUTO_WRITE
+                        ),
+                    momentSourceTerm(i)
+                    );
+    }
 
     Info<< "moment sources:" << endl;
     //TODO: is there a better way to assure that source terms on boundaries
@@ -246,7 +203,7 @@ void MOM::correct()
             }
         }
 
-        printAvgMaxMin(mSource);
+        printAvgMaxMin(mesh_, mSource);
     }
 
     for (std::size_t i = 0; i<moments_.size(); ++i)
@@ -270,12 +227,12 @@ void MOM::correct()
             dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
         );
         //TODO: print a warning message
-        printAvgMaxMin(moment);
+        printAvgMaxMin(mesh_, moment);
     }
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
 
-    printAvgMaxMin(d_);
+    printAvgMaxMin(mesh_, d_);
 }
 
 const volScalarField MOM::d() const
@@ -296,86 +253,71 @@ tmp<volScalarField> MOM::momentSourceTerm(label momenti)
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
+using GammaDistribution = boost::math::gamma_distribution<>;
+using boost::math::pdf;
 
 tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 {
-
-    /*
-    dimensionedScalar xiDim = dimensionedScalar("xiDim", dimLength, 1.0);
-
-    scalar dMean = max(d_.weightedAverage(mesh_.V()).value(), SMALL);
-    scalar maxArg = maxDiameterMultiplicator_ * dMean ;
-    label maxIter = integrationSteps_;
-    dimensionedScalar dx = xiDim * maxArg / integrationSteps_;
-
-    dimensionedScalar arg_i1 = xiDim;
-    dimensionedScalar arg_j1 = xiDim;
-    label iterator = 0;
-    label iterator2 = 0;
-
-    //value of the integral
-    volScalarField sum
+    volScalarField toReturn
+    (
+        IOobject
         (
-            IOobject
-            (
-                "sum",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
+            "Sbc",
+            mesh_.time().timeName(),
             mesh_,
-            dimensionedScalar
-            (
-                "sum", 
-                pow(dimVolume, momenti - 1) / dimTime,
-                0
-            ) 
-        );
-    volScalarField sum_i0(sum);
-
-
-    */
-    volScalarField sum2
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            false
+        ),
+        mesh_,
+        dimensionedScalar
         (
-            IOobject
-            (
-                "Scoal",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            mesh_,
-            dimensionedScalar
-            (
-                "Scoal", 
-                pow(dimVolume, momenti) / dimTime,
-                0
-            ) 
-        );
+            "Sbc",
+            pow(dimVolume, momenti) /dimTime,
+            0
+        )
+    );
 
-    return tmp<volScalarField>( new volScalarField(sum2));
+    forAll(dispersedPhase_, celli)
+    {
+        GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
+        auto m0 = moments_[0][celli];
+
+        auto deathIntegrand = [&](double xi){
+
+            auto deathInnerIntegrand = [&](double xi_prime){
+
+                return coalescence_->S(xi, xi_prime).value() *
+                       m0 * pdf(gamma, xi_prime);
+            };
+
+            return pow(xi, momenti) * m0 * pdf(gamma, xi) *
+                   integrate(deathInnerIntegrand, 0.);
+        };
+
+        auto birthIntegrand = [&](double xi){
+
+            auto birthInnerIntegrand = [&](double xi_prime){
+
+                return coalescence_->S(xi, xi_prime).value() *
+                       pow(xi_prime + xi, momenti) *
+                       m0 * pdf(gamma, xi_prime);
+            };
+
+            return m0 * pdf(gamma, xi) *
+                   integrate(birthInnerIntegrand, 0.);
+        };
+
+        toReturn[celli] = integrate(birthIntegrand, 0.)/2. -
+                          integrate(deathIntegrand, 0.);
+    }
+
+    return tmp<volScalarField>( new volScalarField(toReturn));
 }
-
-void MOM::printAvgMaxMin(const volScalarField &v) const
-{
-    Info<< v.name() << ": avg, max,min "
-        << v.weightedAverage(mesh_.V()).value()
-        << ", " << max(v).value()
-        << ", " << min(v).value() << endl;
-}
-
-using gammaDistribution = boost::math::gamma_distribution<>;
-using boost::math::pdf;
 
 tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 {
-
-    //value of the integral
     volScalarField toReturn
     (
         IOobject
@@ -398,14 +340,14 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        gammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
+        GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
         auto m0 = moments_[0][celli];
 
         auto breakupSourceIntegrand = [&](double xi){
             scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
 
-            auto breakupBirthIntegrand = [&, xi](double xi_prime){
+            auto breakupBirthIntegrand = [&](double xi_prime){
                 return daughterParticleDistribution_->beta(xi, xi_prime).value()
                     * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
             };

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "scalar.H"
-#include "QMOM.H"
+#include "MomentInversion.H"
 #include <Eigen/Dense>
 
 /*

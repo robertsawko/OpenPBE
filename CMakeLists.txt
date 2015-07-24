@@ -75,7 +75,6 @@ add_subdirectory(ext/gtest/)
 include_directories(${GTEST_INCLUDE_DIRS})
 find_package(Boost REQUIRED)
 
-# add_subdirectory(ext/eigen3/)
 
 # add_subdirectory(ext/eigen3/)
 #Library
