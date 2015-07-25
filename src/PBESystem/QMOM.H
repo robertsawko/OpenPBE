@@ -88,7 +88,7 @@ private:
  void solve();
 
 public:
- TypeName("methodOfMoments");
+ TypeName("quadratureMethodOfMoments");
 
  // Constructors
 
