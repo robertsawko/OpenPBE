@@ -53,24 +53,7 @@ class binaryBreakup
 :
     public breakupKernel
 {
- private:
-  // Private data
-  const dimensionedScalar consistency_;
-  //const multiphaseTurbulence::turbulenceModel& turbulence_;
-//  const volScalarField& turbulence;
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  binaryBreakup(const binaryBreakup&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const binaryBreakup&);
-
  public:
-
   // Static data members
 
   //- Static data staticData
@@ -91,7 +74,7 @@ class binaryBreakup
 
   // Member Functions
 
-  dimensionedScalar S(const dimensionedScalar& xi) const;
+  dimensionedScalar S(const dimensionedScalar& xi) const override;
 };
 
 

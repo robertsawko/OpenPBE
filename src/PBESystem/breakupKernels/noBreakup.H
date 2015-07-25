@@ -53,19 +53,6 @@ class noBreakup
 :
     public breakupKernel
 {
- private:
-  // Private data
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  noBreakup(const noBreakup&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const noBreakup&);
-
  public:
 
   // Static data members
@@ -86,7 +73,7 @@ class noBreakup
 
   // Member Functions
 
-  dimensionedScalar S(const dimensionedScalar& xi) const;
+  dimensionedScalar S(const dimensionedScalar& xi) const override;
 };
 
 

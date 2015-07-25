@@ -52,15 +52,6 @@ namespace Foam
 
 class breakupKernel
 {
- private:
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  breakupKernel(const breakupKernel&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const breakupKernel&);
-
   // Protected data
  protected:
   dictionary breakupDict_;
@@ -68,6 +59,10 @@ class breakupKernel
   const phaseModel* dispersedPhase_;
 
  public:
+
+  breakupKernel(const breakupKernel&) = delete;
+  breakupKernel& operator=(const breakupKernel&) = delete;
+
   TypeName("breakupKernel");
 
   declareRunTimeSelectionTable

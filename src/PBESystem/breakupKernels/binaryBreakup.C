@@ -43,8 +43,7 @@ addToRunTimeSelectionTable
 
 binaryBreakup::binaryBreakup()
 :
-    breakupKernel(),
-    consistency_("c", dimensionSet(0, -6, -1, 0, 0, 0, 0), 1.0)
+    breakupKernel()
 {
 }
 
@@ -54,8 +53,7 @@ binaryBreakup::binaryBreakup
     const phaseModel& dispersedPhase
 )
 :
-    breakupKernel(breakupDict, dispersedPhase),
-    consistency_("c", dimensionSet(0, -6, -1, 0, 0, 0, 0), 1.0)
+    breakupKernel(breakupDict, dispersedPhase)
 {
 }
 
@@ -69,7 +67,7 @@ binaryBreakup::~binaryBreakup()
 
 dimensionedScalar binaryBreakup::S(const dimensionedScalar& xi) const
 {
-    return consistency_ * pow(xi, 2);
+    return dimensionedScalar("S", dimless / dimTime, pow(xi.value(), 2));
 }
 
 } //End namespace breakupKernels
