@@ -1,6 +1,7 @@
 set(benchmark_SRCS
     moment_inversion.cpp
     integration.cpp
+    breakup.cpp
     main.cpp
 )
 
