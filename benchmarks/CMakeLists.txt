@@ -11,6 +11,7 @@ include_directories ("$ENV{FOAM_SRC}/transportModels/incompressible/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/transportModels/compressible/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/thermophysicalModels/basic/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/meshTools/lnInclude")
+include_directories ("${PROJECT_SOURCE_DIR}/src/PBESystem")
 add_executable(benchmarks ${benchmark_SRCS})
 
 target_link_libraries(benchmarks PBE)

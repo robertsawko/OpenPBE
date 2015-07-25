@@ -62,6 +62,8 @@ class noBreakup
 
   // Constructors
 
+  noBreakup();
+
   noBreakup
   (
       const dictionary& breakupDict,

@@ -41,6 +41,12 @@ addToRunTimeSelectionTable
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
+noBreakup::noBreakup():
+    breakupKernel()
+{
+
+}
+
 noBreakup::noBreakup
 (
     const dictionary& breakupDict,
