@@ -1,0 +1,177 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.3;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+phases (oil water);
+
+oil
+{
+    diameterModel   PBEDiameter;
+    PBEDiameterCoeffs
+    {
+        method methodOfClasses;
+        MOCCoeffs
+        {
+            numberOfClasses 3;
+            xi1 1.0e-10;
+        }
+        coalescenceKernel noCoalescence;
+        breakupKernel noBreakup;
+        daughterParticleDistribution uniformBinaryBreakup;
+        noCoalescenceCoeffs
+        {}
+        noBreakupCoeffs
+        {}
+        uniformBinaryBreakupCoeffs
+        {}
+        CoulaloglouTavlaridesCoeffs
+        {
+                //c1 and c2 after Hsia and Talvarides (1983)
+                c1	0.1;
+                c2	0.06354;
+                sigma	0.047;
+                gamma	0.0;
+        }
+    }
+}
+
+
+water
+{
+    diameterModel constant;
+    constantCoeffs
+    {
+        d               1e-3;
+    }
+}
+
+blending
+{
+    default
+    {
+        type            linear;
+        residualAlpha 1;
+        maxFullyDispersedAlpha.oil 0.3;
+        maxPartlyDispersedAlpha.oil 0.5;
+        maxFullyDispersedAlpha.water 0.3;
+        maxPartlyDispersedAlpha.water 0.5;
+    }
+}
+
+sigma
+(
+    (oil and water)     0.00
+);
+
+aspectRatio
+(
+    (oil in water)
+    {
+        type            constant;
+        E0              1.0;
+    }
+
+    (water in oil)
+    {
+        type            constant;
+        E0              1.0;
+    }
+);
+
+drag
+(
+    (oil in water)
+    {
+        type            SchillerNaumann;
+        residualAlpha   1e-6;
+        residualRe      1e-3;
+        swarmCorrection
+        {
+            type        none;
+        }
+    }
+
+    (water in oil)
+    {
+        type            SchillerNaumann;
+        residualAlpha   1e-6;
+        residualRe      1e-3;
+        swarmCorrection
+        {
+            type        none;
+        }
+    }
+
+    (oil and water)
+    {
+        type            segregated;
+        residualAlpha   1e-6;
+        m               0.5;
+        n               8;
+        swarmCorrection
+        {
+            type        none;
+        }
+    }
+);
+
+virtualMass
+(
+    (oil in water)
+    {
+        type            constantCoefficient;
+        Cvm             0.5;
+    }
+
+    (water in oil)
+    {
+        type            constantCoefficient;
+        Cvm             0.5;
+    }
+);
+
+heatTransfer
+(
+    (oil in water)
+    {
+        type            RanzMarshall;
+        residualAlpha   1e-4;
+    }
+
+    (water in oil)
+    {
+        type            RanzMarshall;
+        residualAlpha   1e-4;
+    }
+);
+
+lift
+(
+);
+
+wallLubrication
+(
+);
+
+turbulentDispersion
+(
+);
+
+// Minimum allowable pressure
+pMin            10000;
+
+
+// ************************************************************************* //
