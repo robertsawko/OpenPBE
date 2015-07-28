@@ -26,7 +26,8 @@ oil
         MOCCoeffs
         {
             numberOfClasses 3;
-            xi1 0.01;
+            xi1 1.0e-10;
+            usingMULES on;
         }
         coalescenceKernel noCoalescence;
         breakupKernel noBreakup;
