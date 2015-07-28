@@ -34,9 +34,6 @@ import ycm_core
 foam_app = os.environ['FOAM_APP']
 foam_src = os.environ['FOAM_SRC']
 
-# These are the compilation flags that will be used in case there's no
-# compilation database set (by default, one is not set).
-# CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
 flags = [
     '-m64',
     '-Dlinux64',
@@ -51,17 +48,7 @@ flags = [
     '-ftemplate-depth-100',
     # '-DNDEBUG',
     # '-DUSE_CLANG_COMPLETER',
-    # THIS IS IMPORTANT! Without a "-std=<something>" flag, clang won't know
-    # which language to use when compiling headers. So it will guess. Badly. So
-    # C++ headers will be compiled as C headers. You don't want that so ALWAYS
-    # specify a "-std=<something>".
-    # For a C project, you would set this to something like 'c99' instead of
-    # 'c++11'.
     '-std=c++11',
-    # ...and the same thing goes for the magic -x option which specifies the
-    # language that the files to be compiled are written in. This is mostly
-    # relevant for c++ headers.
-    # For a C project, you would set this to 'c' instead of 'c++'.
     '-x',
     'c++',
     # This path will only work on OS X, but extra paths that don't exist are
@@ -75,7 +62,7 @@ flags = [
     '-I' + foam_src + '/OpenFOAM/lnInclude',
     '-I./src/PBESystem/',
     '-I.',
-    '-I' + foam_src + '/OSspecific/POSIX/lnInclude',
+#    '-I' + foam_src + '/OSspecific/POSIX/lnInclude',
     '-I./build/ext/gtest/src/googletest/include/'
 ]
 
@@ -126,7 +113,7 @@ def MakeRelativePathsInFlagsAbsolute(flags, working_directory):
     return new_flags
 
 
-def FlagsForFile( filename ):
+def FlagsForFile(filename):
   if database:
     # Bear in mind that compilation_info.compiler_flags_ does NOT return a
     # python list, but a "list-like" StringVec object
