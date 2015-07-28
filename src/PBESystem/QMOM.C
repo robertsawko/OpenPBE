@@ -86,18 +86,17 @@ QMOM::QMOM
     )
 {
     for (std::size_t i = 0; i<3; ++i){
-        moments_.emplace_back
-                (
-                    IOobject
-                    (
-                        "m" + std::to_string(i),
-                        mesh_.time().timeName(),
-                        mesh_,
-                        IOobject::MUST_READ,
-                        IOobject::AUTO_WRITE
-                    ),
-                    mesh_
-                );
+        moments_.emplace_back(
+            IOobject
+            (
+                "m" + std::to_string(i),
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::MUST_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh_
+        );
     }
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
@@ -111,19 +110,19 @@ void QMOM::correct()
 {
     std::vector<volScalarField> mSources_;
 
-    for (std::size_t i = 0; i<moments_.size(); ++i){
+    for (std::size_t i = 0; i < moments_.size(); ++i){
         mSources_.emplace_back
-                (
-                    IOobject
-                    (
-                        "m" + std::to_string(i) + "Source",
-                        mesh_.time().timeName(),
-                        mesh_,
-                        IOobject::NO_READ,
-                        IOobject::AUTO_WRITE
-                        ),
-                    momentSourceTerm(i)
-                    );
+        (
+            IOobject
+            (
+                "m" + std::to_string(i) + "Source",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            momentSourceTerm(i)
+        );
     }
 
     Info<< "moment sources:" << endl;
@@ -196,24 +195,24 @@ tmp<volScalarField> QMOM::momentSourceTerm(label momenti)
 tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
 {
     volScalarField toReturn
-            (
-                IOobject
-                (
-                    "Sc",
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE,
-                    false
-                    ),
-                mesh_,
-                dimensionedScalar
-                (
-                    "Sc",
-                    pow(dimVolume, momenti - 1) / dimTime,
-                    0
-                    )
-                );
+    (
+        IOobject
+        (
+            "Sc",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            false
+        ),
+        mesh_,
+        dimensionedScalar
+        (
+            "Sc",
+            pow(dimVolume, momenti) / dimTime,
+            0
+        )
+    );
 
     forAll(dispersedPhase_, celli)
     {
