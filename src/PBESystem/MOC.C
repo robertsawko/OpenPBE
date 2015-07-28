@@ -132,28 +132,26 @@ volScalarField MOC::coalescenceSourceTerm(label i)
         dimensionedScalar
         (
             "Scoal", 
-            classNumberDensity_[i].dimensions()/dimTime,
+            classNumberDensity_[i].dimensions() / dimTime,
             0
         ) 
     );
 
-    forAll(xi_, classj)
-    {
-        coalescenceField -=
-            coalescence_().S(xi_[i], xi_[classj])
-            * classNumberDensity_[classj];
+    forAll(phase_, celli){
+        forAll(xi_, classj){
+            coalescenceField[celli] -=
+                coalescence_().S(xi_[i], xi_[classj]).value()
+                * classNumberDensity_[classj][celli];
+        }
+        coalescenceField[celli] *= classNumberDensity_[i][celli];
+        //-1 in pairs account for zero-based numbering
+        for(int j = 0; j < i; ++j){
+            coalescenceField[celli] +=
+                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j]).value()
+                * classNumberDensity_[i - j - 1][celli]
+                * classNumberDensity_[j][celli];
+        }
     }
-
-    coalescenceField *= classNumberDensity_[i];
-
-    //-1 in pairs account for zero-based numbering
-    for(int j = 0; j < i; ++j)
-    {
-        coalescenceField +=
-            0.5 * coalescence_().S(xi_[i - j - 1], xi_[j])
-            * classNumberDensity_[i - j - 1] * classNumberDensity_[j];
-    }
-
     return coalescenceField;
 
 }
@@ -179,16 +177,19 @@ volScalarField MOC::breakupSourceTerm(label i)
             0.0
         ) 
     );
-    breakupField -=
-        breakup_().S(xi_[i]) * classNumberDensity_[i];
 
-    for (label j = i + 1; j < numberOfClasses_; ++j)
-        // deltaXi comes from the application of mean value theorem on the
-        // second integral see Kumar and Ramkrishna (1996) paper
-        breakupField +=
-            daughterParticleDistribution_().beta(xi_[i], xi_[j])
-            * breakup_().S( xi_[j]) * classNumberDensity_[j] * deltaXi_;
+    forAll(phase_, celli){
+        breakupField[celli] -=
+            breakup_().S(xi_[i]).value() * classNumberDensity_[i][celli];
 
+        for (label j = i + 1; j < numberOfClasses_; ++j)
+            // deltaXi comes from the application of mean value theorem on the
+            // second integral see Kumar and Ramkrishna (1996) paper
+            breakupField[celli] +=
+                daughterParticleDistribution_().beta(xi_[i], xi_[j]).value()
+                * breakup_().S( xi_[j]).value()
+                * classNumberDensity_[j][celli] * deltaXi_.value();
+    }
     return breakupField;
 }
 
@@ -291,16 +292,16 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
 
     MULES::limitSum(phiNkCorrs);
 
-    volScalarField sumNk
+    volScalarField volumeSum
     (
         IOobject
         (
-            "sumNk",
+            "sumVolumeNk",
             mesh.time().timeName(),
             mesh
         ),
         mesh,
-        dimensionedScalar("sumNk", dimless, 0)
+        dimensionedScalar("sumVolumeNk", xi_[0].dimensions(), 0)
     );
 
     forAll(classNumberDensity_, k)
@@ -319,14 +320,16 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
             S[k]
         );
 
-        Info<< Nk.name() << " volume average, min, max = "
-            << Nk.weightedAverage(mesh.V()).value()
-            << ' ' << min(Nk).value()
-            << ' ' << max(Nk).value()
-            << endl;
-
-        sumNk += Nk;
+        volumeSum += xi_[k] * Nk;
     }
+
+    volScalarField alphaPBE = phase_;
+    alphaPBE.internalField() = volumeSum.internalField() / mesh.V();
+    volScalarField continuityError("continuityError", mag(alphaPBE - phase_));
+
+    Info<< "Max continuity error between advection and PBE: "
+        << max(continuityError).value() << endl;
+        
 }
 
 inline dimensionedScalar volumeToDiameter(const dimensionedScalar& v)

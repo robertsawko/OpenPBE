@@ -309,7 +309,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
                    integrate(birthInnerIntegrand, 0.);
         };
 
-        toReturn[celli] = integrate(birthIntegrand, 0.)/2. -
+        toReturn[celli] = integrate(birthIntegrand, 0.) / 2. -
                           integrate(deathIntegrand, 0.);
     }
 

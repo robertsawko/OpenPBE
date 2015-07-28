@@ -27,6 +27,7 @@ oil
         {
             numberOfClasses 3;
             xi1 1.0e-10;
+            usingMULES 1;
         }
         coalescenceKernel noCoalescence;
         breakupKernel noBreakup;

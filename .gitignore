@@ -4,7 +4,6 @@ linux64GccDPOpt
 linux64GccDPDebug
 linux64GccDPProf
 lnInclude
-*/*.csv
 tags
 gmon.out
 sets
@@ -24,16 +23,11 @@ extendedFeatureEdgeMesh
 surfaceIndex
 log.*
 *.png
-*.csv
-*.dat
 doc
 results
 *.eMesh
 processor*
-STFConfig.h
 build
-multiphaseEulerModels
-src/eigen/build
 .ycm_extra_conf.pyc
 PlyParser_FoamFileParser_parsetab.py
 __pycache__/
