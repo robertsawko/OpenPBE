@@ -1,8 +1,7 @@
 from os import path
-from numpy import exp, arange
 from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
-from generate_initial_conditions import calculate_MOC_initial_condition
+from calc_MOC_initial_condition import calculate_MOC_initial_condition
 
 
 class test_case:
