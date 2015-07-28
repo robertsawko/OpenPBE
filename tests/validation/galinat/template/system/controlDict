@@ -52,4 +52,34 @@ maxCo           0.25;
 maxDeltaT       1e-02;
 
 libs ("libPBE.so");
+
+functions
+{
+    probes
+    {
+        functionObjectLibs ( "libsampling.so" );
+
+        type            probes;
+
+        // Name of the directory for probe data
+        name            probes;
+
+        // Write at same frequency as fields
+        outputControl   timeStep;
+        outputInterval  10;
+
+        // Fields to be probed
+        fields
+        (
+            n0
+        );
+
+        probeLocations
+        (
+            (0 0 0)        // in the orifice
+            (0 0 0.1)      // after
+            (0 0 -0.1)     // before
+        );
+    }
+}
 // ************************************************************************* //

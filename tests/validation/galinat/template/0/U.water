@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
-    object      Ucont;
+    object      U.water;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,10 +34,6 @@ boundaryField
         type               fixedValue;
         value              uniform (0 0 0.177);
     }
-    }
-    frontAndBack
-    {
-        type               empty;
     }
 }
 

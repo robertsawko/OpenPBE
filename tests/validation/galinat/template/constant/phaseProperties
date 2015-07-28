@@ -62,12 +62,8 @@ blending
 {
     default
     {
-        type            linear;
-        residualAlpha 1;
-        maxFullyDispersedAlpha.oil 0.3;
-        maxPartlyDispersedAlpha.oil 0.5;
-        maxFullyDispersedAlpha.water 0.3;
-        maxPartlyDispersedAlpha.water 0.5;
+        type            none;
+        continuousPhase water;
     }
 }
 
@@ -79,12 +75,6 @@ sigma
 aspectRatio
 (
     (oil in water)
-    {
-        type            constant;
-        E0              1.0;
-    }
-
-    (water in oil)
     {
         type            constant;
         E0              1.0;
@@ -103,29 +93,6 @@ drag
             type        none;
         }
     }
-
-    (water in oil)
-    {
-        type            SchillerNaumann;
-        residualAlpha   1e-6;
-        residualRe      1e-3;
-        swarmCorrection
-        {
-            type        none;
-        }
-    }
-
-    (oil and water)
-    {
-        type            segregated;
-        residualAlpha   1e-6;
-        m               0.5;
-        n               8;
-        swarmCorrection
-        {
-            type        none;
-        }
-    }
 );
 
 virtualMass
@@ -135,23 +102,11 @@ virtualMass
         type            constantCoefficient;
         Cvm             0.5;
     }
-
-    (water in oil)
-    {
-        type            constantCoefficient;
-        Cvm             0.5;
-    }
 );
 
 heatTransfer
 (
     (oil in water)
-    {
-        type            RanzMarshall;
-        residualAlpha   1e-4;
-    }
-
-    (water in oil)
     {
         type            RanzMarshall;
         residualAlpha   1e-4;

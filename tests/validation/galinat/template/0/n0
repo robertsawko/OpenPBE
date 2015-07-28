@@ -24,7 +24,8 @@ boundaryField
     outlet
     {
         type               inletOutlet;
-        inletValue          uniform 0.0021042;
+        inletValue         $internalField;
+        value              $internalField;
 
     }
     walls
@@ -34,12 +35,7 @@ boundaryField
     inlet
     {
         type            fixedValue;
-        value           uniform 0.0021042;
-    }
-
-    frontAndBack
-    {
-        type            empty;
+        value           $internalField;
     }
 }
 
