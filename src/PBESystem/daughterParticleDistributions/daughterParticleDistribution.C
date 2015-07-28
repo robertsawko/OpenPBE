@@ -60,7 +60,7 @@ Foam::daughterParticleDistribution::New
     word daughterParticleDistributionType(
         pbeDict.lookup("daughterParticleDistribution")
     );
-    Info<< "Selecting daugheter particle model: " <<
+    Info<< "Selecting daughter particle model: " <<
         daughterParticleDistributionType << endl;
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(daughterParticleDistributionType);
