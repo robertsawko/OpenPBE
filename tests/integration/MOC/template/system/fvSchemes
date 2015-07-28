@@ -31,6 +31,7 @@ divSchemes
 
     div(phi,alpha.air)              Gauss vanLeer;
     div(phir,alpha.air)             Gauss vanLeer;
+    "div\(phi,n.*\)"                Gauss vanLeer;
 
     "div\(alphaRhoPhi.*,U.*\)"      Gauss limitedLinearV 1;
     "div\(phi.*,U.*\)"              Gauss limitedLinearV 1;

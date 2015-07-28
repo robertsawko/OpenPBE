@@ -27,6 +27,7 @@ air
         {
             numberOfClasses 20;
             xi1 0.005;
+            usingMULES on;
         }
         coalescenceKernel noCoalescence;
         breakupKernel binaryBreakup;
