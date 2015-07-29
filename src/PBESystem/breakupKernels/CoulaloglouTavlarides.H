@@ -37,76 +37,52 @@ SourceFiles
 #define CoulaloglouTavlarides_H
 
 #include "breakupKernel.H"
-#include "turbulenceModel.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 namespace breakupKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class CoulaloglouTavlarides Declaration
-\*---------------------------------------------------------------------------*/
+class CoulaloglouTavlaridesImp
+{
+public:
+    CoulaloglouTavlaridesImp(scalar c1, scalar c2, scalar gamma, scalar sigma);
+
+    dimensionedScalar S(const dimensionedScalar& xi,
+                        const dimensionedScalar& rho_d,
+                        const dimensionedScalar& epsilon) const;
+
+private:
+    const scalar c1_;
+    const scalar c2_;
+    const scalar gamma_;
+    const scalar sigma_;
+};
 
 class CoulaloglouTavlarides
 :
     public breakupKernel
 {
- private:
-  // Private data
-  const scalar c1_;
-  const scalar c2_;
-  const scalar gamma_;
-  const scalar sigma_;
-  //const multiphaseTurbulence::turbulenceModel& turbulence_;
-//  const volScalarField& turbulence;
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  CoulaloglouTavlarides(const CoulaloglouTavlarides&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const CoulaloglouTavlarides&);
-
- public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("CoulaloglouTavlarides");
-
-  // Constructors
+public:
+  TypeName("CoulaloglouTavlarides")
 
   CoulaloglouTavlarides
   (
       const dictionary& breakupDict,
-      const phaseModel& continuousPhase,
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~CoulaloglouTavlarides();
+  virtual ~CoulaloglouTavlarides() = default;
 
-  // Member Functions
+  dimensionedScalar S(const dimensionedScalar& xi) const override;
 
-  tmp<volScalarField> S(const volScalarField& xi) const;
+private:
+  CoulaloglouTavlaridesImp impl_;
+
 };
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace breakupModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //

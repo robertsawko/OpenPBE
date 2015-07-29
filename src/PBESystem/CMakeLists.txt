@@ -16,6 +16,7 @@ set(lib_header_files
   breakupKernels/binaryBreakup.H
   breakupKernels/breakupKernel.H
   breakupKernels/noBreakup.H
+  breakupKernels/CoulaloglouTavlarides.H
   daughterParticleDistributions/daughterParticleDistribution.H
   daughterParticleDistributions/uniformBinaryBreakup.H
   PBEDiameter.H
@@ -36,6 +37,7 @@ set(lib_source_files
   breakupKernels/binaryBreakup.C
   breakupKernels/breakupKernel.C
   breakupKernels/noBreakup.C
+  breakupKernels/CoulaloglouTavlarides.C
   daughterParticleDistributions/daughterParticleDistribution.C
   daughterParticleDistributions/uniformBinaryBreakup.C
   PBEDiameter.C
