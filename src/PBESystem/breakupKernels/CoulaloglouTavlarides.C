@@ -65,11 +65,11 @@ CoulaloglouTavlaridesImp::CoulaloglouTavlaridesImp(scalar c1, scalar c2,
     :
       c1_(c1), c2_(c2), gamma_(gamma), sigma_(sigma)
 {
-    Info << "CoulaloglouTavlaride model constants: \n{\n";
-    Info << "\tc1: " << c1_ << endl;
-    Info << "\tc2: " << c2_ << endl;
-    Info << "\tgamma: " << gamma_ << endl;
-    Info << "\tsigma: " << sigma_ << endl;
+//    Info << "CoulaloglouTavlaride model constants: \n{\n";
+//    Info << "\tc1: " << c1_ << endl;
+//    Info << "\tc2: " << c2_ << endl;
+//    Info << "\tgamma: " << gamma_ << endl;
+//    Info << "\tsigma: " << sigma_ << endl;
 }
 
 dimensionedScalar CoulaloglouTavlaridesImp::S(
@@ -83,8 +83,8 @@ dimensionedScalar CoulaloglouTavlaridesImp::S(
             (
                 -c2_ * sigma_ * pow(1+gamma_,2)
                 /(
-                    rho_d * pow(epsilon, 2.0/3.0)
-                    * pow(xi, 5.0/3.0)
+                    rho_d.value() * pow(epsilon.value(), 2.0/3.0)
+                    * pow(xi.value(), 5.0/3.0)
                  )
             )
             /((1+gamma_) * pow(xi, 2.0/3.0));
