@@ -85,18 +85,17 @@ QMOM::QMOM
           dimensionedScalar("diameter", dimLength, 0.0)
     )
 {
-    for (std::size_t i = 0; i<3; ++i){
+    std::size_t number_of_moments =
+        2 * readLabel(QMOMDict_.lookup("quadratureOrder"));
+    for (std::size_t i = 0; i < number_of_moments; ++i) {
         moments_.emplace_back(
-            IOobject
-            (
+            IOobject(
                 "m" + std::to_string(i),
                 mesh_.time().timeName(),
                 mesh_,
                 IOobject::MUST_READ,
-                IOobject::AUTO_WRITE
-            ),
-            mesh_
-        );
+                IOobject::AUTO_WRITE),
+            mesh_);
     }
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);

@@ -12,6 +12,7 @@ class test_case:
     ):
         self.name = case_name
         self.quadrature_order = quadrature_order
+        self.number_of_moments = 2 * quadrature_order
         self.initial_moments = initial_moments
         self.phase_properties_name = phase_properties_name
         self.end_time = end_time
@@ -61,7 +62,7 @@ def case_setup(ci):
 
     phase_properties = ParsedParameterFile(
         path.join("./diffs", ci.phase_properties_name))
-    phase_properties["air"]["PBEDiameterCoeffs"]["QMOMCoeffs"]["numberOfClasses"] = ci.quadrature_order
+    phase_properties["air"]["PBEDiameterCoeffs"]["QMOMCoeffs"]["quadratureOrder"] = ci.quadrature_order
 
     # manually fix bad pyfoam parsing
     phase_properties["blending"]["default"]["type"] = "none"
@@ -71,7 +72,7 @@ def case_setup(ci):
     ))
 
     m0 = ParsedParameterFile(path.join(template_case.name, "0", "m0"))
-    for i in range(2 * ci.quadrature_order):
+    for i in range(ci.number_of_moments):
         m0.header["object"] = "m" + str(i)
         m0["internalField"].setUniform(ci.initial_moments[i])
         m0["dimensions"] = "[0 {0} 0 0 0 0 0]".format(3 * i)
@@ -81,7 +82,7 @@ def case_setup(ci):
         path.join(case.name, "system", "controlDict")
     )
     controlDict["functions"]["probes"]["fields"] = [
-        "m{0}".format(m) for m in range(ci.quadrature_order)]
+        "m{0}".format(m) for m in range(ci.number_of_moments)]
     controlDict["endTime"] = ci.end_time
     controlDict["deltaT"] = ci.delta_t
     controlDict.writeFile()
