@@ -1,5 +1,5 @@
 from os import path
-from numpy import ones, array
+from numpy import ones, array, arange
 from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 
@@ -87,7 +87,7 @@ def case_setup(ci):
     controlDict["deltaT"] = ci.delta_t
     controlDict.writeFile()
 
-pbe_grids = [1, 2, 4, 6]
+pbe_grids = range(1, 5)
 coalescence_cases = [coalescence_case(nC) for nC in pbe_grids]
 breakup_cases = [breakup_case(nC) for nC in pbe_grids]
 
