@@ -69,7 +69,7 @@ private:
  const phaseModel& dispersedPhase_;
  const fvMesh& mesh_;
 
- std::vector<volScalarField> moments_;
+ PtrList<volScalarField> moments_;
 
  volScalarField d_;
 

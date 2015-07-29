@@ -70,7 +70,7 @@ QMOM::QMOM
       QMOMDict_(pbeProperties.subDict("QMOMCoeffs")),
       dispersedPhase_(phase),
       mesh_(dispersedPhase_.U().mesh()),
-      moments_(),
+      moments_(2 * readLabel(QMOMDict_.lookup("quadratureOrder"))),
       d_
       (
           IOobject
@@ -85,31 +85,29 @@ QMOM::QMOM
           dimensionedScalar("diameter", dimLength, 0.0)
     )
 {
-    std::size_t number_of_moments =
-        2 * readLabel(QMOMDict_.lookup("quadratureOrder"));
-    for (std::size_t i = 0; i < number_of_moments; ++i) {
-        moments_.emplace_back(
-            IOobject(
-                "m" + std::to_string(i),
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::MUST_READ,
-                IOobject::AUTO_WRITE),
-            mesh_);
-    }
+    forAll(moments_, momenti)
+        moments_.set(
+            momenti,
+            new volScalarField(
+                IOobject(
+                    "m" + std::to_string(momenti),
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::MUST_READ,
+                    IOobject::AUTO_WRITE),
+                mesh_));
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
 }
 
 QMOM::~QMOM()
 {
-
 }
 void QMOM::correct()
 {
     std::vector<volScalarField> mSources_;
 
-    for (std::size_t i = 0; i < moments_.size(); ++i){
+    for (label i = 0; i < moments_.size(); ++i){
         mSources_.emplace_back
         (
             IOobject
@@ -142,7 +140,7 @@ void QMOM::correct()
         printAvgMaxMin(mesh_, mSource);
     }
 
-    for (std::size_t i = 0; i<moments_.size(); ++i)
+    for (label i = 0; i < moments_.size(); ++i)
     {
         fvScalarMatrix mEqn
                 (

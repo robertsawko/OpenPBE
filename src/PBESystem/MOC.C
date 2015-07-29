@@ -25,7 +25,6 @@ License
 #include "fvCFD.H"
 
 #include <string>
-#include <sstream>
 
 #include "MOC.H"
 #include "addToRunTimeSelectionTable.H"
@@ -47,65 +46,37 @@ addToRunTimeSelectionTable(PBEMethod, MOC, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-MOC::MOC
-(
-    const dictionary& pbeProperties,
-    const phaseModel& phase
-)
-:
-    PBEMethod(pbeProperties, phase),
-    MOCDict_(pbeProperties.subDict("MOCCoeffs")),
-    numberOfClasses_(readLabel(MOCDict_.lookup("numberOfClasses"))),
-    classNumberDensity_(numberOfClasses_),
-    classVelocity_(numberOfClasses_),
-    deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
-    xi_(numberOfClasses_),
-    usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false))
-{
+MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
+    : PBEMethod(pbeProperties, phase),
+      MOCDict_(pbeProperties.subDict("MOCCoeffs")),
+      numberOfClasses_(readLabel(MOCDict_.lookup("numberOfClasses"))),
+      classNumberDensity_(numberOfClasses_), classVelocity_(numberOfClasses_),
+      deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
+      xi_(numberOfClasses_),
+      usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false)) {
     Info << "Creating " << numberOfClasses_ << " class";
-    //Taking pedantry one step too far!
-    if(numberOfClasses_ > 1)
+    // Taking pedantry one step too far!
+    if (numberOfClasses_ > 1)
         Info << "es";
     Info << endl;
 
-    //int phasei = 0;
-    forAll(classNumberDensity_, i)
-    {
-        //TODO: Is it possible to do the same with OF string?
-        std::stringstream className;
-        std::stringstream xiName;
-        className << "n" << i; 
-        //TODO: There MUST be a way of doing it more easily
-        xiName << "xi " << deltaXi_.value() * i; 
-        classNumberDensity_.set
-        (
+    // int phasei = 0;
+    forAll(classNumberDensity_, i) {
+        classNumberDensity_.set(
             i,
-            new volScalarField
-            (
-                IOobject
-                (
-                    className.str(),
-                    phase.U().mesh().time().timeName(),
-                    phase.U().mesh(),
-                    IOobject::MUST_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                phase.U().mesh()
-            )
-        );
+            new volScalarField(
+                   IOobject(
+                       "n" + std::to_string(i),
+                       phase.U().mesh().time().timeName(),
+                       phase.U().mesh(),
+                       IOobject::MUST_READ,
+                       IOobject::AUTO_WRITE),
+                   phase.U().mesh()));
         classVelocity_.set(i, phase.U());
-        xi_.set
-        (
-            i,
-            new dimensionedScalar(xiName.str(), deltaXi_ * (i + 1))
-        );
-        Info<< className.str().c_str() << " has volume " << xi_[i]
-            << endl;
+        xi_.set(i, new dimensionedScalar(
+            "xi" + std::to_string(i), deltaXi_ * (i + 1)));
+        Info << i << " has volume " << xi_[i] << endl;
     }
-    //TODO: Add error checking classes must add to dispersed or to 1
-
-
-
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
