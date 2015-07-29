@@ -38,30 +38,23 @@ SourceFiles
 
 #include "breakupKernel.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 namespace breakupKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class binaryBreakup Declaration
-\*---------------------------------------------------------------------------*/
+class binaryBreakupImpl
+{
+public:
+    dimensionedScalar S(const dimensionedScalar& xi) const;
+};
 
 class binaryBreakup
 :
     public breakupKernel
 {
  public:
-  // Static data members
-
-  //- Static data staticData
-  TypeName("binaryBreakup");
-
-  // Constructors
-
-  binaryBreakup();
+  TypeName("binaryBreakup")
 
   binaryBreakup
   (
@@ -69,24 +62,20 @@ class binaryBreakup
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~binaryBreakup();
+  virtual ~binaryBreakup() = default;
 
-  // Member Functions
+  dimensionedScalar S(const dimensionedScalar& xi) const override
+  {
+      return impl_.S(xi);
+  }
 
-  dimensionedScalar S(const dimensionedScalar& xi) const override;
+private:
+  binaryBreakupImpl impl_;
+
 };
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace breakupModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //

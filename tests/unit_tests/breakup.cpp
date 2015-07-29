@@ -9,7 +9,7 @@ TEST(breakup, binary){
     Foam::dimensionedScalar expected(
         "expected", Foam::dimensionSet(0, 0, -1, 0, 0), 36);
 
-    Foam::breakupKernels::binaryBreakup kernel;
+    Foam::breakupKernels::binaryBreakupImpl kernel;
 
     auto result = kernel.S(xi);
 
@@ -24,7 +24,7 @@ TEST(breakup, none){
     Foam::dimensionedScalar expected(
         "expected", Foam::dimensionSet(0, 0, -1, 0, 0), 0);
 
-    Foam::breakupKernels::noBreakup kernel;
+    Foam::breakupKernels::noBreakupImpl kernel;
 
     auto result = kernel.S(xi);
 

@@ -38,31 +38,23 @@ SourceFiles
 
 #include "breakupKernel.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 namespace breakupKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class noBreakup Declaration
-\*---------------------------------------------------------------------------*/
+class noBreakupImpl
+{
+public:
+    dimensionedScalar S(const dimensionedScalar& xi) const;
+};
 
 class noBreakup
 :
     public breakupKernel
 {
- public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("noBreakup");
-
-  // Constructors
-
-  noBreakup();
+public:
+  TypeName("noBreakup")
 
   noBreakup
   (
@@ -70,24 +62,18 @@ class noBreakup
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~noBreakup();
+  virtual ~noBreakup() = default;
 
-  // Member Functions
+  dimensionedScalar S(const dimensionedScalar& xi) const override
+  {
+      return impl_.S(xi);
+  }
 
-  dimensionedScalar S(const dimensionedScalar& xi) const override;
+private:
+  noBreakupImpl impl_;
 };
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace breakupModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //
