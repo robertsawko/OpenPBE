@@ -37,7 +37,8 @@ TEST(breakup, CoulaloglouTavlarides){
     Foam::scalar C1(0.0152), C2(0.0678),
                  sigma(0.04282), alpha(0.050000000000000003);
 
-    Foam::dimensionedScalar epsilon("epsilon", Foam::dimless, 0.12935361098784559);
+    Foam::dimensionedScalar epsilon("epsilon", Foam::dimless,
+                                    0.12935361098784559);
     Foam::dimensionedScalar rho_d("rho_d", Foam::dimless, 972.0);
 
     Foam::dimensionedScalar xi(

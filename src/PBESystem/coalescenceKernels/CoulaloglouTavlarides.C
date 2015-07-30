@@ -26,7 +26,6 @@ License
 #include "CoulaloglouTavlarides.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 namespace coalescenceKernels
@@ -39,103 +38,68 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
 CoulaloglouTavlaridesC::CoulaloglouTavlaridesC
-(
-    const dictionary& coalescenceDict,
-    const phaseModel& continuousPhase,
+(const dictionary& coalescenceDict,
     const phaseModel& dispersedPhase
 )
 :
-    coalescenceKernel(coalescenceDict,continuousPhase,dispersedPhase),
-    c1_( coalescenceDict.lookupOrDefault<scalar>("c1",0.00487) ),
-    c2_( coalescenceDict.lookupOrDefault<scalar>("c2",0.008) ),
-    gamma_( coalescenceDict.lookupOrDefault<scalar>("gamma",0.0) ),
-    sigma_( coalescenceDict.lookupOrDefault<scalar>("sigma",0.047) )
+    coalescenceKernel(coalescenceDict, dispersedPhase),
+    impl_( coalescenceDict.lookupOrDefault<scalar>("c1",0.00487),
+           coalescenceDict.lookupOrDefault<scalar>("c2",0.008),
+           coalescenceDict.lookupOrDefault<scalar>("gamma",0.0),
+           coalescenceDict.lookupOrDefault<scalar>("sigma",0.047) )
 {
 }
 
+dimensionedScalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
+                                            const dimensionedScalar &xi2) const
+{
+    scalar epsilon(1), nud(1), rhod(1);
+    return impl_.S(xi1, xi2, epsilon, rhod, nud);
+}
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-CoulaloglouTavlaridesC::~CoulaloglouTavlaridesC()
+CoulaloglouTavlaridesCImpl::CoulaloglouTavlaridesCImpl(scalar c1,
+                                                       scalar c2,
+                                                       scalar gamma,
+                                                       scalar sigma)
+    :
+      c1_(c1), c2_(c2), gamma_(gamma), sigma_(sigma)
 {}
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-tmp<volScalarField> CoulaloglouTavlaridesC::S
+dimensionedScalar CoulaloglouTavlaridesCImpl::S
 (
-    const volScalarField& xi1,
-    const volScalarField& xi2
+        const dimensionedScalar& xi1,
+        const dimensionedScalar& xi2,
+        const dimensionedScalar& epsilon,
+        const dimensionedScalar& rhod,
+        const dimensionedScalar& nud
 ) const
 {
-
-
-    const multiphaseTurbulence::turbulenceModel& turbulence
-    (
-       continuousPhase_.mesh().lookupObject
-       <multiphaseTurbulence::turbulenceModel>("turbulenceModel")
-    );
-
-    volScalarField epsilon = turbulence.epsilon();
-    volScalarField k = turbulence.k();
-    volScalarField nut = turbulence.nut();
-
-    const dimensionedScalar nud = dispersedPhase_.nu();
-    const dimensionedScalar nuc = continuousPhase_.nu();
-    const dimensionedScalar rhod = dispersedPhase_.rho();
-    const dimensionedScalar rhoc = continuousPhase_.rho();
-    dimensionedScalar epsilonDim("epsilonDim", epsilon.dimensions(), 1.0);
-    dimensionedScalar kDim("kDim", k.dimensions(), 1.0);
-    dimensionedScalar nuDim("nuDim", nud.dimensions(), 1.0);
-    dimensionedScalar xiDim = dimensionedScalar("unitLength", dimLength, 1.0);
-
-    volScalarField epsilonSafe = max(epsilon, SMALL * epsilonDim);
-
-    dimensionedScalar sigma("sigma", dimensionSet(1,0,-2,0,0,0,0), sigma_);
-
-    volScalarField frequency = 
-        c1_ * pow(epsilonSafe, 1.0 / 3.0) * pow(xi1 + xi2, 2) * 
+    dimensionedScalar frequency =
+        c1_ * pow(epsilon, 1.0 / 3.0) * pow(xi1 + xi2, 2) *
         pow
-        ( 
+        (
             pow(xi1, 2.0 / 3.0) + pow(xi2, 2.0 / 3.0),
             0.5
-        ) 
+        )
         / (1 + gamma_);
 
 
-    volScalarField rate = 
+    dimensionedScalar rate =
         exp
         (
-            - c2_ * rhod * epsilonSafe * (rhod * nud) * pow(xiDim,-2)
-            / ( pow(sigma,2) * pow( 1 + gamma_,3) )
+            (- c2_ * rhod * epsilon * (rhod * nud)
+            / ( pow(sigma_,2) * pow( 1 + gamma_,3) )
             * pow
                 (
                     xi1 * xi2 / (xi1 + xi2),
                     4.0
-                )
+                ).value())
         );
 
 
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "S",
-                xi1.mesh().time().timeName(),
-                xi1.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            frequency * rate * pow(xiDim, -2)
-        )
-    );
+    return frequency * rate;
 }
 
 } //End namespace coalescenceKernels
 } //End namespace Foam
-// ************************************************************************* //

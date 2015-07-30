@@ -27,7 +27,7 @@ static void noBreakup(benchmark::State& state) {
 
 BENCHMARK(noBreakup);
 
-static void CoulaloglouTavlarides(benchmark::State& state) {
+static void CoulaloglouTavlaridesBreakup(benchmark::State& state) {
     Foam::scalar C1(0.0152), C2(0.0678),
                  sigma(0.04282), alpha(0.050000000000000003);
 
@@ -44,4 +44,4 @@ static void CoulaloglouTavlarides(benchmark::State& state) {
         kernel.S(xi, rho_d, epsilon);
 }
 
-BENCHMARK(CoulaloglouTavlarides);
+BENCHMARK(CoulaloglouTavlaridesBreakup);

@@ -37,76 +37,58 @@ SourceFiles
 #define CoulaloglouTavlaridesC_H
 
 #include "coalescenceKernel.H"
-#include "turbulenceModel.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 namespace coalescenceKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class CoulaloglouTavlaridesC Declaration
-\*---------------------------------------------------------------------------*/
+class CoulaloglouTavlaridesCImpl
+{
+public:
+ CoulaloglouTavlaridesCImpl(scalar c1, scalar c2, scalar gamma, scalar sigma);
+
+ dimensionedScalar S
+ (
+         const dimensionedScalar& xi1,
+         const dimensionedScalar& xi2,
+         const dimensionedScalar& epsilon,
+         const dimensionedScalar& rhod,
+         const dimensionedScalar& nud
+ ) const;
+
+private:
+ const scalar c1_;
+ const scalar c2_;
+ const scalar gamma_;
+ const scalar sigma_;
+
+};
 
 class CoulaloglouTavlaridesC
 :
     public coalescenceKernel
 {
- private:
-  // Private data
-  const scalar c1_;
-  const scalar c2_;
-  const scalar gamma_;
-  const scalar sigma_;
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  CoulaloglouTavlaridesC(const CoulaloglouTavlaridesC&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const CoulaloglouTavlaridesC&);
-
- public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("CoulaloglouTavlaridesC");
-
-  // Constructors
+ public:  
+  TypeName("CoulaloglouTavlaridesC")
 
   CoulaloglouTavlaridesC
   (
       const dictionary& coalescenceDict,
-      const phaseModel& continuousPhase,
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~CoulaloglouTavlaridesC();
+  virtual ~CoulaloglouTavlaridesC() = default;
 
-  // Member Functions
+  dimensionedScalar S(
+      const dimensionedScalar& xi1,
+      const dimensionedScalar& xi2) const override;
 
-  tmp<volScalarField> S(
-      const volScalarField& xi1,
-      const volScalarField& xi2) const;
+private:
+  CoulaloglouTavlaridesCImpl impl_;
 };
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace coalescenceModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //
