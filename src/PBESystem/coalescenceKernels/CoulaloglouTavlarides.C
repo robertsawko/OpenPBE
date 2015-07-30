@@ -47,14 +47,22 @@ CoulaloglouTavlaridesC::CoulaloglouTavlaridesC
     impl_( coalescenceDict.lookupOrDefault<scalar>("c1",0.00487),
            coalescenceDict.lookupOrDefault<scalar>("c2",0.008),
            coalescenceDict.lookupOrDefault<scalar>("gamma",0.0),
-           coalescenceDict.lookupOrDefault<scalar>("sigma",0.047) )
+           coalescenceDict.lookupOrDefault<scalar>("sigma",0.047) ),
+    epsilon_(
+        dispersedPhase.U().mesh().lookupObject<volScalarField>("epsilonm")),
+    rhod_(dispersedPhase.rho()),
+    nud_(dispersedPhase.nu())
 {
 }
 
 dimensionedScalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
-                                            const dimensionedScalar &xi2) const
-{
-    scalar epsilon(1), nud(1), rhod(1);
+                                            const dimensionedScalar &xi2,
+                                            label celli) const {
+    dimensionedScalar epsilon(
+        "epsilon", epsilon_.dimensions(), epsilon_[celli]),
+        rhod("rhod", rhod_.dimensions(), rhod_[celli]),
+        nud("nud", nud_.dimensions(), nud_[celli]);
+
     return impl_.S(xi1, xi2, epsilon, rhod, nud);
 }
 

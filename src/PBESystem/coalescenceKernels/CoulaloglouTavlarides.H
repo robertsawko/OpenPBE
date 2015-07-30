@@ -82,10 +82,14 @@ class CoulaloglouTavlaridesC
 
   dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const override;
+      const dimensionedScalar& xi2,
+      label celli) const override;
 
 private:
   CoulaloglouTavlaridesCImpl impl_;
+  const volScalarField& epsilon_;
+  const volScalarField& rhod_;
+  const volScalarField& nud_;
 };
 
 } // End namespace coalescenceModels

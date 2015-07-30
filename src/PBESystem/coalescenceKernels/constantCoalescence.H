@@ -48,9 +48,8 @@ class constantCoalescenceImpl
 public:
     constantCoalescenceImpl(scalar constant);
 
-    const dimensionedScalar S(
-        const dimensionedScalar& xi1,
-        const dimensionedScalar& xi2) const;
+    const dimensionedScalar S(const dimensionedScalar &xi1,
+                              const dimensionedScalar &xi2) const;
 
 private:
     scalar constant_;
@@ -76,14 +75,14 @@ class constantCoalescence
 
   dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const override
+      const dimensionedScalar& xi2,
+      label celli) const override
   {
       return impl_.S(xi1, xi2);
   }
 
  private:
   constantCoalescenceImpl impl_;
-
 };
 
 

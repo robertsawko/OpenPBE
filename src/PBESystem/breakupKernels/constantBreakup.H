@@ -91,7 +91,7 @@ class constantBreakup
 
   // Member Functions
 
-  tmp<volScalarField> S(const volScalarField& xi) const;
+  dimensionedScalar S(const volScalarField& xi, label celli) const;
 };
 
 
