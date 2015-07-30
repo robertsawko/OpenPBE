@@ -26,7 +26,6 @@ License
 #include "noCoalescence.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 namespace coalescenceKernels
@@ -39,8 +38,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
 noCoalescence::noCoalescence
 (
     const dictionary& coalescenceDict,
@@ -51,40 +48,6 @@ noCoalescence::noCoalescence
 {
 }
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-noCoalescence::~noCoalescence()
-{}
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-tmp<volScalarField> noCoalescence::S
-(
-    const volScalarField& xi1,
-    const volScalarField& xi2
-) const
-{
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "S",
-                xi1.mesh().time().timeName(),
-                xi1.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            xi1.mesh(),
-            //TODO Is the dimension correct?
-            dimensionedScalar("S", dimless/dimTime, 0) 
-        )
-    );
-}
-
 const dimensionedScalar noCoalescence::S
 (
     const dimensionedScalar& xi1,
@@ -93,6 +56,7 @@ const dimensionedScalar noCoalescence::S
 {
     return dimensionedScalar("S", dimless/dimTime, 0);
 }
+
 } //End namespace coalescenceKernels
 } //End namespace Foam
 // ************************************************************************* //

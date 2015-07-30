@@ -41,34 +41,21 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-  Class coalescenceKernel Declaration
-\*---------------------------------------------------------------------------*/
-
 class coalescenceKernel
 {
- private:
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  coalescenceKernel(const coalescenceKernel&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const coalescenceKernel&);
-
-  // Protected data
  protected:
   dictionary coalescenceDict_;
   const phaseModel& continuousPhase_;
   const phaseModel& dispersedPhase_;
 
  public:
-  TypeName("coalescenceKernel");
+  coalescenceKernel(const coalescenceKernel&) = delete;
+  coalescenceKernel& operator=(const coalescenceKernel&) = delete;
+
+  TypeName("coalescenceKernel")
 
   declareRunTimeSelectionTable
   (
@@ -80,53 +67,28 @@ class coalescenceKernel
           const phaseModel& dispersedPhase
       ),
       (coalescenceDict, dispersedPhase)
-  );
+  )
 
-  // Static data members
-
-  //- Static data staticData
-
-
-  // Constructors
-
-  //- Construct null
-  //coalescenceKernel();
-
-  //- Construct from components
   coalescenceKernel
   (
       const dictionary& coalescenceDict,
       const phaseModel& dispersedPhase
   );
 
-
-  // Selectors
   static autoPtr<coalescenceKernel> New
   (
       const dictionary& coalescenceDict,
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~coalescenceKernel();
-
-  // Member Functions
-
-  //- Source function for the coalescence kernel used in PBE
-  virtual tmp<volScalarField> S(
-      const volScalarField& xi1,const volScalarField& xi2) const = 0;
+  virtual ~coalescenceKernel() = default;
 
   virtual const dimensionedScalar S(
       const dimensionedScalar& xi1,const dimensionedScalar& xi2) const = 0;
 };
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
-
-// ************************************************************************* //

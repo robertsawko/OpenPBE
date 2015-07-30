@@ -29,18 +29,9 @@ License
 namespace Foam
 {
 defineTypeNameAndDebug(coalescenceKernel, 0);
-defineRunTimeSelectionTable(coalescenceKernel, dictionary);
+defineRunTimeSelectionTable(coalescenceKernel, dictionary)
 }
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 Foam::coalescenceKernel::coalescenceKernel
 (
     const dictionary& coalescenceDict,
@@ -51,9 +42,8 @@ Foam::coalescenceKernel::coalescenceKernel
     continuousPhase_(dispersedPhase.otherPhase()),
     dispersedPhase_(dispersedPhase)
 {
-};
+}
 
-// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 Foam::autoPtr<Foam::coalescenceKernel> Foam::coalescenceKernel::New
 (
     const dictionary& pbeDict,
@@ -79,22 +69,4 @@ Foam::autoPtr<Foam::coalescenceKernel> Foam::coalescenceKernel::New
         pbeDict.subDict(coalescenceKernelType + "Coeffs"),
         dispersedPhase
     );
-};
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::coalescenceKernel::~coalescenceKernel()
-{
 }
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * Friend Operators * * * * * * * * * * * * * * //
-
-
-// ************************************************************************* //

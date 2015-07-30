@@ -38,42 +38,17 @@ SourceFiles
 
 #include "coalescenceKernel.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 namespace coalescenceKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class noCoalescence Declaration
-\*---------------------------------------------------------------------------*/
-
 class noCoalescence
 :
     public coalescenceKernel
 {
- private:
-  // Private data
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  noCoalescence(const noCoalescence&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const noCoalescence&);
-
  public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("noCoalescence");
-
-  // Constructors
+  TypeName("noCoalescence")
 
   noCoalescence
   (
@@ -81,30 +56,15 @@ class noCoalescence
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~noCoalescence();
-
-  // Member Functions
-
-  tmp<volScalarField> S(
-      const volScalarField& xi1,
-      const volScalarField& xi2) const;
+  virtual ~noCoalescence() = default;
 
   const dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const;
+      const dimensionedScalar& xi2) const override;
 };
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace coalescenceModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //

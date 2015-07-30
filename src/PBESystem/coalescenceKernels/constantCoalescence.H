@@ -38,16 +38,10 @@ SourceFiles
 
 #include "coalescenceKernel.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 namespace coalescenceKernels
 {
-
-/*---------------------------------------------------------------------------*\
-                         Class constantCoalescence Declaration
-\*---------------------------------------------------------------------------*/
 
 class constantCoalescence
 :
@@ -55,26 +49,9 @@ class constantCoalescence
 {
  private:
   scalar constant_;
-  // Private data
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  constantCoalescence(const constantCoalescence&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const constantCoalescence&);
 
  public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("constantCoalescence");
-
-  // Constructors
+  TypeName("constantCoalescence")
 
   constantCoalescence
   (
@@ -82,30 +59,16 @@ class constantCoalescence
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~constantCoalescence();
-
-  // Member Functions
-
-  tmp<volScalarField> S(
-      const volScalarField& xi1,
-      const volScalarField& xi2) const;
+  virtual ~constantCoalescence() = default;
 
   const dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const;
+      const dimensionedScalar& xi2) const override;
 };
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace coalescenceModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
-
-// ************************************************************************* //
