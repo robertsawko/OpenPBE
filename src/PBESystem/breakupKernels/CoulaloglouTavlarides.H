@@ -63,7 +63,7 @@ class CoulaloglouTavlarides
 :
     public breakupKernel
 {
-public:
+ public:
   TypeName("CoulaloglouTavlarides")
 
   CoulaloglouTavlarides
@@ -78,6 +78,8 @@ public:
 
 private:
   CoulaloglouTavlaridesImp impl_;
+  const volScalarField& epsilon_;
+  const volScalarField& rhod_;
 
 };
 
