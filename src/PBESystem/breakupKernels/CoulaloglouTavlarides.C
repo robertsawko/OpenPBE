@@ -64,8 +64,6 @@ dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
         "epsilon", epsilonField.dimensions(), epsilonField[celli]);
     dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[celli]);
 
-    Info << "S(" << xi.value() << ", " << epsilon.value() << ", "
-         << rho_d.value() << ")" << impl_.S(xi, rho_d, epsilon) << nl;
     return impl_.S(xi, rho_d, epsilon);
 }
 
