@@ -57,8 +57,8 @@ constantCoalescenceImpl::constantCoalescenceImpl(scalar constant):
 
 const dimensionedScalar constantCoalescenceImpl::S
 (
-        const dimensionedScalar &xi1,
-        const dimensionedScalar &xi2
+        const dimensionedScalar& xi1,
+        const dimensionedScalar& xi2
 ) const
 {
     return dimensionedScalar("S", dimless/dimTime, constant_);

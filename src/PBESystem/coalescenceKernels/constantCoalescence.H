@@ -74,7 +74,7 @@ class constantCoalescence
 
   virtual ~constantCoalescence() = default;
 
-  const dimensionedScalar S(
+  dimensionedScalar S(
       const dimensionedScalar& xi1,
       const dimensionedScalar& xi2) const override
   {

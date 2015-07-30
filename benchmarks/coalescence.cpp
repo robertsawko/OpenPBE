@@ -18,3 +18,18 @@ static void constantCoalescence(benchmark::State& state) {
 }
 
 BENCHMARK(constantCoalescence);
+
+static void noCoalescence(benchmark::State& state) {
+    Foam::dimensionedScalar xi1(
+        "xi1", Foam::dimensionSet(0, 3, 0, 0, 0), 6);
+
+    Foam::dimensionedScalar xi2(
+        "xi2", Foam::dimensionSet(0, 3, 0, 0, 0), 8);
+
+    Foam::coalescenceKernels::noCoalescenceImpl kernel;
+
+    while (state.KeepRunning())
+        kernel.S(xi1, xi2);
+}
+
+BENCHMARK(noCoalescence);

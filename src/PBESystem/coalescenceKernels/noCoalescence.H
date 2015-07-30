@@ -43,6 +43,14 @@ namespace Foam
 namespace coalescenceKernels
 {
 
+class noCoalescenceImpl
+{
+public:
+    dimensionedScalar S(
+        const dimensionedScalar& xi1,
+        const dimensionedScalar& xi2) const;
+};
+
 class noCoalescence
 :
     public coalescenceKernel
@@ -58,9 +66,15 @@ class noCoalescence
 
   virtual ~noCoalescence() = default;
 
-  const dimensionedScalar S(
+  dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const override;
+      const dimensionedScalar& xi2) const override
+  {
+      return impl_.S(xi1, xi2);
+  }
+
+ private:
+  noCoalescenceImpl impl_;
 };
 
 

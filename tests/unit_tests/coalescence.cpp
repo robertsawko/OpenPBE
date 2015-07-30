@@ -21,3 +21,21 @@ TEST(coalescence, constant){
     ASSERT_EQ(expected.value(), result.value());
     ASSERT_EQ(expected.dimensions(), result.dimensions());
 }
+
+TEST(coalescence, none){
+    Foam::dimensionedScalar xi1(
+        "xi1", Foam::dimensionSet(0, 3, 0, 0, 0), 6);
+
+    Foam::dimensionedScalar xi2(
+        "xi2", Foam::dimensionSet(0, 3, 0, 0, 0), 8);
+
+    Foam::coalescenceKernels::noCoalescenceImpl kernel;
+
+    Foam::dimensionedScalar expected(
+        "expected", Foam::dimensionSet(0, 0, -1, 0, 0), 0);
+
+    auto result = kernel.S(xi1, xi2);
+
+    ASSERT_EQ(expected.value(), result.value());
+    ASSERT_EQ(expected.dimensions(), result.dimensions());
+}
