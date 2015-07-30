@@ -87,9 +87,10 @@ class CoulaloglouTavlaridesC
 
 private:
   CoulaloglouTavlaridesCImpl impl_;
-  const volScalarField& epsilon_;
+  const phaseModel& phase_;
   const volScalarField& rhod_;
   const volScalarField& nud_;
+  const word epsilonName_;
 };
 
 } // End namespace coalescenceModels

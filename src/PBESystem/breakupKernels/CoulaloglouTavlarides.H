@@ -78,9 +78,9 @@ class CoulaloglouTavlarides
 
 private:
   CoulaloglouTavlaridesImp impl_;
-  const volScalarField& epsilon_;
+  const phaseModel& phase_;
   const volScalarField& rhod_;
-
+  const word epsilonName_;
 };
 
 
