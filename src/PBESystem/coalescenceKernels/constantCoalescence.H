@@ -43,12 +43,25 @@ namespace Foam
 namespace coalescenceKernels
 {
 
+class constantCoalescenceImpl
+{
+public:
+    constantCoalescenceImpl(scalar constant);
+
+    const dimensionedScalar S(
+        const dimensionedScalar& xi1,
+        const dimensionedScalar& xi2) const;
+
+private:
+    scalar constant_;
+
+};
+
 class constantCoalescence
 :
     public coalescenceKernel
 {
- private:
-  scalar constant_;
+
 
  public:
   TypeName("constantCoalescence")
@@ -63,7 +76,14 @@ class constantCoalescence
 
   const dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const override;
+      const dimensionedScalar& xi2) const override
+  {
+      return impl_.S(xi1, xi2);
+  }
+
+ private:
+  constantCoalescenceImpl impl_;
+
 };
 
 

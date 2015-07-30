@@ -1,5 +1,6 @@
 set(test_SRCS
     breakup.cpp
+    coalescence.cpp
     integration.cpp
     moment_inversion.cpp
 )

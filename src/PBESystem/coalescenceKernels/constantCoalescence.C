@@ -45,15 +45,20 @@ constantCoalescence::constantCoalescence
 )
 :
     coalescenceKernel(coalescenceDict, dispersedPhase),
-    constant_(readScalar(coalescenceDict.lookup("constant")))
-   
+    impl_(readScalar(coalescenceDict.lookup("constant")))
 {
 }
 
-const dimensionedScalar constantCoalescence::S
+constantCoalescenceImpl::constantCoalescenceImpl(scalar constant):
+    constant_(constant)
+{
+
+}
+
+const dimensionedScalar constantCoalescenceImpl::S
 (
-    const dimensionedScalar& xi1,
-    const dimensionedScalar& xi2
+        const dimensionedScalar &xi1,
+        const dimensionedScalar &xi2
 ) const
 {
     return dimensionedScalar("S", dimless/dimTime, constant_);

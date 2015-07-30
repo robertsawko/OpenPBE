@@ -25,7 +25,6 @@ License
 
 #include "coalescenceKernel.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 defineTypeNameAndDebug(coalescenceKernel, 0);

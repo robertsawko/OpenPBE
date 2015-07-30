@@ -36,7 +36,6 @@ SourceFiles
 #ifndef coalescenceKernel_H
 #define coalescenceKernel_H
 
-//#include "fvCFD.H"
 #include "phaseModel.H"
 #include "runTimeSelectionTables.H"
 #include "dictionary.H"
