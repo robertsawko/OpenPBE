@@ -48,7 +48,7 @@ constantBreakup::constantBreakup
     const phaseModel& dispersedPhase
 )
 :
-    breakupKernel(breakupDict,continuousPhase,dispersedPhase),
+    breakupKernel(breakupDict, dispersedPhase),
     c_("c", dimensionSet(0, 1, -1, 0, 0), breakupDict.lookup("c"))
 {
     Info << "CoulaloglouTavlaride model constants: \n{\n"; 
@@ -64,24 +64,9 @@ constantBreakup::~constantBreakup()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-tmp<volScalarField> constantBreakup::S(const volScalarField& xi) const
-{
-    return tmp<volScalarField>
-        (
-            new volScalarField
-            (
-                IOobject
-                (
-                    "bRate",
-                    xi.mesh().time().timeName(),
-                    xi.mesh(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                xi.mesh(),
-                c_
-            )
-        );
+dimensionedScalar constantBreakup::S(const volScalarField &xi,
+                                       label celli) const {
+    return c_;
 }
 
 } //End namespace breakupKernels

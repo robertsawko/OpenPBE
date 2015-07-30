@@ -82,7 +82,8 @@ class breakupKernel
 
   virtual ~breakupKernel() = default;
 
-  virtual dimensionedScalar S(const dimensionedScalar& xi) const = 0;
+  virtual dimensionedScalar S(const dimensionedScalar &xi,
+                              label celli) const = 0;
 };
 
 

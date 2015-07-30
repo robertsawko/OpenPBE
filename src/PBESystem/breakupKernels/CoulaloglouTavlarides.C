@@ -54,10 +54,11 @@ CoulaloglouTavlarides::CoulaloglouTavlarides(const dictionary &breakupDict,
 {
 }
 
-dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi) const
-{
-    dimensionedScalar epsilon("epsilon", epsilon_.dimensions(), epsilon_[0]);
-    dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[0]);
+dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
+                                           label celli) const {
+    dimensionedScalar epsilon(
+        "epsilon", epsilon_.dimensions(), epsilon_[celli]);
+    dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[celli]);
 
     return impl_.S(xi, rho_d, epsilon);
 }

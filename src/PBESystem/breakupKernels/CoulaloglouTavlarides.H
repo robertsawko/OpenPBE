@@ -74,7 +74,7 @@ class CoulaloglouTavlarides
 
   virtual ~CoulaloglouTavlarides() = default;
 
-  dimensionedScalar S(const dimensionedScalar& xi) const override;
+  dimensionedScalar S(const dimensionedScalar& xi, label celli) const override;
 
 private:
   CoulaloglouTavlaridesImp impl_;
