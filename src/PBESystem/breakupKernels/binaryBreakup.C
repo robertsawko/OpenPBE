@@ -48,8 +48,7 @@ binaryBreakup::binaryBreakup
 {
 }
 
-dimensionedScalar binaryBreakupImpl::S(const dimensionedScalar &xi) const
-{
+dimensionedScalar binaryBreakupImpl::S(const dimensionedScalar &xi) const {
     return dimensionedScalar("S", dimless / dimTime, pow(xi.value(), 2));
 }
 

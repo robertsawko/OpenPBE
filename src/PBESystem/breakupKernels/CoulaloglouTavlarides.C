@@ -47,15 +47,22 @@ CoulaloglouTavlarides::CoulaloglouTavlarides(const dictionary &breakupDict,
           breakupDict.lookupOrDefault<scalar>("c2",0.008),
           breakupDict.lookupOrDefault<scalar>("gamma",0.0),
           breakupDict.lookupOrDefault<scalar>("sigma",0.047)
-          )
+          ),
+      phase_(dispersedPhase),
+      rhod_(dispersedPhase.rho()),
+      epsilonName_("epsilon." + phase_.name())
 {
-
 }
 
-dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi) const
-{
-    dimensionedScalar epsilon("epsilon", dimless, 1.0);
-    dimensionedScalar rho_d("rho_d", dimless, 1.0);
+dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
+                                           label celli) const {
+
+    const volScalarField& epsilonField = 
+        phase_.U().mesh().lookupObject<volScalarField>(epsilonName_);
+
+    dimensionedScalar epsilon(
+        "epsilon", epsilonField.dimensions(), epsilonField[celli]);
+    dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[celli]);
 
     return impl_.S(xi, rho_d, epsilon);
 }
@@ -81,13 +88,13 @@ dimensionedScalar CoulaloglouTavlaridesImp::S(
     return c1_ * pow(epsilon, 1.0/3.0)
             * exp
             (
-                -c2_ * sigma_ * pow(1+gamma_,2)
+                -c2_ * sigma_ * pow(1 + gamma_,2)
                 /(
                     rho_d.value() * pow(epsilon.value(), 2.0/3.0)
-                    * pow(xi.value(), 5.0/3.0)
+                    * pow(xi.value(), 5.0/9.0)
                  )
             )
-            /((1+gamma_) * pow(xi, 2.0/3.0));
+            /((1 + gamma_) * pow(xi, 1.0/3.0));
 }
 
 } //End namespace breakupKernels
