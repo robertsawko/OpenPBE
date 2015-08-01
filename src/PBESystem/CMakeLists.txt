@@ -13,9 +13,11 @@ set(lib_header_files
   coalescenceKernels/coalescenceKernel.H
   coalescenceKernels/noCoalescence.H
   coalescenceKernels/constantCoalescence.H
+  coalescenceKernels/CoulaloglouTavlarides.H
   breakupKernels/binaryBreakup.H
   breakupKernels/breakupKernel.H
   breakupKernels/noBreakup.H
+  breakupKernels/CoulaloglouTavlarides.H
   daughterParticleDistributions/daughterParticleDistribution.H
   daughterParticleDistributions/uniformBinaryBreakup.H
   PBEDiameter.H
@@ -33,9 +35,11 @@ set(lib_source_files
   coalescenceKernels/coalescenceKernel.C
   coalescenceKernels/noCoalescence.C
   coalescenceKernels/constantCoalescence.C
+  coalescenceKernels/CoulaloglouTavlarides.C
   breakupKernels/binaryBreakup.C
   breakupKernels/breakupKernel.C
   breakupKernels/noBreakup.C
+  breakupKernels/CoulaloglouTavlarides.C
   daughterParticleDistributions/daughterParticleDistribution.C
   daughterParticleDistributions/uniformBinaryBreakup.C
   PBEDiameter.C

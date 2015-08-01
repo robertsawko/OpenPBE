@@ -2,6 +2,7 @@ set(benchmark_SRCS
     moment_inversion.cpp
     integration.cpp
     breakup.cpp
+    coalescence.cpp
     main.cpp
 )
 

@@ -38,42 +38,25 @@ SourceFiles
 
 #include "coalescenceKernel.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 namespace coalescenceKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class noCoalescence Declaration
-\*---------------------------------------------------------------------------*/
+class noCoalescenceImpl
+{
+public:
+    dimensionedScalar S(
+        const dimensionedScalar& xi1,
+        const dimensionedScalar& xi2) const;
+};
 
 class noCoalescence
 :
     public coalescenceKernel
 {
- private:
-  // Private data
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  noCoalescence(const noCoalescence&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const noCoalescence&);
-
  public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("noCoalescence");
-
-  // Constructors
+  TypeName("noCoalescence")
 
   noCoalescence
   (
@@ -81,30 +64,22 @@ class noCoalescence
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~noCoalescence();
+  virtual ~noCoalescence() = default;
 
-  // Member Functions
-
-  tmp<volScalarField> S(
-      const volScalarField& xi1,
-      const volScalarField& xi2) const;
-
-  const dimensionedScalar S(
+  dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const;
+      const dimensionedScalar& xi2,
+      label celli) const override
+  {
+      return impl_.S(xi1, xi2);
+  }
+
+ private:
+  noCoalescenceImpl impl_;
 };
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace coalescenceModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //

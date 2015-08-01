@@ -25,28 +25,10 @@ License
 
 #include "breakupKernel.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 defineTypeNameAndDebug(breakupKernel, 0);
-defineRunTimeSelectionTable(breakupKernel, dictionary);
-}
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-Foam::breakupKernel::breakupKernel():
-    breakupDict_(),
-    continuousPhase_(nullptr),
-    dispersedPhase_(nullptr)
-{
-
+defineRunTimeSelectionTable(breakupKernel, dictionary)
 }
 
 Foam::breakupKernel::breakupKernel
@@ -56,12 +38,11 @@ Foam::breakupKernel::breakupKernel
 ) 
 :
     breakupDict_(breakupDict),
-    continuousPhase_(&dispersedPhase.otherPhase()),
-    dispersedPhase_(&dispersedPhase)
+    continuousPhase_(dispersedPhase.otherPhase()),
+    dispersedPhase_(dispersedPhase)
 {
-};
+}
 
-// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 Foam::autoPtr<Foam::breakupKernel> Foam::breakupKernel::New
 (
     const dictionary& pbeDict,
@@ -84,22 +65,4 @@ Foam::autoPtr<Foam::breakupKernel> Foam::breakupKernel::New
     }
     return cstrIter()(
         pbeDict.subDict(breakupKernelType+"Coeffs"), dispersedPhase);
-};
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::breakupKernel::~breakupKernel()
-{
 }
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * Friend Operators * * * * * * * * * * * * * * //
-
-
-// ************************************************************************* //

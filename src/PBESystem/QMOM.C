@@ -230,11 +230,11 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
                 double xi_j = quadrature.abcissas[j];
 
                 innerDeathTerm += quadrature.weights[j] *
-                             coalescence_->S(xi_i, xi_j).value();
+                             coalescence_->S(xi_i, xi_j, celli).value();
 
                 innerBirthTerm += quadrature.weights[j] *
                         pow(xi_i + xi_j, momenti) *
-                        coalescence_->S(xi_i, xi_j).value();
+                        coalescence_->S(xi_i, xi_j, celli).value();
             }
 
             death += pow(xi_i, momenti) *
@@ -291,7 +291,7 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
 
             death += quadrature.weights[i] *
                     pow(xi_i, momenti) *
-                    breakup_->S(xi_i).value();
+                    breakup_->S(xi_i, celli).value();
         }
 
         auto birthIntegrand = [&](double xi){
@@ -301,7 +301,7 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
                 double xi_i = quadrature.abcissas[i];
 
                 result += quadrature.weights[i] *
-                        breakup_->S(xi_i).value() *
+                        breakup_->S(xi_i, celli).value() *
                         daughterParticleDistribution_->
                         beta(xi,xi_i).value();
             }

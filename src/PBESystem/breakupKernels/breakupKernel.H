@@ -36,34 +36,25 @@ SourceFiles
 #ifndef breakupKernel_H
 #define breakupKernel_H
 
-//#include "fvCFD.H"
 #include "phaseModel.H"
 #include "runTimeSelectionTables.H"
 #include "dictionary.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-  Class breakupKernel Declaration
-\*---------------------------------------------------------------------------*/
-
 class breakupKernel
 {
-  // Protected data
  protected:
   dictionary breakupDict_;
-  const phaseModel* continuousPhase_;
-  const phaseModel* dispersedPhase_;
+  const phaseModel& continuousPhase_;
+  const phaseModel& dispersedPhase_;
 
  public:
-
   breakupKernel(const breakupKernel&) = delete;
   breakupKernel& operator=(const breakupKernel&) = delete;
 
-  TypeName("breakupKernel");
+  TypeName("breakupKernel")
 
   declareRunTimeSelectionTable
   (
@@ -75,49 +66,27 @@ class breakupKernel
           const phaseModel& dispersedPhase
       ),
       (breakupDict, dispersedPhase)
-  );
+  )
 
-  // Static data members
-
-  //- Static data staticData
-
-
-  // Constructors
-
-  //- Construct null
-  breakupKernel();
-
-  //- Construct from components
   breakupKernel
   (
       const dictionary& breakupDict,
       const phaseModel& dispersedPhase
   );
 
-
-  // Selectors
   static autoPtr<breakupKernel> New
   (
       const dictionary& breakupDict,
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~breakupKernel();
+  virtual ~breakupKernel() = default;
 
-  // Member Functions
-
-  //- Source function for the breakup kernel used in PBE
-  virtual dimensionedScalar S(const dimensionedScalar& xi) const = 0;
+  virtual dimensionedScalar S(const dimensionedScalar &xi,
+                              label celli) const = 0;
 };
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
-// ************************************************************************* //

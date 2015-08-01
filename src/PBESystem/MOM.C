@@ -288,7 +288,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 
             auto deathInnerIntegrand = [&](double xi_prime){
 
-                return coalescence_->S(xi, xi_prime).value() *
+                return coalescence_->S(xi, xi_prime, celli).value() *
                        m0 * pdf(gamma, xi_prime);
             };
 
@@ -300,7 +300,7 @@ tmp<volScalarField> MOM::coalescenceSourceTerm(label momenti)
 
             auto birthInnerIntegrand = [&](double xi_prime){
 
-                return coalescence_->S(xi, xi_prime).value() *
+                return coalescence_->S(xi, xi_prime, celli).value() *
                        pow(xi_prime + xi, momenti) *
                        m0 * pdf(gamma, xi_prime);
             };
@@ -344,19 +344,22 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
 
         auto m0 = moments_[0][celli];
 
-        auto breakupSourceIntegrand = [&](double xi){
-            scalar breakupDeath = breakup_->S(xi).value() * m0 * pdf(gamma, xi);
+        auto breakupSourceIntegrand = [&](double xi) {
+            scalar breakupDeath =
+                breakup_->S(xi, celli).value() * m0 * pdf(gamma, xi);
 
-            auto breakupBirthIntegrand = [&](double xi_prime){
-                return daughterParticleDistribution_->beta(xi, xi_prime).value()
-                    * breakup_->S(xi_prime).value() * m0 * pdf(gamma, xi_prime);
+            auto breakupBirthIntegrand = [&](double xi_prime) {
+                return daughterParticleDistribution_->beta(xi, xi_prime)
+                           .value() *
+                       breakup_->S(xi_prime, celli).value() * m0 *
+                       pdf(gamma, xi_prime);
             };
 
             double breakupBirth = integrate(breakupBirthIntegrand, xi);
 
             return pow(xi, momenti) * (breakupBirth - breakupDeath);
         };
-        
+
         toReturn[celli] = integrate(breakupSourceIntegrand, 0.);
     }
 

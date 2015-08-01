@@ -26,7 +26,6 @@ License
 #include "noBreakup.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 namespace breakupKernels
@@ -39,14 +38,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-noBreakup::noBreakup():
-    breakupKernel()
-{
-
-}
-
 noBreakup::noBreakup
 (
     const dictionary& breakupDict,
@@ -57,19 +48,10 @@ noBreakup::noBreakup
 {
 }
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-noBreakup::~noBreakup()
-{}
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-dimensionedScalar noBreakup::S(const dimensionedScalar& xi) const
+dimensionedScalar noBreakupImpl::S(const dimensionedScalar &xi) const
 {
     return dimensionedScalar("S", dimless / dimTime, 0);
 }
 
 } //End namespace breakupKernels
 } //End namespace Foam
-// ************************************************************************* //

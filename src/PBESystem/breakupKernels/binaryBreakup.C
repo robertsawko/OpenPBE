@@ -26,7 +26,6 @@ License
 #include "binaryBreakup.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 namespace breakupKernels
@@ -39,14 +38,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-binaryBreakup::binaryBreakup()
-:
-    breakupKernel()
-{
-}
-
 binaryBreakup::binaryBreakup
 (
     const dictionary& breakupDict,
@@ -57,19 +48,9 @@ binaryBreakup::binaryBreakup
 {
 }
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-binaryBreakup::~binaryBreakup()
-{}
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-dimensionedScalar binaryBreakup::S(const dimensionedScalar& xi) const
-{
+dimensionedScalar binaryBreakupImpl::S(const dimensionedScalar &xi) const {
     return dimensionedScalar("S", dimless / dimTime, pow(xi.value(), 2));
 }
 
 } //End namespace breakupKernels
 } //End namespace Foam
-// ************************************************************************* //

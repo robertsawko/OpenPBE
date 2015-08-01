@@ -30,6 +30,7 @@ License
 #include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
 #include "MULES.H"
+#include "Utility.H"
 
 
 namespace Foam
@@ -109,16 +110,18 @@ volScalarField MOC::coalescenceSourceTerm(label i)
     );
 
     forAll(phase_, celli){
-        forAll(xi_, classj){
+        // the upper limit stops from removing mass through coalescence that
+        // results in drops that are outside of PBE domain
+        for(int j = 0; j < classNumberDensity_.size() - i - 1; ++j){
             coalescenceField[celli] -=
-                coalescence_().S(xi_[i], xi_[classj]).value()
-                * classNumberDensity_[classj][celli];
+                coalescence_().S(xi_[i], xi_[j], celli).value()
+                * classNumberDensity_[j][celli];
         }
         coalescenceField[celli] *= classNumberDensity_[i][celli];
         //-1 in pairs account for zero-based numbering
         for(int j = 0; j < i; ++j){
             coalescenceField[celli] +=
-                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j]).value()
+                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli).value()
                 * classNumberDensity_[i - j - 1][celli]
                 * classNumberDensity_[j][celli];
         }
@@ -151,14 +154,14 @@ volScalarField MOC::breakupSourceTerm(label i)
 
     forAll(phase_, celli){
         breakupField[celli] -=
-            breakup_().S(xi_[i]).value() * classNumberDensity_[i][celli];
+            breakup_().S(xi_[i], celli).value() * classNumberDensity_[i][celli];
 
         for (label j = i + 1; j < numberOfClasses_; ++j)
             // deltaXi comes from the application of mean value theorem on the
             // second integral see Kumar and Ramkrishna (1996) paper
             breakupField[celli] +=
                 daughterParticleDistribution_().beta(xi_[i], xi_[j]).value()
-                * breakup_().S( xi_[j]).value()
+                * breakup_().S(xi_[j], celli).value()
                 * classNumberDensity_[j][celli] * deltaXi_.value();
     }
     return breakupField;

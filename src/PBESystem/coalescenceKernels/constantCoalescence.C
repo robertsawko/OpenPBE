@@ -26,7 +26,6 @@ License
 #include "constantCoalescence.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 namespace coalescenceKernels
@@ -39,8 +38,6 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
 constantCoalescence::constantCoalescence
 (
     const dictionary& coalescenceDict,
@@ -48,52 +45,24 @@ constantCoalescence::constantCoalescence
 )
 :
     coalescenceKernel(coalescenceDict, dispersedPhase),
-    constant_(readScalar(coalescenceDict.lookup("constant")))
-   
+    impl_(readScalar(coalescenceDict.lookup("constant")))
 {
 }
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-constantCoalescence::~constantCoalescence()
-{}
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-tmp<volScalarField> constantCoalescence::S
-(
-    const volScalarField& xi1,
-    const volScalarField& xi2
-) const
+constantCoalescenceImpl::constantCoalescenceImpl(scalar constant):
+    constant_(constant)
 {
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "S",
-                xi1.mesh().time().timeName(),
-                xi1.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            xi1.mesh(),
-            dimensionedScalar("S", dimless/dimTime, constant_) 
-        )
-    );
+
 }
 
-const dimensionedScalar constantCoalescence::S
+const dimensionedScalar constantCoalescenceImpl::S
 (
-    const dimensionedScalar& xi1,
-    const dimensionedScalar& xi2
+        const dimensionedScalar& xi1,
+        const dimensionedScalar& xi2
 ) const
 {
     return dimensionedScalar("S", dimless/dimTime, constant_);
 }
+
 } //End namespace coalescenceKernels
 } //End namespace Foam
-// ************************************************************************* //

@@ -38,43 +38,32 @@ SourceFiles
 
 #include "coalescenceKernel.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 namespace Foam
 {
 namespace coalescenceKernels
 {
 
-/*---------------------------------------------------------------------------*\
-                         Class constantCoalescence Declaration
-\*---------------------------------------------------------------------------*/
+class constantCoalescenceImpl
+{
+public:
+    constantCoalescenceImpl(scalar constant);
+
+    const dimensionedScalar S(const dimensionedScalar &xi1,
+                              const dimensionedScalar &xi2) const;
+
+private:
+    scalar constant_;
+
+};
 
 class constantCoalescence
 :
     public coalescenceKernel
 {
- private:
-  scalar constant_;
-  // Private data
 
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  constantCoalescence(const constantCoalescence&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const constantCoalescence&);
 
  public:
-
-  // Static data members
-
-  //- Static data staticData
-  TypeName("constantCoalescence");
-
-  // Constructors
+  TypeName("constantCoalescence")
 
   constantCoalescence
   (
@@ -82,30 +71,23 @@ class constantCoalescence
       const phaseModel& dispersedPhase
   );
 
-  //- Destructor
-  virtual ~constantCoalescence();
+  virtual ~constantCoalescence() = default;
 
-  // Member Functions
-
-  tmp<volScalarField> S(
-      const volScalarField& xi1,
-      const volScalarField& xi2) const;
-
-  const dimensionedScalar S(
+  dimensionedScalar S(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const;
+      const dimensionedScalar& xi2,
+      label celli) const override
+  {
+      return impl_.S(xi1, xi2);
+  }
+
+ private:
+  constantCoalescenceImpl impl_;
 };
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace coalescenceModels
 } // End namespace Foam
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
-
-// ************************************************************************* //

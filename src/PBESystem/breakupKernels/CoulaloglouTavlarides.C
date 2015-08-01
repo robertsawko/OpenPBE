@@ -26,7 +26,6 @@ License
 #include "CoulaloglouTavlarides.H"
 #include "addToRunTimeSelectionTable.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 namespace Foam
 {
 namespace breakupKernels
@@ -39,77 +38,64 @@ addToRunTimeSelectionTable
     dictionary
 );
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-CoulaloglouTavlarides::CoulaloglouTavlarides
-(
-    const dictionary& breakupDict,
-    const phaseModel& continuousPhase,
-    const phaseModel& dispersedPhase
-)
-:
-   breakupKernel(breakupDict,continuousPhase,dispersedPhase),
-    c1_( breakupDict.lookupOrDefault<scalar>("c1",0.00487) ),
-    c2_( breakupDict.lookupOrDefault<scalar>("c2",0.008) ),
-    gamma_( breakupDict.lookupOrDefault<scalar>("gamma",0.0) ),
-    sigma_( breakupDict.lookupOrDefault<scalar>("sigma",0.047) )
-   //TODO this lookup does not work; there is no object of type mEuler::RASModel
-   //in the registry
+CoulaloglouTavlarides::CoulaloglouTavlarides(const dictionary &breakupDict,
+                                             const phaseModel &dispersedPhase)
+    :
+      breakupKernel(breakupDict, dispersedPhase),
+      impl_(
+          breakupDict.lookupOrDefault<scalar>("c1",0.00487),
+          breakupDict.lookupOrDefault<scalar>("c2",0.008),
+          breakupDict.lookupOrDefault<scalar>("gamma",0.0),
+          breakupDict.lookupOrDefault<scalar>("sigma",0.047)
+          ),
+      phase_(dispersedPhase),
+      rhod_(dispersedPhase.rho()),
+      epsilonName_("epsilon." + phase_.name())
 {
-    Info << "CoulaloglouTavlaride model constants: \n{\n"; 
-    Info << "\tc1: " << c1_ << endl;
-    Info << "\tc2: " << c2_ << endl;
-    Info << "\tgamma: " << gamma_ << endl;
-    Info << "\tsigma: " << sigma_ << endl;
-
 }
 
+dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
+                                           label celli) const {
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-CoulaloglouTavlarides::~CoulaloglouTavlarides()
-{}
+    const volScalarField& epsilonField = 
+        phase_.U().mesh().lookupObject<volScalarField>(epsilonName_);
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+    dimensionedScalar epsilon(
+        "epsilon", epsilonField.dimensions(), epsilonField[celli]);
+    dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[celli]);
 
-tmp<volScalarField> CoulaloglouTavlarides::S(const volScalarField& xi) const
+    return impl_.S(xi, rho_d, epsilon);
+}
+
+CoulaloglouTavlaridesImp::CoulaloglouTavlaridesImp(scalar c1, scalar c2,
+                                                   scalar gamma, scalar sigma)
+    :
+      c1_(c1), c2_(c2), gamma_(gamma), sigma_(sigma)
 {
-    const multiphaseTurbulence::turbulenceModel& turbulence
-    (
-       continuousPhase_.mesh().lookupObject
-       <multiphaseTurbulence::turbulenceModel>("turbulenceModel")
-    );
+//    Info << "CoulaloglouTavlaride model constants: \n{\n";
+//    Info << "\tc1: " << c1_ << endl;
+//    Info << "\tc2: " << c2_ << endl;
+//    Info << "\tgamma: " << gamma_ << endl;
+//    Info << "\tsigma: " << sigma_ << endl;
+}
 
-    volScalarField epsilon = turbulence.epsilon();
-    //volScalarField k = turbulence.k();
-    dimensionedScalar epsilonDim("epsilonDim", epsilon.dimensions(), 1.0);
-    dimensionedScalar xiDim("xiDim", xi.dimensions(), 1.0);
-
-    dimensionedScalar sigma("sigma", dimensionSet( 1, 0, -2, 0, 0), sigma_);
-    dimensionedScalar c1("c1", dimensionSet( 0, 1, 0, 0, 0), c1_);
-
-    const dimensionedScalar rhod = dispersedPhase_.rho();
-        
-    //Info << breakupKernel.weightedAverage(k.mesh().V()) << endl;
-    volScalarField xiSafe = max(xi, SMALL * xiDim);
-    volScalarField epsilonSafe = max(epsilon, SMALL * epsilonDim);
-
-
-    return tmp<volScalarField>
-        (
-            c1 * pow( epsilonSafe , 1.0 / 3.0 )
+dimensionedScalar CoulaloglouTavlaridesImp::S(
+        const dimensionedScalar &xi,
+        const dimensionedScalar &rho_d,
+        const dimensionedScalar &epsilon
+        ) const
+{
+    return c1_ * pow(epsilon, 1.0/3.0)
             * exp
             (
-                - c2_ * sigma * pow( 1 + gamma_, 2)
-                / (
-                    rhod * pow( epsilonSafe, 2.0 / 3.0) 
-                    * pow(xiSafe, 5.0 / 3.0)
-                )
+                -c2_ * sigma_ * pow(1 + gamma_,2)
+                /(
+                    rho_d.value() * pow(epsilon.value(), 2.0/3.0)
+                    * pow(xi.value(), 5.0/9.0)
+                 )
             )
-            /( (1 + gamma_) * pow(xiSafe, 2.0 / 3.0) )
-        );
+            /((1 + gamma_) * pow(xi, 1.0/3.0));
 }
 
 } //End namespace breakupKernels
 } //End namespace Foam
-// ************************************************************************* //
