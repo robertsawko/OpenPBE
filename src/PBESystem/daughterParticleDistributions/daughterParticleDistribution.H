@@ -36,7 +36,6 @@ SourceFiles
 #ifndef daughterParticleDistribution_H
 #define daughterParticleDistribution_H
 
-//#include "fvCFD.H"
 #include "phaseModel.H"
 #include "runTimeSelectionTables.H"
 #include "dictionary.H"
@@ -52,21 +51,15 @@ namespace Foam
 
 class daughterParticleDistribution
 {
- private:
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  daughterParticleDistribution(const daughterParticleDistribution&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const daughterParticleDistribution&);
-
-  // Protected data
  protected:
   dictionary dpdDict_;
 
  public:
-  TypeName("daughterParticleDistribution");
+  daughterParticleDistribution(const daughterParticleDistribution&) = delete;
+  daughterParticleDistribution& operator=(const daughterParticleDistribution&)
+                                          = delete;
+
+  TypeName("daughterParticleDistribution")
 
   declareRunTimeSelectionTable
   (
@@ -77,37 +70,17 @@ class daughterParticleDistribution
           dictionary dpdDict
       ),
       (dpdDict)
-  );
+  )
 
-  // Static data members
-
-  //- Static data staticData
-
-
-  // Constructors
-
-  //- Construct null
-  //daughterParticleDistribution();
-
-  //- Construct from components
   daughterParticleDistribution(const dictionary& dpdDict);
 
-
-  // Selectors
   static autoPtr<daughterParticleDistribution> New(
       const dictionary& pbeDict
   );
 
-  //- Destructor
-  virtual ~daughterParticleDistribution();
+  virtual ~daughterParticleDistribution() = default;
 
-  // Member Functions
-
-  //- Source function for the coalescence kernel used in PBE
-  virtual tmp<volScalarField> beta(
-      const volScalarField& xi1,const volScalarField& xi2) const = 0;
-
-  virtual const dimensionedScalar beta(
+  virtual dimensionedScalar beta(
       const dimensionedScalar& xi1,const dimensionedScalar& xi2) const = 0;
 };
 

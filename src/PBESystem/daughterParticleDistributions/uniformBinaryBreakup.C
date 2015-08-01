@@ -50,39 +50,9 @@ uniformBinaryBreakup::uniformBinaryBreakup
 {
 }
 
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-//
-uniformBinaryBreakup::~uniformBinaryBreakup()
-{}
-
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-tmp<volScalarField> uniformBinaryBreakup::beta
-(
-    const volScalarField& xi1,
-    const volScalarField& xi2
-) const
-{
-    return tmp<volScalarField>
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "S",
-                xi1.mesh().time().timeName(),
-                xi1.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE,
-                false
-            ),
-            2.0 / xi2 * pos(xi2 - xi1)
-        )
-    );
-}
-
-const dimensionedScalar uniformBinaryBreakup::beta
+dimensionedScalar uniformBinaryBreakup::beta
 (
     const dimensionedScalar& xi1,
     const dimensionedScalar& xi2
