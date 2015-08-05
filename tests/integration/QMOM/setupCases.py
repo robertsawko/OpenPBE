@@ -41,8 +41,10 @@ class coalescence_case(test_case):
         from sympy import simplify, symbols, integrate, exp, oo
         v = symbols('v', real=True, positive=True)
 
-        initial_moments = 0.25 * N0 / v0**2 * array([
-            float(simplify(integrate(v**(k + 1) * exp(-v / (2 * v0)), (v, 0, oo))))
+        initial_moments = N0 / (v0 / 2.)**2 * array([
+            float(simplify(integrate(
+                v**(k + 1) * exp(-v / (v0 / 2.)),
+                (v, 0, oo))))
             for k in range(2 * quadrature_order)])
 
         test_case.__init__(
