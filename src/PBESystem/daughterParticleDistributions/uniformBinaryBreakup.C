@@ -60,6 +60,15 @@ dimensionedScalar uniformBinaryBreakup::beta
 {
     return dimensionedScalar("beta", 2.0 / xi2)  * pos(xi2 - xi1);
 }
+
+dimensionedScalar uniformBinaryBreakup::moment
+(
+        const dimensionedScalar &xi,
+        label k
+) const
+{
+    return 2*pow(xi,k)/(k+1);
+}
 } //End namespace daughterParticleDistributions
 } //End namespace Foam
 // ************************************************************************* //

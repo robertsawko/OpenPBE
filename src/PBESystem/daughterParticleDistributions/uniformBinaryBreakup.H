@@ -74,6 +74,9 @@ class uniformBinaryBreakup
   dimensionedScalar beta(
       const dimensionedScalar& xi1,
       const dimensionedScalar& xi2) const override;
+
+  dimensionedScalar moment(
+            const dimensionedScalar& xi, label k) const override;
 };
 
 

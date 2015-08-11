@@ -82,6 +82,9 @@ class daughterParticleDistribution
 
   virtual dimensionedScalar beta(
       const dimensionedScalar& xi1,const dimensionedScalar& xi2) const = 0;
+
+  virtual dimensionedScalar moment(
+          const dimensionedScalar& xi, label k) const = 0;
 };
 
 

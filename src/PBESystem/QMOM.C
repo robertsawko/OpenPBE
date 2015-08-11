@@ -253,7 +253,6 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
 
 tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
 {
-
     //value of the integral
     volScalarField toReturn
             (
@@ -294,22 +293,15 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
                     breakup_->S(xi_i, celli).value();
         }
 
-        auto birthIntegrand = [&](double xi){
-            double result = 0.;
+        double birth = 0.;
 
-            for (int i=0;i<N; ++i){
-                double xi_i = quadrature.abcissas[i];
-
-                result += quadrature.weights[i] *
-                        breakup_->S(xi_i, celli).value() *
-                        daughterParticleDistribution_->
-                        beta(xi,xi_i).value();
-            }
-
-            return pow(xi, momenti)*result;
-        };
-
-        auto birth = integrate(birthIntegrand, 0.);
+        for (int i=0;i<N; ++i){
+            double xi_i = quadrature.abcissas[i];
+            birth += quadrature.weights[i] *
+                    breakup_->S(xi_i, celli).value() *
+                    daughterParticleDistribution_->
+                    moment(xi_i,momenti).value();
+        }
 
         toReturn[celli] = birth - death;
 
