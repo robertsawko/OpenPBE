@@ -177,25 +177,13 @@ const volScalarField QMOM::d() const
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-tmp<volScalarField> QMOM::momentSourceTerm(label momenti)
-{
-    volScalarField bS = breakupSourceTerm(momenti);
-    volScalarField cS = coalescenceSourceTerm(momenti);
-    Info<< "breakup (moment " << momenti << ") "
-        << bS.weightedAverage(mesh_.V()).value() << endl;
-    Info<< "coalescence (moment " << momenti << ") "
-        << cS.weightedAverage(mesh_.V()).value() << endl;
-    return cS + bS;// breakupSourceTerm(momenti);
-}
-
-
-tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
+volScalarField QMOM::momentSourceTerm(label momenti)
 {
     volScalarField toReturn
     (
         IOobject
         (
-            "Sc",
+            "S",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -205,7 +193,7 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
         mesh_,
         dimensionedScalar
         (
-            "Sc",
+            "S",
             pow(dimVolume, momenti) / dimTime,
             0
         )
@@ -220,73 +208,29 @@ tmp<volScalarField> QMOM::coalescenceSourceTerm(label momenti)
         auto quadrature = wheeler_inversion(momentVector);
         int N = quadrature.abcissas.size();
 
-        double death{0.}, birth{0.};
+        double coalescenceSource{0.}, breakupSource{0.};
 
         for (int i=0; i<N; ++i){
             double xi_i = quadrature.abcissas[i];
-            double innerDeathTerm{0.}, innerBirthTerm{0.};
+            double innerCoalescenceDeathTerm{0.},
+                   innerCoalescenceBirthTerm{0.};
 
             for (int j=0; j<N; ++j){
                 double xi_j = quadrature.abcissas[j];
 
-                innerDeathTerm += quadrature.weights[j] *
+                innerCoalescenceDeathTerm += quadrature.weights[j] *
                              coalescence_->S(xi_i, xi_j, celli).value();
 
-                innerBirthTerm += quadrature.weights[j] *
+                innerCoalescenceBirthTerm += quadrature.weights[j] *
                         pow(xi_i + xi_j, momenti) *
                         coalescence_->S(xi_i, xi_j, celli).value();
             }
 
-            death += pow(xi_i, momenti) *
-                     quadrature.weights[i] *
-                     innerDeathTerm;
-
-            birth += quadrature.weights[i] *
-                     innerBirthTerm;
-        }
-        toReturn[celli] = birth/2. - death;
-    }
-
-    return tmp<volScalarField>( new volScalarField(toReturn));
-
-}
-
-tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
-{
-    //value of the integral
-    volScalarField toReturn
-            (
-                IOobject
-                (
-                    "Sbr",
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE,
-                    false
-                    ),
-                mesh_,
-                dimensionedScalar
-                (
-                    "Sbr",
-                    pow(dimVolume, momenti) /dimTime,
-                    0
-                    )
-                );
-
-    forAll(dispersedPhase_, celli)
-    {
-        Eigen::VectorXd momentVector(moments_.size());
-        for (int i=0; i<momentVector.size(); ++i)
-            momentVector[i] = moments_[i][celli];
-
-        auto quadrature = wheeler_inversion(momentVector);
-        int N = quadrature.abcissas.size();
-
-        double breakupSource = 0.;
-
-        for (int i=0; i<N; ++i){
-            double xi_i = quadrature.abcissas[i];
+            coalescenceSource += quadrature.weights[i] *
+                           (innerCoalescenceBirthTerm/2. -
+                            pow(xi_i, momenti) *
+                            innerCoalescenceDeathTerm
+                           );
 
             breakupSource += quadrature.weights[i] *
                              breakup_->S(xi_i, celli).value() *
@@ -296,12 +240,11 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
                              );
         }
 
-        toReturn[celli] = breakupSource;
+        toReturn[celli] = coalescenceSource + breakupSource;
     }
 
-    return tmp<volScalarField>( new volScalarField(toReturn));
+    return toReturn;
 }
-
 
 }//end namespace PBEMethods
 }//end namespace Foam
