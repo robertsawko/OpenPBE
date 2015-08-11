@@ -283,28 +283,20 @@ tmp<volScalarField> QMOM::breakupSourceTerm(label momenti)
         auto quadrature = wheeler_inversion(momentVector);
         int N = quadrature.abcissas.size();
 
-        double death = 0.;
+        double breakupSource = 0.;
 
         for (int i=0; i<N; ++i){
             double xi_i = quadrature.abcissas[i];
 
-            death += quadrature.weights[i] *
-                    pow(xi_i, momenti) *
-                    breakup_->S(xi_i, celli).value();
+            breakupSource += quadrature.weights[i] *
+                             breakup_->S(xi_i, celli).value() *
+                             (daughterParticleDistribution_->
+                                moment(xi_i,momenti).value()
+                              - pow(xi_i, momenti)
+                             );
         }
 
-        double birth = 0.;
-
-        for (int i=0;i<N; ++i){
-            double xi_i = quadrature.abcissas[i];
-            birth += quadrature.weights[i] *
-                    breakup_->S(xi_i, celli).value() *
-                    daughterParticleDistribution_->
-                    moment(xi_i,momenti).value();
-        }
-
-        toReturn[celli] = birth - death;
-
+        toReturn[celli] = breakupSource;
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
