@@ -33,6 +33,11 @@ zMinusTwo -0.02;
 nXOne  300; //200;
 nYOne  12;
 
+// Grading parameters
+radialGrading 0.5;
+upstreamGrading 0.1;
+downstreamGrading 10;
+
 // dimensions of the orifice section
 xTwo 20.5; //xOne + orifice thickness;
 // number of cells in the orifice section:
@@ -79,20 +84,22 @@ vertices
  ($xThree $yTwo $zMinusTwo) // 19
 );
 
-blocks          
+blocks
 (
-    // inside upstream section
-    hex (0 3 5 2 0 3 4 1) ($nXOne $nYOne 1) simpleGrading (1 1 1)
     //orifice
     hex (3 6 8 5 3 6 7 4) ($nXTwo $nYOne 1) simpleGrading (1 1 1)
+
+    // inside upstream section
+    hex (0 3 5 2 0 3 4 1) ($nXOne $nYOne 1) simpleGrading ($upstreamGrading 1 1)
     // inside downstream section
-    hex (6 9 11 8 6 9 10 7) ($nXThree $nYOne 1) simpleGrading (1 1 1)
+    hex (6 9 11 8 6 9 10 7) ($nXThree $nYOne 1) simpleGrading ($downstreamGrading 1 1)
+
     // outside upstream section
-    hex (2 5 15 13 1 4 14 12) ($nXOne $nYTwo 1) simpleGrading (1 1 1)
+    hex (2 5 15 13 1 4 14 12) ($nXOne $nYTwo 1) simpleGrading ($upstreamGrading $radialGrading 1)
     // outside downstream section
-    hex (8 11 19 17 7 10 18 16) ($nXThree $nYTwo 1) simpleGrading (1 1 1)
+    hex (8 11 19 17 7 10 18 16) ($nXThree $nYTwo 1) simpleGrading ($downstreamGrading $radialGrading 1)
 );
-boundary          
+boundary
 (
    front 
    {
