@@ -49,18 +49,6 @@ boundaryField
     {
        type      symmetryPlane;
     }
-    front
-    {
-        type wedge;
-    }
-    back
-    {
-        type wedge;
-    }
-    axis
-    {
-       type      symmetryPlane;
-    }
 }
 
 
