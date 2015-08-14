@@ -22,7 +22,7 @@ boundaryField
 {
     walls
     {
-        type            zeroGradient;
+        type        zeroGradient;
     }
     outlet
     {
@@ -43,7 +43,7 @@ boundaryField
     }
     axis
     {
-       type      symmetryPlane;
+       type      empty;
     }
 }
 
