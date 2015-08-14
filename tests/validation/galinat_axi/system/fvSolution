@@ -21,6 +21,9 @@ solvers
     {
         nAlphaCorr      1;
         nAlphaSubCycles 2;
+        MULESCorr yes;
+        nLimiterIter    8; // Number of MULES iterations over the limiter
+        alphaApplyPrevCorr  true;
     }
 
     p
@@ -83,9 +86,9 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors 1;
+    nOuterCorrectors 5;
     nCorrectors      3;
-    nNonOrthogonalCorrectors 1;
+    nNonOrthogonalCorrectors 2;
 }
 
 relaxationFactors

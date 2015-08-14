@@ -129,7 +129,7 @@ boundary
 
    axis 
    {
-    type symmetryPlane;
+    type empty;
     faces
     (
       (0 3 3 0)  

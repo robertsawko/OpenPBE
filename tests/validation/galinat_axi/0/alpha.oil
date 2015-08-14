@@ -37,15 +37,15 @@ boundaryField
     }
     front
     {
-        type wedge;
+        type            wedge;
     }
     back
     {
-        type wedge;
+        type            wedge;
     }
     axis
     {
-       type      symmetryPlane;
+       type      empty;
     }
 }
 
