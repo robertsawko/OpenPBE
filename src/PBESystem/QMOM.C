@@ -44,67 +44,44 @@ License
 #include "Utility.H"
 #include "MomentInversion.H"
 
-namespace Foam
-{
-namespace PBEMethods
-{
-
+namespace Foam {
+namespace PBEMethods {
 
 defineTypeNameAndDebug(QMOM, 0);
 addToRunTimeSelectionTable(PBEMethod, QMOM, dictionary);
 // * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
 
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 using constant::mathematical::pi;
 
-QMOM::QMOM
-(
-        const dictionary& pbeProperties,
-        const phaseModel& phase
-        )
-    :
-      PBEMethod(pbeProperties, phase),
-      QMOMDict_(pbeProperties.subDict("QMOMCoeffs")),
-      dispersedPhase_(phase),
+QMOM::QMOM(const dictionary &pbeProperties, const phaseModel &phase)
+    : PBEMethod(pbeProperties, phase),
+      QMOMDict_(pbeProperties.subDict("QMOMCoeffs")), dispersedPhase_(phase),
       mesh_(dispersedPhase_.U().mesh()),
       moments_(2 * readLabel(QMOMDict_.lookup("quadratureOrder"))),
-      d_
-      (
-          IOobject
-          (
-              "diameter",
-              mesh_.time().timeName(),
-              mesh_,
-              IOobject::NO_READ,
-              IOobject::AUTO_WRITE
-              ),
-          mesh_,
-          dimensionedScalar("diameter", dimLength, 0.0)
-    ),
-    usingMULES_(QMOMDict_.lookupOrDefault<Switch>("usingMULES", false))
-{
+      d_(IOobject("diameter",
+                  mesh_.time().timeName(),
+                  mesh_,
+                  IOobject::NO_READ,
+                  IOobject::AUTO_WRITE),
+         mesh_,
+         dimensionedScalar("diameter", dimLength, 0.0)),
+      usingMULES_(QMOMDict_.lookupOrDefault<Switch>("usingMULES", false)) {
     forAll(moments_, momenti)
-        moments_.set(
-            momenti,
-            new volScalarField(
-                IOobject(
-                    "m" + std::to_string(momenti),
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::MUST_READ,
-                    IOobject::AUTO_WRITE),
-                mesh_));
+        moments_.set(momenti,
+                     new volScalarField(IOobject("m" + std::to_string(momenti),
+                                                 mesh_.time().timeName(),
+                                                 mesh_,
+                                                 IOobject::MUST_READ,
+                                                 IOobject::AUTO_WRITE),
+                                        mesh_));
 
     d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
 }
 
-QMOM::~QMOM()
-{
-}
+QMOM::~QMOM() {}
 void QMOM::correct() {
     std::vector<volScalarField> mSources;
 
@@ -151,31 +128,20 @@ void QMOM::correct() {
     printAvgMaxMin(mesh_, d_);
 }
 
-void QMOM::solveWithMULES(const std::vector<volScalarField>& S) {
-    const fvMesh& mesh = moments_[0].mesh();
-    const surfaceScalarField& phi = phase_.phi();
+void QMOM::solveWithMULES(const std::vector<volScalarField> &S) {
+    const fvMesh &mesh = moments_[0].mesh();
+    const surfaceScalarField &phi = phase_.phi();
     PtrList<surfaceScalarField> phimkCorrs(moments_.size());
 
-    forAll(moments_, k)
-    {
-        volScalarField& mk = moments_[k];
+    forAll(moments_, k) {
+        volScalarField &mk = moments_[k];
 
-        phimkCorrs.set
-        (
-            k,
-            new surfaceScalarField
-            (
-                "phi" + mk.name() + "Corr",
-                fvc::flux
-                (
-                    phi,
-                    mk,
-                    "div(phi," + mk.name() + ')'
-                )
-            )
-        );
+        phimkCorrs.set(k,
+                       new surfaceScalarField(
+                           "phi" + mk.name() + "Corr",
+                           fvc::flux(phi, mk, "div(phi," + mk.name() + ')')));
 
-        surfaceScalarField& phimkCorr = phimkCorrs[k];
+        surfaceScalarField &phimkCorr = phimkCorrs[k];
 
         /*
         // Ensure that the flux at inflow BCs is preserved
@@ -200,92 +166,67 @@ void QMOM::solveWithMULES(const std::vector<volScalarField>& S) {
         }
         */
 
-        //This limited assumed that moment cannot be greater than it's current
-        //value + 20%
+        // This limited assumed that moment cannot be greater than it's current
+        // value + 20%
         scalar maxmk = 1.2 * max(mk).value();
 
-        MULES::limit
-        (
-            1.0 / mesh.time().deltaT().value(),
-            geometricOneField(),
-            mk,
-            phi,
-            phimkCorr,
-            zeroField(), //implicit source?
-            S[k], 
-            maxmk,
-            0,
-            3,
-            true
-        );
+        MULES::limit(1.0 / mesh.time().deltaT().value(),
+                     geometricOneField(),
+                     mk,
+                     phi,
+                     phimkCorr,
+                     zeroField(), // implicit source?
+                     S[k],
+                     maxmk,
+                     0,
+                     3,
+                     true);
     }
 
     MULES::limitSum(phimkCorrs);
 
-    forAll(moments_, k)
-    {
-        volScalarField& mk = moments_[k];
+    forAll(moments_, k) {
+        volScalarField &mk = moments_[k];
 
-        surfaceScalarField& phimk = phimkCorrs[k];
+        surfaceScalarField &phimk = phimkCorrs[k];
         phimk += upwind<scalar>(mesh, phi).flux(mk);
 
-        MULES::explicitSolve
-        (
-            geometricOneField(),
-            mk,
-            phimk,
-            zeroField(), //implicit source?
-            S[k]
-        );
+        MULES::explicitSolve(geometricOneField(),
+                             mk,
+                             phimk,
+                             zeroField(), // implicit source?
+                             S[k]);
     }
 }
 
-void QMOM::solveWithFVM(const std::vector<volScalarField>& S) {
+void QMOM::solveWithFVM(const std::vector<volScalarField> &S) {
     for (label i = 0; i < moments_.size(); ++i) {
-        fvScalarMatrix mEqn(
-            fvm::ddt(moments_[i]) +
-            fvm::div(dispersedPhase_.phi(), moments_[i]) ==
-            S[i]
-        );
+        fvScalarMatrix mEqn(fvm::ddt(moments_[i]) +
+                                fvm::div(dispersedPhase_.phi(), moments_[i]) ==
+                            S[i]);
         mEqn.relax();
         mEqn.solve();
     }
 }
 
-
-const volScalarField QMOM::d() const
-{
-    return d_;
-}
+const volScalarField QMOM::d() const { return d_; }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-volScalarField QMOM::momentSourceTerm(label momenti)
-{
-    volScalarField toReturn
-    (
-        IOobject
-        (
-            "S",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
+volScalarField QMOM::momentSourceTerm(label momenti) {
+    volScalarField toReturn(
+        IOobject("S",
+                 mesh_.time().timeName(),
+                 mesh_,
+                 IOobject::NO_READ,
+                 IOobject::NO_WRITE,
+                 false),
         mesh_,
-        dimensionedScalar
-        (
-            "S",
-            pow(dimVolume, momenti) / dimTime,
-            0
-        )
-    );
+        dimensionedScalar("S", pow(dimVolume, momenti) / dimTime, 0));
 
-    forAll(dispersedPhase_, celli)
-    {
+    forAll(dispersedPhase_, celli) {
         Eigen::VectorXd momentVector(moments_.size());
-        for (int i=0; i<momentVector.size(); ++i)
+        for (int i = 0; i < momentVector.size(); ++i)
             momentVector[i] = moments_[i][celli];
 
         auto quadrature = wheeler_inversion(momentVector);
@@ -293,34 +234,31 @@ volScalarField QMOM::momentSourceTerm(label momenti)
 
         double coalescenceSource{0.}, breakupSource{0.};
 
-        for (int i=0; i<N; ++i){
+        for (int i = 0; i < N; ++i) {
             double xi_i = quadrature.abcissas[i];
-            double innerCoalescenceDeathTerm{0.},
-                   innerCoalescenceBirthTerm{0.};
+            double innerCoalescenceDeathTerm{0.}, innerCoalescenceBirthTerm{0.};
 
-            for (int j=0; j<N; ++j){
+            for (int j = 0; j < N; ++j) {
                 double xi_j = quadrature.abcissas[j];
 
-                innerCoalescenceDeathTerm += quadrature.weights[j] *
-                             coalescence_->S(xi_i, xi_j, celli).value();
+                innerCoalescenceDeathTerm +=
+                    quadrature.weights[j] *
+                    coalescence_->S(xi_i, xi_j, celli).value();
 
-                innerCoalescenceBirthTerm += quadrature.weights[j] *
-                        pow(xi_i + xi_j, momenti) *
-                        coalescence_->S(xi_i, xi_j, celli).value();
+                innerCoalescenceBirthTerm +=
+                    quadrature.weights[j] * pow(xi_i + xi_j, momenti) *
+                    coalescence_->S(xi_i, xi_j, celli).value();
             }
 
-            coalescenceSource += quadrature.weights[i] *
-                           (innerCoalescenceBirthTerm/2. -
-                            pow(xi_i, momenti) *
-                            innerCoalescenceDeathTerm
-                           );
+            coalescenceSource +=
+                quadrature.weights[i] *
+                (innerCoalescenceBirthTerm / 2. -
+                 pow(xi_i, momenti) * innerCoalescenceDeathTerm);
 
-            breakupSource += quadrature.weights[i] *
-                             breakup_->S(xi_i, celli).value() *
-                             (daughterParticleDistribution_->
-                                moment(xi_i,momenti).value()
-                              - pow(xi_i, momenti)
-                             );
+            breakupSource +=
+                quadrature.weights[i] * breakup_->S(xi_i, celli).value() *
+                (daughterParticleDistribution_->moment(xi_i, momenti).value() -
+                 pow(xi_i, momenti));
         }
 
         toReturn[celli] = coalescenceSource + breakupSource;
@@ -329,7 +267,7 @@ volScalarField QMOM::momentSourceTerm(label momenti)
     return toReturn;
 }
 
-}//end namespace PBEMethods
+} // end namespace PBEMethods
 }//end namespace Foam
 
 // ************************************************************************* //
