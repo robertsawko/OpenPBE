@@ -73,12 +73,7 @@ private:
 
  volScalarField d_;
 
- //- Return a source term due to breakup
- tmp<volScalarField> breakupSourceTerm(label momenti);
- //- Return a source term due to coalescence
- tmp<volScalarField> coalescenceSourceTerm(label momenti);
- //- Return a source term due to coalescence
- tmp<volScalarField> momentSourceTerm(label momenti);
+ volScalarField momentSourceTerm(label momenti);
 
  // Private member functions
  
@@ -88,7 +83,7 @@ private:
  void solve();
 
 public:
- TypeName("quadratureMethodOfMoments");
+ TypeName("quadratureMethodOfMoments")
 
  // Constructors
 
