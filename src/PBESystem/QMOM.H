@@ -83,7 +83,8 @@ private:
  void updateMoments();
  //overwrites virtual solve from multiphaseSystem
  void solve();
-
+ void solveWithMULES(const std::vector<volScalarField>& S);
+ void solveWithFVM(const std::vector<volScalarField>& S);
 public:
  TypeName("quadratureMethodOfMoments")
 

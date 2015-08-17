@@ -40,6 +40,7 @@ License
 #include "fvm.H"
 #include "Integrator.H"
 #include "mathematicalConstants.H"
+#include "MULES.H"
 #include "Utility.H"
 #include "MomentInversion.H"
 
@@ -104,36 +105,26 @@ QMOM::QMOM
 QMOM::~QMOM()
 {
 }
-void QMOM::correct()
-{
-    std::vector<volScalarField> mSources_;
+void QMOM::correct() {
+    std::vector<volScalarField> mSources;
 
-    for (label i = 0; i < moments_.size(); ++i){
-        mSources_.emplace_back
-        (
-            IOobject
-            (
-                "m" + std::to_string(i) + "Source",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            ),
-            momentSourceTerm(i)
-        );
+    for (label i = 0; i < moments_.size(); ++i) {
+        mSources.emplace_back(IOobject("m" + std::to_string(i) + "Source",
+                                       mesh_.time().timeName(),
+                                       mesh_,
+                                       IOobject::NO_READ,
+                                       IOobject::AUTO_WRITE),
+                              momentSourceTerm(i));
     }
 
-    Info<< "moment sources:" << endl;
-    for (auto& mSource : mSources_)
-    {
+    Info << "moment sources:" << endl;
+    for (auto &mSource : mSources) {
         mSource.boundaryField() = 0;
 
-        //fix for nan values
-        forAll(mesh_.C(), celli)
-        {
-            auto& mSource_i = mSource[celli];
-            if ( std::isnan(mSource_i) )
-            {
+        // fix for nan values
+        forAll(mesh_.C(), celli) {
+            auto &mSource_i = mSource[celli];
+            if (std::isnan(mSource_i)) {
                 mSource_i = 0.0;
             }
         }
@@ -141,35 +132,126 @@ void QMOM::correct()
         printAvgMaxMin(mesh_, mSource);
     }
 
-    for (label i = 0; i < moments_.size(); ++i)
-    {
-        fvScalarMatrix mEqn
-                (
-                    fvm::ddt(moments_[i])
-                    + fvm::div(dispersedPhase_.phi(),moments_[i])
-                    ==
-                    mSources_[i]
-                    );
-        mEqn.relax();
-        mEqn.solve();
-    }
+    if (usingMULES_)
+        solveWithMULES(mSources);
+    else
+        solveWithFVM(mSources);
 
-    for (auto& moment : moments_)
-    {
-        moment = max(
-                    moment,
-                    dimensionedScalar(moment.name(), moment.dimensions(), SMALL)
-                    );
-        //TODO: print a warning message
+    for (auto &moment : moments_) {
+        moment =
+            max(moment,
+                dimensionedScalar(moment.name(), moment.dimensions(), SMALL));
+        // TODO: print a warning message
         printAvgMaxMin(mesh_, moment);
     }
 
-    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
-    //clamp d_ here?
-
+    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
+    // clamp d_ here?
 
     printAvgMaxMin(mesh_, d_);
 }
+
+void QMOM::solveWithMULES(const std::vector<volScalarField>& S) {
+    const fvMesh& mesh = moments_[0].mesh();
+    const surfaceScalarField& phi = phase_.phi();
+    PtrList<surfaceScalarField> phimkCorrs(moments_.size());
+
+    forAll(moments_, k)
+    {
+        volScalarField& mk = moments_[k];
+
+        phimkCorrs.set
+        (
+            k,
+            new surfaceScalarField
+            (
+                "phi" + mk.name() + "Corr",
+                fvc::flux
+                (
+                    phi,
+                    mk,
+                    "div(phi," + mk.name() + ')'
+                )
+            )
+        );
+
+        surfaceScalarField& phimkCorr = phimkCorrs[k];
+
+        /*
+        // Ensure that the flux at inflow BCs is preserved
+        forAll(phiNkCorr.boundaryField(), patchi)
+        {
+            fvsPatchScalarField& phiNkCorrp =
+                phiNkCorr.boundaryField()[patchi];
+
+            if (!phiNkCorrp.coupled())
+            {
+                const scalarField& phi1p = phase1.phi().boundaryField()[patchi];
+                const scalarField& alpha1p = alpha1.boundaryField()[patchi];
+
+                forAll(phiAlphaCorrp, facei)
+                {
+                    if (phi1p[facei] < 0)
+                    {
+                        phiAlphaCorrp[facei] = alpha1p[facei]*phi1p[facei];
+                    }
+                }
+            }
+        }
+        */
+
+        //This limited assumed that moment cannot be greater than it's current
+        //value + 20%
+        scalar maxmk = 1.2 * max(mk).value();
+
+        MULES::limit
+        (
+            1.0 / mesh.time().deltaT().value(),
+            geometricOneField(),
+            mk,
+            phi,
+            phimkCorr,
+            zeroField(), //implicit source?
+            S[k], 
+            maxmk,
+            0,
+            3,
+            true
+        );
+    }
+
+    MULES::limitSum(phimkCorrs);
+
+    forAll(moments_, k)
+    {
+        volScalarField& mk = moments_[k];
+
+        surfaceScalarField& phimk = phimkCorrs[k];
+        phimk += upwind<scalar>(mesh, phi).flux(mk);
+
+        MULES::explicitSolve
+        (
+            geometricOneField(),
+            mk,
+            phimk,
+            zeroField(), //implicit source?
+            S[k]
+        );
+    }
+}
+
+void QMOM::solveWithFVM(const std::vector<volScalarField>& S) {
+    for (label i = 0; i < moments_.size(); ++i) {
+        fvScalarMatrix mEqn(
+            fvm::ddt(moments_[i]) +
+            fvm::div(dispersedPhase_.phi(), moments_[i]) ==
+            S[i]
+        );
+        mEqn.relax();
+        mEqn.solve();
+    }
+}
+
 
 const volScalarField QMOM::d() const
 {
