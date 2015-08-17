@@ -83,7 +83,8 @@ QMOM::QMOM
               ),
           mesh_,
           dimensionedScalar("diameter", dimLength, 0.0)
-    )
+    ),
+    usingMULES_(QMOMDict_.lookupOrDefault<Switch>("usingMULES", false))
 {
     forAll(moments_, momenti)
         moments_.set(

@@ -75,6 +75,8 @@ private:
 
  volScalarField momentSourceTerm(label momenti);
 
+ Switch usingMULES_;
+
  // Private member functions
  
  //- Update values of moments and diameter
