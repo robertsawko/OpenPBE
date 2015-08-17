@@ -1,0 +1,8 @@
+ blockMesh
+ subsetMesh -overwrite half
+ sed -i -e 's/oldInternalFaces/symmetry1/' 0/* constant/polyMesh/boundary
+ topoSet
+ subsetMesh -overwrite quarter
+ sed -i -e 's/oldInternalFaces/symmetry2/' 0/* constant/polyMesh/boundary
+ sed -i -e 's/empty/symmetryPlane/' 0/* constant/polyMesh/boundary
+ twoPhaseEulerFoam
