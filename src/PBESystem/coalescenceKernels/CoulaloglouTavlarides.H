@@ -53,8 +53,9 @@ public:
          const dimensionedScalar& xi1,
          const dimensionedScalar& xi2,
          const dimensionedScalar& epsilon,
-         const dimensionedScalar& rhod,
-         const dimensionedScalar& nud
+         const dimensionedScalar& rhoc,
+         const dimensionedScalar& nuc,
+         const dimensionedScalar& V
  ) const;
 
 private:
