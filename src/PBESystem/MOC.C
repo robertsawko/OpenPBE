@@ -54,7 +54,9 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
       classNumberDensity_(numberOfClasses_), classVelocity_(numberOfClasses_),
       deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
       xi_(numberOfClasses_),
-      usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false)) {
+      usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false)),
+      breakupCache_(numberOfClasses_*phase.size())
+{
     Info << "Creating " << numberOfClasses_ << " class";
     // Taking pedantry one step too far!
     if (numberOfClasses_ > 1)
@@ -152,22 +154,32 @@ volScalarField MOC::breakupSourceTerm(label i)
         ) 
     );
 
+    auto phaseSize = phase_.size();
+
     forAll(phase_, celli){
         breakupField[celli] -=
-            breakup_().S(xi_[i], celli).value() * classNumberDensity_[i][celli];
+            breakupCache_[i*phaseSize+celli] * classNumberDensity_[i][celli];
 
-        for (label j = i + 1; j < numberOfClasses_; ++j)
+        for (label j = i + 1; j < numberOfClasses_; ++j){
             // deltaXi comes from the application of mean value theorem on the
             // second integral see Kumar and Ramkrishna (1996) paper
             breakupField[celli] +=
                 daughterParticleDistribution_().beta(xi_[i], xi_[j]).value()
-                * breakup_().S(xi_[j], celli).value()
+                * breakupCache_[j*phaseSize+celli]
                 * classNumberDensity_[j][celli] * deltaXi_.value();
+        }
     }
     return breakupField;
 }
 
 void MOC::correct(){
+
+    auto phaseSize = phase_.size();
+
+    for (int i=0; i<numberOfClasses_; ++i){
+        for (int j=0; j<phaseSize; ++j)
+            breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j).value();
+    }
 
     PtrList<volScalarField> S(numberOfClasses_);
     forAll(classNumberDensity_, k){
