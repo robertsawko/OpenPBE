@@ -51,11 +51,14 @@ static void CoulaloglouTavlaridesCoalescence(benchmark::State& state) {
     Foam::dimensionedScalar xi2(
         "xi2", Foam::dimensionSet(0, 3, 0, 0, 0), 2.885425297794245861e-11);
 
+    Foam::dimensionedScalar Vcell(
+        "xi2", Foam::dimensionSet(0, 3, 0, 0, 0), 0.012);
+
     Foam::coalescenceKernels::CoulaloglouTavlaridesCImpl kernel(
                 C1, C2, alpha, sigma);
 
     while (state.KeepRunning())
-        kernel.S(xi1, xi2, epsilon, rho_d, nud);
+        kernel.S(xi1, xi2, epsilon, rho_d, nud, Vcell);
 }
 
 BENCHMARK(CoulaloglouTavlaridesCoalescence);

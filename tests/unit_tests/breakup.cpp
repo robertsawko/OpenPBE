@@ -37,9 +37,12 @@ TEST(breakup, CoulaloglouTavlarides){
     Foam::scalar C1(0.0152), C2(0.0678),
                  sigma(0.04282), alpha(0.050000000000000003);
 
-    Foam::dimensionedScalar epsilon("epsilon", Foam::dimless,
+    Foam::dimensionedScalar epsilon("epsilon",
+                                    Foam::dimensionSet(0, 2, -3, 0, 0),
                                     0.12935361098784559);
-    Foam::dimensionedScalar rho_d("rho_d", Foam::dimless, 972.0);
+    Foam::dimensionedScalar rho_d("rho_d",
+                                  Foam::dimensionSet(1, -3, 0, 0, 0),
+                                  972.0);
 
     Foam::dimensionedScalar xi(
         "xi", Foam::dimensionSet(0, 3, 0, 0, 0), 9.738310380055584507e-11);
@@ -52,6 +55,7 @@ TEST(breakup, CoulaloglouTavlarides){
 
     auto result = kernel.S(xi, rho_d, epsilon);
 
-    ASSERT_EQ(expected.value(), result.value());
-    ASSERT_EQ(expected.dimensions(), result.dimensions());
+    ASSERT_DOUBLE_EQ(expected.value(), result.value());
+    for(int i = 0; i < 7; ++i)
+        ASSERT_NEAR(expected.dimensions()[i], result.dimensions()[i], 1e-9);
 }
