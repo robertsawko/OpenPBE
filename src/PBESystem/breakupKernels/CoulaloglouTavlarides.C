@@ -94,7 +94,7 @@ dimensionedScalar CoulaloglouTavlaridesImp::S(
                     * pow(xi.value(), 5.0/9.0)
                  )
             )
-            /((1 + gamma_) * pow(xi, 1.0/3.0));
+            /((1 + gamma_) * pow(xi, 2.0/9.0));
 }
 
 } //End namespace breakupKernels

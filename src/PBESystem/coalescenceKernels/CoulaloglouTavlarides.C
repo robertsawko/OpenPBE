@@ -65,9 +65,10 @@ dimensionedScalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
     dimensionedScalar epsilon(
         "epsilon", epsilonField.dimensions(), epsilonField[celli]),
         rhod("rhod", rhod_.dimensions(), rhod_[celli]),
-        nud("nud", nud_.dimensions(), nud_[celli]);
+        nud("nud", nud_.dimensions(), nud_[celli]),
+        Vcell("V", dimVolume, phase_.U().mesh().V()[celli]);
 
-    return impl_.S(xi1, xi2, epsilon, rhod, nud);
+    return impl_.S(xi1, xi2, epsilon, rhod, nud, Vcell);
 }
 
 CoulaloglouTavlaridesCImpl::CoulaloglouTavlaridesCImpl(scalar c1,
@@ -83,32 +84,36 @@ dimensionedScalar CoulaloglouTavlaridesCImpl::S
         const dimensionedScalar& xi1,
         const dimensionedScalar& xi2,
         const dimensionedScalar& epsilon,
-        const dimensionedScalar& rhod,
-        const dimensionedScalar& nud
+        const dimensionedScalar& rhoc,
+        const dimensionedScalar& nuc,
+        const dimensionedScalar& Vcell
 ) const
 {
+    dimensionedScalar xi1pow13 = pow(xi1, 1.0 / 3.0);
+    dimensionedScalar xi2pow13 = pow(xi2, 1.0 / 3.0);
+
     dimensionedScalar frequency =
-        c1_ * pow(epsilon, 1.0 / 3.0) * pow(xi1 + xi2, 2) *
+        c1_ * pow(epsilon, 1.0 / 3.0) *
+        pow(xi1pow13 + xi2pow13, 2) *
         pow
         (
-            pow(xi1, 2.0 / 3.0) + pow(xi2, 2.0 / 3.0),
+            pow(xi1, 2.0 / 9.0) + pow(xi2, 2.0 / 9.0),
             0.5
         )
-        / (1 + gamma_);
+        / (1 + gamma_) / Vcell;
 
 
     dimensionedScalar rate =
         exp
         (
-            (- c2_ * rhod * epsilon * (rhod * nud)
-            / ( pow(sigma_,2) * pow( 1 + gamma_,3) )
+            (- c2_ * rhoc.value() * epsilon.value() * (rhoc * nuc).value()
+            / ( pow(sigma_, 2) * pow(1 + gamma_, 3) )
             * pow
                 (
-                    xi1 * xi2 / (xi1 + xi2),
+                    xi1pow13 * xi2pow13 / (xi1pow13 + xi2pow13),
                     4.0
                 ).value())
         );
-
 
     return frequency * rate;
 }
