@@ -10,4 +10,3 @@ sed -i -e 's/oldInternalFaces/symmetry2/' 0/* constant/polyMesh/boundary
 sed -i -e 's/empty/symmetryPlane/' 0/* constant/polyMesh/boundary
 sed -i -e 's/ascii/binary/' -e 's/ uncompressed/ compressed/' system/controlDict
 foamFormatConvert
-twoPhaseEulerFoam
