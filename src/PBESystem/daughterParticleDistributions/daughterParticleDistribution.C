@@ -29,7 +29,7 @@ License
 namespace Foam
 {
 defineTypeNameAndDebug(daughterParticleDistribution, 0);
-defineRunTimeSelectionTable(daughterParticleDistribution, dictionary);
+defineRunTimeSelectionTable(daughterParticleDistribution, dictionary)
 }
 // * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
 
@@ -78,13 +78,6 @@ Foam::daughterParticleDistribution::New
     (
         pbeDict.subDict(daughterParticleDistributionType + "Coeffs")
     );
-};
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::daughterParticleDistribution::~daughterParticleDistribution()
-{
 }
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 

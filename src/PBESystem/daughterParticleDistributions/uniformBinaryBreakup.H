@@ -53,25 +53,12 @@ class uniformBinaryBreakup
 :
     public daughterParticleDistribution
 {
- private:
-  // Private data
-
-  //- Description of data_
-
-  // Private Member Functions
-
-  //- Disallow default bitwise copy construct
-  uniformBinaryBreakup(const uniformBinaryBreakup&);
-
-  //- Disallow default bitwise assignment
-  void operator=(const uniformBinaryBreakup&);
-
  public:
 
   // Static data members
 
   //- Static data staticData
-  TypeName("uniformBinaryBreakup");
+  TypeName("uniformBinaryBreakup")
 
   // Constructors
 
@@ -80,17 +67,16 @@ class uniformBinaryBreakup
   );
 
   //- Destructor
-  virtual ~uniformBinaryBreakup();
+  virtual ~uniformBinaryBreakup() = default;
 
   // Member Functions
 
-  tmp<volScalarField> beta(
-      const volScalarField& xi1,
-      const volScalarField& xi2) const;
-
-  const dimensionedScalar beta(
+  dimensionedScalar beta(
       const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const;
+      const dimensionedScalar& xi2) const override;
+
+  dimensionedScalar moment(
+            const dimensionedScalar& xi, label k) const override;
 };
 
 
