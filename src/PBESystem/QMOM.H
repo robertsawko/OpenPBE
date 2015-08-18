@@ -54,65 +54,54 @@ SourceFiles
 //
 
 
-namespace Foam
-{
-namespace PBEMethods
-{
+namespace Foam {
+namespace PBEMethods {
 /*---------------------------------------------------------------------------*\
                       Class QMOM Declaration
 \*---------------------------------------------------------------------------*/
 
-class QMOM : public PBEMethod
-{
-private:
- const dictionary QMOMDict_;
- const phaseModel& dispersedPhase_;
- const fvMesh& mesh_;
+class QMOM : public PBEMethod {
+  private:
+    const dictionary QMOMDict_;
+    const phaseModel &dispersedPhase_;
+    const fvMesh &mesh_;
 
- PtrList<volScalarField> moments_;
+    PtrList<volScalarField> moments_;
 
- volScalarField d_;
+    volScalarField d_;
 
- //- Return a source term due to breakup
- tmp<volScalarField> breakupSourceTerm(label momenti);
- //- Return a source term due to coalescence
- tmp<volScalarField> coalescenceSourceTerm(label momenti);
- //- Return a source term due to coalescence
- tmp<volScalarField> momentSourceTerm(label momenti);
+    volScalarField momentSourceTerm(label momenti);
 
- // Private member functions
- 
- //- Update values of moments and diameter
- void updateMoments();
- //overwrites virtual solve from multiphaseSystem
- void solve();
+    Switch usingMULES_;
 
-public:
- TypeName("quadratureMethodOfMoments");
+    // Private member functions
 
- // Constructors
+    //- Update values of moments and diameter
+    void updateMoments();
+    // overwrites virtual solve from multiphaseSystem
+    void solve();
+    void solveWithMULES(const std::vector<volScalarField> &S);
+    void solveWithFVM(const std::vector<volScalarField> &S);
 
- //- Construct from components
- QMOM
- (
-     const dictionary& pbeProperties,
-     const phaseModel& phase
- );
+  public:
+    TypeName("quadratureMethodOfMoments")
 
- //- Dummy correct
- virtual void correct() override;
+        // Constructors
 
- ////- Return the Sauter-mean diameter
- virtual const volScalarField d() const override;
+        //- Construct from components
+        QMOM(const dictionary &pbeProperties, const phaseModel &phase);
 
+    //- Dummy correct
+    virtual void correct() override;
 
+    //- Return the Sauter-mean diameter
+    virtual const volScalarField d() const override;
 
- //- Destructor
- virtual ~QMOM();
+    //- Destructor
+    virtual ~QMOM();
 
- // Member Functions
+    // Member Functions
 };
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

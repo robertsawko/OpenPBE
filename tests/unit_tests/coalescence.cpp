@@ -42,20 +42,28 @@ TEST(coalescence, none){
 }
 
 TEST(coalescence, CoulaloglouTavlarides){
-    Foam::scalar C1(0.0152), C2(0.0678),
+    Foam::scalar C1(1.06e-12), C2(51300000000000.0),
                  sigma(0.04282), alpha(0.050000000000000003);
 
-    Foam::dimensionedScalar epsilon("epsilon", Foam::dimless,
+    Foam::dimensionedScalar epsilon("epsilon",
+                                    Foam::dimensionSet(0, 2, -3, 0, 0),
                                     0.12935361098784559);
-    Foam::dimensionedScalar rho_d("rho_d", Foam::dimless, 972.0);
+    Foam::dimensionedScalar rho_c("rho_c",
+                                  Foam::dimensionSet(1, -3, 0, 0, 0),
+                                  1000);
 
-    Foam::dimensionedScalar nud("nu_d", Foam::dimless, 0.001); //actually muc
+    Foam::dimensionedScalar nuc("nu_c",
+                                Foam::dimensionSet(0, 2, -1, 0, 0),
+                                1e-6);
 
     Foam::dimensionedScalar xi1(
         "xi1", Foam::dimensionSet(0, 3, 0, 0, 0), 5.071423503403169858e-10);
 
     Foam::dimensionedScalar xi2(
         "xi2", Foam::dimensionSet(0, 3, 0, 0, 0), 2.885425297794245861e-11);
+
+    Foam::dimensionedScalar Vcell(
+        "xi2", Foam::dimensionSet(0, 3, 0, 0, 0), 0.012);
 
     Foam::dimensionedScalar expected(
         "expected", Foam::dimensionSet(0, 0, -1, 0, 0),
@@ -64,8 +72,9 @@ TEST(coalescence, CoulaloglouTavlarides){
     Foam::coalescenceKernels::CoulaloglouTavlaridesCImpl kernel(
                 C1, C2, alpha, sigma);
 
-    auto result = kernel.S(xi1, xi2, epsilon, rho_d, nud);
+    auto result = kernel.S(xi1, xi2, epsilon, rho_c, nuc, Vcell);
 
-    ASSERT_EQ(expected.value(), result.value());
-    ASSERT_EQ(expected.dimensions(), result.dimensions());
+    ASSERT_FLOAT_EQ(expected.value(), result.value());
+    for(int i = 0; i < 7; ++i)
+        ASSERT_NEAR(expected.dimensions()[i], result.dimensions()[i], 1e-9);
 }

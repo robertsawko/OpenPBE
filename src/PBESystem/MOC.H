@@ -90,6 +90,8 @@ private:
  void solveWithFVM(const PtrList<volScalarField>& sources);
  void solveWithMULES(const PtrList<volScalarField>& sources);
 
+ std::vector<scalar> breakupCache_;
+
 protected:
  // Protected data
 
