@@ -18,7 +18,7 @@ find_package(Eigen3 REQUIRED)
 include_directories (${EIGEN3_INCLUDE_DIR})
 
 #TODO Is there a better way to break lines?
-set(CMAKE_CXX_FLAGS "-g -m64 -Dlinux64 -DWM_DP") 
+set(CMAKE_CXX_FLAGS "-O3 -m64 -Dlinux64 -DWM_DP")
 #g++ will inform you of unused typedefs and we want to suppress this as there
 #are typedefs like this in OF
 

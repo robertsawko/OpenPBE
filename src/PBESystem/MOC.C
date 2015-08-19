@@ -31,6 +31,8 @@ License
 #include "mathematicalConstants.H"
 #include "MULES.H"
 #include "Utility.H"
+#include <boost/timer/timer.hpp>
+
 
 
 namespace Foam
@@ -134,6 +136,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
 volScalarField MOC::breakupSourceTerm(label i)
 {
+    boost::timer::auto_cpu_timer t;
     volScalarField breakupField(
         IOobject
         (
