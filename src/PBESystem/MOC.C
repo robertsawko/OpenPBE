@@ -55,7 +55,7 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
       numberOfClasses_(readLabel(MOCDict_.lookup("numberOfClasses"))),
       classNumberDensity_(numberOfClasses_), classVelocity_(numberOfClasses_),
       deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
-      xi_(numberOfClasses_),
+      //xi_(numberOfClasses_),
       usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false)),
       breakupCache_(numberOfClasses_*phase.size())
 {
@@ -78,8 +78,8 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
                        IOobject::AUTO_WRITE),
                    phase.U().mesh()));
         classVelocity_.set(i, phase.U());
-        xi_.set(i, new dimensionedScalar(
-            "xi" + std::to_string(i), deltaXi_ * (i + 1)));
+        xi_.emplace_back(
+            "xi" + std::to_string(i), deltaXi_ * (i + 1));
         Info << i << " has volume " << xi_[i] << endl;
     }
 }
@@ -92,6 +92,7 @@ volScalarField MOC::classSourceTerm(label i)
 }
 volScalarField MOC::coalescenceSourceTerm(label i)
 {
+    //boost::timer::auto_cpu_timer t;
     volScalarField coalescenceField
     (
         IOobject
@@ -117,18 +118,23 @@ volScalarField MOC::coalescenceSourceTerm(label i)
         // the upper limit stops from removing mass through coalescence that
         // results in drops that are outside of PBE domain
         for(int j = 0; j < classNumberDensity_.size() - i - 1; ++j){
+            //Info << "Calling for " << std::to_string(i) << std::to_string(j) << std::to_string(celli) << endl;
             coalescenceField[celli] -=
                 coalescence_().S(xi_[i], xi_[j], celli).value()
                 * classNumberDensity_[j][celli];
         }
+
+        //Info << "=================" << endl;
         coalescenceField[celli] *= classNumberDensity_[i][celli];
         //-1 in pairs account for zero-based numbering
         for(int j = 0; j < i; ++j){
+            //Info << "Calling lala for " << std::to_string(i-j-1) << std::to_string(j) << std::to_string(celli) << endl;
             coalescenceField[celli] +=
                 0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli).value()
                 * classNumberDensity_[i - j - 1][celli]
                 * classNumberDensity_[j][celli];
         }
+        //Info << "/***********************\\" << endl;
     }
     return coalescenceField;
 
@@ -136,7 +142,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
 volScalarField MOC::breakupSourceTerm(label i)
 {
-    boost::timer::auto_cpu_timer t;
+    //boost::timer::auto_cpu_timer t;
     volScalarField breakupField(
         IOobject
         (
@@ -176,7 +182,7 @@ volScalarField MOC::breakupSourceTerm(label i)
 }
 
 void MOC::correct(){
-    //boost::timer::auto_cpu_timer t;
+    boost::timer::auto_cpu_timer t;
 
     {
     //boost::timer::auto_cpu_timer t;

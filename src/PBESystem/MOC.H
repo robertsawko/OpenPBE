@@ -74,7 +74,7 @@ private:
  dimensionedScalar deltaXi_;
 
  //- diameters for each class 
- PtrList<dimensionedScalar> xi_;
+ std::vector<dimensionedScalar> xi_;
 
  bool usingMULES_;
 
