@@ -59,11 +59,6 @@ class MOC
     public PBEMethod
 {
 private:
- const dictionary MOCDict_;
-
- //- number of size classes
- const label numberOfClasses_;
-
  //- class sizes
  PtrList<volScalarField> classNumberDensity_;
 

@@ -50,15 +50,20 @@ addToRunTimeSelectionTable(PBEMethod, MOC, dictionary);
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
-    : PBEMethod(pbeProperties, phase),
-      MOCDict_(pbeProperties.subDict("MOCCoeffs")),
-      numberOfClasses_(readLabel(MOCDict_.lookup("numberOfClasses"))),
-      classNumberDensity_(numberOfClasses_), classVelocity_(numberOfClasses_),
-      deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
-      //xi_(numberOfClasses_),
-      usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false)),
-      breakupCache_(numberOfClasses_*phase.size())
+    : PBEMethod(pbeProperties, phase)
 {
+    auto MOCDict_ = pbeProperties.subDict("MOCCoeffs");
+    auto numberOfClasses_ = readLabel(MOCDict_.lookup("numberOfClasses"));
+
+    classNumberDensity_.resize(numberOfClasses_);
+    classVelocity_.resize(numberOfClasses_);
+    dimensionedScalar deltaXi_("deltaXi", dimVolume,
+                               readScalar(MOCDict_.lookup("xi1")));
+
+    usingMULES_ = MOCDict_.lookupOrDefault<Switch>("usingMULES", false);
+    breakupCache_.resize(numberOfClasses_*phase.size());
+
+
     Info << "Creating " << numberOfClasses_ << " class";
     // Taking pedantry one step too far!
     if (numberOfClasses_ > 1)
@@ -169,7 +174,7 @@ volScalarField MOC::breakupSourceTerm(label i)
         breakupField[celli] -=
             breakupCache_[i*phaseSize+celli] * classNumberDensity_[i][celli];
 
-        for (label j = i + 1; j < numberOfClasses_; ++j){
+        for (label j = i + 1; j < classNumberDensity_.size(); ++j){
             // deltaXi comes from the application of mean value theorem on the
             // second integral see Kumar and Ramkrishna (1996) paper
             breakupField[celli] +=
@@ -190,14 +195,14 @@ void MOC::correct(){
 
     auto phaseSize = phase_.size();
 
-    for (int i=0; i<numberOfClasses_; ++i){
+    for (int i=0; i<classNumberDensity_.size(); ++i){
         for (int j=0; j<phaseSize; ++j)
             breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j);
     }
 
     }
 
-    PtrList<volScalarField> S(numberOfClasses_);
+    PtrList<volScalarField> S(classNumberDensity_.size());
     forAll(classNumberDensity_, k){
         S.set(k, classSourceTerm(k));
     }
@@ -342,7 +347,7 @@ const volScalarField MOC::d() const
 {
     volScalarField sum = volumeToDiameter(xi_[0]) * classNumberDensity_[0];
     volScalarField norm = classNumberDensity_[0];
-    for(int i = 1; i < numberOfClasses_; ++i)
+    for(int i = 1; i < classNumberDensity_.size(); ++i)
     {
         sum += volumeToDiameter(xi_[i]) * classNumberDensity_[i];
         norm += classNumberDensity_[i];
