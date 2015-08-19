@@ -48,9 +48,9 @@ class CoulaloglouTavlaridesImp
 public:
     CoulaloglouTavlaridesImp(scalar c1, scalar c2, scalar gamma, scalar sigma);
 
-    dimensionedScalar S(const dimensionedScalar& xi,
-                        const dimensionedScalar& rho_d,
-                        const dimensionedScalar& epsilon) const;
+    scalar S(scalar xi,
+                        scalar rho_d,
+                        scalar epsilon) const;
 
 private:
     const scalar c1_;
@@ -74,7 +74,7 @@ class CoulaloglouTavlarides
 
   virtual ~CoulaloglouTavlarides() = default;
 
-  dimensionedScalar S(const dimensionedScalar& xi, label celli) const override;
+  scalar S(const dimensionedScalar& xi, label celli) const override;
 
 private:
   CoulaloglouTavlaridesImp impl_;
