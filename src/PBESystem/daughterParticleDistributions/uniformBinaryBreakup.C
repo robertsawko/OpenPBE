@@ -52,13 +52,11 @@ uniformBinaryBreakup::uniformBinaryBreakup
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-dimensionedScalar uniformBinaryBreakup::beta
-(
-    const dimensionedScalar& xi1,
-    const dimensionedScalar& xi2
+scalar uniformBinaryBreakup::beta(scalar xi1,
+    scalar xi2
 ) const
 {
-    return dimensionedScalar("beta", 2.0 / xi2)  * pos(xi2 - xi1);
+    return (2.0 / xi2)  * pos(xi2 - xi1);
 }
 
 dimensionedScalar uniformBinaryBreakup::moment
