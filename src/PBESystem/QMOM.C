@@ -256,7 +256,7 @@ volScalarField QMOM::momentSourceTerm(label momenti) {
                  pow(xi_i, momenti) * innerCoalescenceDeathTerm);
 
             breakupSource +=
-                quadrature.weights[i] * breakup_->S(xi_i, celli).value() *
+                quadrature.weights[i] * breakup_->S(xi_i, celli) *
                 (daughterParticleDistribution_->moment(xi_i, momenti).value() -
                  pow(xi_i, momenti));
         }

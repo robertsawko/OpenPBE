@@ -186,7 +186,7 @@ void MOC::correct(){
 
     for (int i=0; i<numberOfClasses_; ++i){
         for (int j=0; j<phaseSize; ++j)
-            breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j).value();
+            breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j);
     }
 
     }
