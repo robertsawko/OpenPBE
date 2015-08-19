@@ -136,7 +136,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
 volScalarField MOC::breakupSourceTerm(label i)
 {
-    boost::timer::auto_cpu_timer t;
+    //boost::timer::auto_cpu_timer t;
     volScalarField breakupField(
         IOobject
         (
@@ -176,12 +176,19 @@ volScalarField MOC::breakupSourceTerm(label i)
 }
 
 void MOC::correct(){
+    boost::timer::auto_cpu_timer t;
+
+    {
+    boost::timer::auto_cpu_timer t;
+
 
     auto phaseSize = phase_.size();
 
     for (int i=0; i<numberOfClasses_; ++i){
         for (int j=0; j<phaseSize; ++j)
             breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j).value();
+    }
+
     }
 
     PtrList<volScalarField> S(numberOfClasses_);
