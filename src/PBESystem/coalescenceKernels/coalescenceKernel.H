@@ -82,7 +82,7 @@ class coalescenceKernel
 
   virtual ~coalescenceKernel() = default;
 
-  virtual dimensionedScalar S(
+  virtual scalar S(
       const dimensionedScalar& xi1,
       const dimensionedScalar& xi2,
       label celli) const = 0;

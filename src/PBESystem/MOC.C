@@ -120,7 +120,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
         for(int j = 0; j < classNumberDensity_.size() - i - 1; ++j){
             //Info << "Calling for " << std::to_string(i) << std::to_string(j) << std::to_string(celli) << endl;
             coalescenceField[celli] -=
-                coalescence_().S(xi_[i], xi_[j], celli).value()
+                coalescence_().S(xi_[i], xi_[j], celli)
                 * classNumberDensity_[j][celli];
         }
 
@@ -130,7 +130,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
         for(int j = 0; j < i; ++j){
             //Info << "Calling lala for " << std::to_string(i-j-1) << std::to_string(j) << std::to_string(celli) << endl;
             coalescenceField[celli] +=
-                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli).value()
+                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli)
                 * classNumberDensity_[i - j - 1][celli]
                 * classNumberDensity_[j][celli];
         }
