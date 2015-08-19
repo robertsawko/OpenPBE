@@ -60,11 +60,7 @@ scalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
     const volScalarField& epsilonField = 
         phase_.U().mesh().lookupObject<volScalarField>(epsilonName_);
 
-    dimensionedScalar epsilon(
-        "epsilon", epsilonField.dimensions(), epsilonField[celli]);
-    dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[celli]);
-
-    return impl_.S(xi.value(), rho_d.value(), epsilon.value());
+    return impl_.S(xi.value(), rhod_[celli], epsilonField[celli]);
 }
 
 CoulaloglouTavlaridesImp::CoulaloglouTavlaridesImp(scalar c1, scalar c2,
