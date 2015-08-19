@@ -46,9 +46,10 @@ namespace coalescenceKernels
 class noCoalescenceImpl
 {
 public:
-    dimensionedScalar S(
-        const dimensionedScalar& xi1,
-        const dimensionedScalar& xi2) const;
+    scalar S() const
+    {
+        return 0.;
+    }
 };
 
 class noCoalescence
@@ -66,12 +67,12 @@ class noCoalescence
 
   virtual ~noCoalescence() = default;
 
-  dimensionedScalar S(
+  scalar S(
       const dimensionedScalar& xi1,
       const dimensionedScalar& xi2,
       label celli) const override
   {
-      return impl_.S(xi1, xi2);
+      return impl_.S();
   }
 
  private:
