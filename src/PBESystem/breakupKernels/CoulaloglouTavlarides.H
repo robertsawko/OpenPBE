@@ -80,7 +80,6 @@ private:
   CoulaloglouTavlaridesImp impl_;
   const phaseModel& phase_;
   const volScalarField& rhod_;
-  const word epsilonName_;
 };
 
 
