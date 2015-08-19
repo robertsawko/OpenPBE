@@ -349,8 +349,7 @@ tmp<volScalarField> MOM::breakupSourceTerm(label momenti)
                 breakup_->S(xi, celli) * m0 * pdf(gamma, xi);
 
             auto breakupBirthIntegrand = [&](double xi_prime) {
-                return daughterParticleDistribution_->beta(xi, xi_prime)
-                           .value() *
+                return daughterParticleDistribution_->beta(xi, xi_prime) *
                        breakup_->S(xi_prime, celli) * m0 *
                        pdf(gamma, xi_prime);
             };

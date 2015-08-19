@@ -136,7 +136,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
 volScalarField MOC::breakupSourceTerm(label i)
 {
-    //boost::timer::auto_cpu_timer t;
+    boost::timer::auto_cpu_timer t;
     volScalarField breakupField(
         IOobject
         (
@@ -167,7 +167,7 @@ volScalarField MOC::breakupSourceTerm(label i)
             // deltaXi comes from the application of mean value theorem on the
             // second integral see Kumar and Ramkrishna (1996) paper
             breakupField[celli] +=
-                daughterParticleDistribution_().beta(xi_[i], xi_[j]).value()
+                daughterParticleDistribution_().beta(xi_[i].value(), xi_[j].value())
                 * breakupCache_[j*phaseSize+celli]
                 * classNumberDensity_[j][celli] * deltaXi_.value();
         }
@@ -176,10 +176,10 @@ volScalarField MOC::breakupSourceTerm(label i)
 }
 
 void MOC::correct(){
-    boost::timer::auto_cpu_timer t;
+    //boost::timer::auto_cpu_timer t;
 
     {
-    boost::timer::auto_cpu_timer t;
+    //boost::timer::auto_cpu_timer t;
 
 
     auto phaseSize = phase_.size();

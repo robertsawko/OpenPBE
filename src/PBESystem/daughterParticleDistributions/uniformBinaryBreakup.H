@@ -71,9 +71,9 @@ class uniformBinaryBreakup
 
   // Member Functions
 
-  dimensionedScalar beta(
-      const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2) const override;
+  scalar beta(
+      scalar xi1,
+      scalar xi2) const override;
 
   dimensionedScalar moment(
             const dimensionedScalar& xi, label k) const override;
