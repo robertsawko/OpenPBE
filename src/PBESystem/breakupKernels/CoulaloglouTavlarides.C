@@ -49,16 +49,15 @@ CoulaloglouTavlarides::CoulaloglouTavlarides(const dictionary &breakupDict,
           breakupDict.lookupOrDefault<scalar>("sigma",0.047)
           ),
       phase_(dispersedPhase),
-      rhod_(dispersedPhase.rho()),
-      epsilonName_("epsilon." + phase_.name())
+      rhod_(dispersedPhase.rho())
 {
 }
 
 scalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
                                            label celli) const {
 
-    const volScalarField& epsilonField = 
-        phase_.U().mesh().lookupObject<volScalarField>(epsilonName_);
+    static const volScalarField& epsilonField =
+        phase_.U().mesh().lookupObject<volScalarField>("epsilon."+ phase_.name());
 
     return impl_.S(xi.value(), rhod_[celli], epsilonField[celli]);
 }
