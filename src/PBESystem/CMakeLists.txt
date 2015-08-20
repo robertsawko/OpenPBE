@@ -1,4 +1,5 @@
-find_package(Boost COMPONENTS timer system REQUIRED)
+#find_package(Boost COMPONENTS timer system REQUIRED)
+find_package(Boost REQUIRED)
 find_package(GSL REQUIRED)
 
 include_directories (${Boost_INCLUDE_DIRS})

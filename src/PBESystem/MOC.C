@@ -31,7 +31,7 @@ License
 #include "mathematicalConstants.H"
 #include "MULES.H"
 #include "Utility.H"
-#include <boost/timer/timer.hpp>
+//#include <boost/timer/timer.hpp>
 
 
 
@@ -123,23 +123,19 @@ volScalarField MOC::coalescenceSourceTerm(label i)
         // the upper limit stops from removing mass through coalescence that
         // results in drops that are outside of PBE domain
         for(int j = 0; j < classNumberDensity_.size() - i - 1; ++j){
-            //Info << "Calling for " << std::to_string(i) << std::to_string(j) << std::to_string(celli) << endl;
             coalescenceField[celli] -=
                 coalescence_().S(xi_[i], xi_[j], celli)
                 * classNumberDensity_[j][celli];
         }
 
-        //Info << "=================" << endl;
         coalescenceField[celli] *= classNumberDensity_[i][celli];
         //-1 in pairs account for zero-based numbering
         for(int j = 0; j < i; ++j){
-            //Info << "Calling lala for " << std::to_string(i-j-1) << std::to_string(j) << std::to_string(celli) << endl;
             coalescenceField[celli] +=
                 0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli)
                 * classNumberDensity_[i - j - 1][celli]
                 * classNumberDensity_[j][celli];
         }
-        //Info << "/***********************\\" << endl;
     }
     return coalescenceField;
 
@@ -187,7 +183,7 @@ volScalarField MOC::breakupSourceTerm(label i)
 }
 
 void MOC::correct(){
-    boost::timer::auto_cpu_timer t;
+    //boost::timer::auto_cpu_timer t;
 
     {
     //boost::timer::auto_cpu_timer t;
