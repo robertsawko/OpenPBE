@@ -50,15 +50,15 @@ addToRunTimeSelectionTable(PBEMethod, MOC, dictionary);
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
-    : PBEMethod(pbeProperties, phase)
+    : PBEMethod(pbeProperties, phase),
+      deltaXi_("deltaXi", dimVolume, 0.)
 {
     auto MOCDict_ = pbeProperties.subDict("MOCCoeffs");
     auto numberOfClasses_ = readLabel(MOCDict_.lookup("numberOfClasses"));
 
     classNumberDensity_.resize(numberOfClasses_);
     classVelocity_.resize(numberOfClasses_);
-    deltaXi_ = dimensionedScalar("deltaXi", dimVolume,
-                               readScalar(MOCDict_.lookup("xi1")));
+    deltaXi_.value() = readScalar(MOCDict_.lookup("xi1"));
 
     usingMULES_ = MOCDict_.lookupOrDefault<Switch>("usingMULES", false);
     breakupCache_.resize(numberOfClasses_*phase.size());
