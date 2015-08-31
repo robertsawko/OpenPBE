@@ -57,7 +57,7 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
 
     classNumberDensity_.resize(numberOfClasses_);
     classVelocity_.resize(numberOfClasses_);
-    dimensionedScalar deltaXi_("deltaXi", dimVolume,
+    deltaXi_ = dimensionedScalar("deltaXi", dimVolume,
                                readScalar(MOCDict_.lookup("xi1")));
 
     usingMULES_ = MOCDict_.lookupOrDefault<Switch>("usingMULES", false);
