@@ -49,22 +49,17 @@ CoulaloglouTavlarides::CoulaloglouTavlarides(const dictionary &breakupDict,
           breakupDict.lookupOrDefault<scalar>("sigma",0.047)
           ),
       phase_(dispersedPhase),
-      rhod_(dispersedPhase.rho()),
-      epsilonName_("epsilon." + phase_.name())
+      rhod_(dispersedPhase.rho())
 {
 }
 
-dimensionedScalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
+scalar CoulaloglouTavlarides::S(const dimensionedScalar &xi,
                                            label celli) const {
 
-    const volScalarField& epsilonField = 
-        phase_.U().mesh().lookupObject<volScalarField>(epsilonName_);
+    static const volScalarField& epsilonField =
+        phase_.U().mesh().lookupObject<volScalarField>("epsilon."+ phase_.name());
 
-    dimensionedScalar epsilon(
-        "epsilon", epsilonField.dimensions(), epsilonField[celli]);
-    dimensionedScalar rho_d("rho_d", rhod_.dimensions(), rhod_[celli]);
-
-    return impl_.S(xi, rho_d, epsilon);
+    return impl_.S(xi.value(), rhod_[celli], epsilonField[celli]);
 }
 
 CoulaloglouTavlaridesImp::CoulaloglouTavlaridesImp(scalar c1, scalar c2,
@@ -79,10 +74,10 @@ CoulaloglouTavlaridesImp::CoulaloglouTavlaridesImp(scalar c1, scalar c2,
 //    Info << "\tsigma: " << sigma_ << endl;
 }
 
-dimensionedScalar CoulaloglouTavlaridesImp::S(
-        const dimensionedScalar &xi,
-        const dimensionedScalar &rho_d,
-        const dimensionedScalar &epsilon
+scalar CoulaloglouTavlaridesImp::S(
+        scalar xi,
+        scalar rho_d,
+        scalar epsilon
         ) const
 {
     return c1_ * pow(epsilon, 1.0/3.0)
@@ -90,8 +85,8 @@ dimensionedScalar CoulaloglouTavlaridesImp::S(
             (
                 -c2_ * sigma_ * pow(1 + gamma_,2)
                 /(
-                    rho_d.value() * pow(epsilon.value(), 2.0/3.0)
-                    * pow(xi.value(), 5.0/9.0)
+                    rho_d * pow(epsilon, 2.0/3.0)
+                    * pow(xi, 5.0/9.0)
                  )
             )
             /((1 + gamma_) * pow(xi, 2.0/9.0));

@@ -48,14 +48,13 @@ class CoulaloglouTavlaridesCImpl
 public:
  CoulaloglouTavlaridesCImpl(scalar c1, scalar c2, scalar gamma, scalar sigma);
 
- dimensionedScalar S
- (
-         const dimensionedScalar& xi1,
-         const dimensionedScalar& xi2,
-         const dimensionedScalar& epsilon,
-         const dimensionedScalar& rhoc,
-         const dimensionedScalar& nuc,
-         const dimensionedScalar& V
+ scalar S
+ (scalar xi1,
+         scalar xi2,
+         scalar epsilon,
+         scalar rhoc,
+         scalar nuc,
+         scalar V
  ) const;
 
 private:
@@ -81,7 +80,7 @@ class CoulaloglouTavlaridesC
 
   virtual ~CoulaloglouTavlaridesC() = default;
 
-  dimensionedScalar S(
+  scalar S(
       const dimensionedScalar& xi1,
       const dimensionedScalar& xi2,
       label celli) const override;

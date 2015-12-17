@@ -18,7 +18,9 @@ find_package(Eigen3 REQUIRED)
 include_directories (${EIGEN3_INCLUDE_DIR})
 
 #TODO Is there a better way to break lines?
-set(CMAKE_CXX_FLAGS "-g -m64 -Dlinux64 -DWM_DP") 
+
+set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_FLAGS "-O3 -m64 -Dlinux64 -DWM_DP")
 #g++ will inform you of unused typedefs and we want to suppress this as there
 #are typedefs like this in OF
 
@@ -72,8 +74,8 @@ set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 #gtest for testing
 add_subdirectory(ext/gtest/)
 #find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
-find_package(Boost REQUIRED)
+#include_directories(${GTEST_INCLUDE_DIRS})
+#find_package(Boost REQUIRED)
 
 
 # add_subdirectory(ext/eigen3/)
@@ -82,12 +84,12 @@ add_subdirectory(src/PBESystem)
 add_subdirectory(applications/PBEFoam)
 
 
-#unit tests
-find_package (Threads)
-add_subdirectory(tests)
+##unit tests
+#find_package (Threads)
+#add_subdirectory(tests)
 
-#benchmarks
-set(CMAKE_BUILD_TYPE Release)
-add_subdirectory(ext/benchmark)
-set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
-add_subdirectory(benchmarks)
+##benchmarks
+#set(CMAKE_BUILD_TYPE Release)
+#add_subdirectory(ext/benchmark)
+#set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
+#add_subdirectory(benchmarks)
