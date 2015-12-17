@@ -31,6 +31,8 @@ License
 #include "mathematicalConstants.H"
 #include "MULES.H"
 #include "Utility.H"
+//#include <boost/timer/timer.hpp>
+
 
 
 namespace Foam
@@ -49,14 +51,19 @@ addToRunTimeSelectionTable(PBEMethod, MOC, dictionary);
 
 MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
     : PBEMethod(pbeProperties, phase),
-      MOCDict_(pbeProperties.subDict("MOCCoeffs")),
-      numberOfClasses_(readLabel(MOCDict_.lookup("numberOfClasses"))),
-      classNumberDensity_(numberOfClasses_), classVelocity_(numberOfClasses_),
-      deltaXi_("deltaXi", dimVolume, readScalar(MOCDict_.lookup("xi1"))),
-      xi_(numberOfClasses_),
-      usingMULES_(MOCDict_.lookupOrDefault<Switch>("usingMULES", false)),
-      breakupCache_(numberOfClasses_*phase.size())
+      deltaXi_("deltaXi", dimVolume, 0.)
 {
+    auto MOCDict_ = pbeProperties.subDict("MOCCoeffs");
+    auto numberOfClasses_ = readLabel(MOCDict_.lookup("numberOfClasses"));
+
+    classNumberDensity_.resize(numberOfClasses_);
+    classVelocity_.resize(numberOfClasses_);
+    deltaXi_.value() = readScalar(MOCDict_.lookup("xi1"));
+
+    usingMULES_ = MOCDict_.lookupOrDefault<Switch>("usingMULES", false);
+    breakupCache_.resize(numberOfClasses_*phase.size());
+
+
     Info << "Creating " << numberOfClasses_ << " class";
     // Taking pedantry one step too far!
     if (numberOfClasses_ > 1)
@@ -76,8 +83,8 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
                        IOobject::AUTO_WRITE),
                    phase.U().mesh()));
         classVelocity_.set(i, phase.U());
-        xi_.set(i, new dimensionedScalar(
-            "xi" + std::to_string(i), deltaXi_ * (i + 1)));
+        xi_.emplace_back(
+            "xi" + std::to_string(i), deltaXi_ * (i + 1));
         Info << i << " has volume " << xi_[i] << endl;
     }
 }
@@ -90,6 +97,7 @@ volScalarField MOC::classSourceTerm(label i)
 }
 volScalarField MOC::coalescenceSourceTerm(label i)
 {
+    //boost::timer::auto_cpu_timer t;
     volScalarField coalescenceField
     (
         IOobject
@@ -116,14 +124,15 @@ volScalarField MOC::coalescenceSourceTerm(label i)
         // results in drops that are outside of PBE domain
         for(int j = 0; j < classNumberDensity_.size() - i - 1; ++j){
             coalescenceField[celli] -=
-                coalescence_().S(xi_[i], xi_[j], celli).value()
+                coalescence_().S(xi_[i], xi_[j], celli)
                 * classNumberDensity_[j][celli];
         }
+
         coalescenceField[celli] *= classNumberDensity_[i][celli];
         //-1 in pairs account for zero-based numbering
         for(int j = 0; j < i; ++j){
             coalescenceField[celli] +=
-                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli).value()
+                0.5 * coalescence_().S(xi_[i - j - 1], xi_[j], celli)
                 * classNumberDensity_[i - j - 1][celli]
                 * classNumberDensity_[j][celli];
         }
@@ -134,6 +143,7 @@ volScalarField MOC::coalescenceSourceTerm(label i)
 
 volScalarField MOC::breakupSourceTerm(label i)
 {
+    //boost::timer::auto_cpu_timer t;
     volScalarField breakupField(
         IOobject
         (
@@ -160,11 +170,11 @@ volScalarField MOC::breakupSourceTerm(label i)
         breakupField[celli] -=
             breakupCache_[i*phaseSize+celli] * classNumberDensity_[i][celli];
 
-        for (label j = i + 1; j < numberOfClasses_; ++j){
+        for (label j = i + 1; j < classNumberDensity_.size(); ++j){
             // deltaXi comes from the application of mean value theorem on the
             // second integral see Kumar and Ramkrishna (1996) paper
             breakupField[celli] +=
-                daughterParticleDistribution_().beta(xi_[i], xi_[j]).value()
+                daughterParticleDistribution_().beta(xi_[i].value(), xi_[j].value())
                 * breakupCache_[j*phaseSize+celli]
                 * classNumberDensity_[j][celli] * deltaXi_.value();
         }
@@ -173,15 +183,22 @@ volScalarField MOC::breakupSourceTerm(label i)
 }
 
 void MOC::correct(){
+    //boost::timer::auto_cpu_timer t;
+
+    {
+    //boost::timer::auto_cpu_timer t;
+
 
     auto phaseSize = phase_.size();
 
-    for (int i=0; i<numberOfClasses_; ++i){
+    for (int i=0; i<classNumberDensity_.size(); ++i){
         for (int j=0; j<phaseSize; ++j)
-            breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j).value();
+            breakupCache_[i*phaseSize+j] = breakup_->S(xi_[i],j);
     }
 
-    PtrList<volScalarField> S(numberOfClasses_);
+    }
+
+    PtrList<volScalarField> S(classNumberDensity_.size());
     forAll(classNumberDensity_, k){
         S.set(k, classSourceTerm(k));
     }
@@ -326,7 +343,7 @@ const volScalarField MOC::d() const
 {
     volScalarField sum = volumeToDiameter(xi_[0]) * classNumberDensity_[0];
     volScalarField norm = classNumberDensity_[0];
-    for(int i = 1; i < numberOfClasses_; ++i)
+    for(int i = 1; i < classNumberDensity_.size(); ++i)
     {
         sum += volumeToDiameter(xi_[i]) * classNumberDensity_[i];
         norm += classNumberDensity_[i];

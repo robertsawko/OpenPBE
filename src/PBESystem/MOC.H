@@ -59,11 +59,6 @@ class MOC
     public PBEMethod
 {
 private:
- const dictionary MOCDict_;
-
- //- number of size classes
- const label numberOfClasses_;
-
  //- class sizes
  PtrList<volScalarField> classNumberDensity_;
 
@@ -74,7 +69,7 @@ private:
  dimensionedScalar deltaXi_;
 
  //- diameters for each class 
- PtrList<dimensionedScalar> xi_;
+ std::vector<dimensionedScalar> xi_;
 
  bool usingMULES_;
 

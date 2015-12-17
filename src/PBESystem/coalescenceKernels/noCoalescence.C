@@ -48,14 +48,5 @@ noCoalescence::noCoalescence
 {
 }
 
-dimensionedScalar noCoalescenceImpl::S
-(
-        const dimensionedScalar& xi1,
-        const dimensionedScalar& xi2
-) const
-{
-    return dimensionedScalar("S", dimless/dimTime, 0);
-}
-
 } //End namespace coalescenceKernels
 } //End namespace Foam

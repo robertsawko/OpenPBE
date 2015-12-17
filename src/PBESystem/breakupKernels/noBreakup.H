@@ -64,8 +64,8 @@ public:
 
   virtual ~noBreakup() = default;
 
-  dimensionedScalar S(const dimensionedScalar &xi, label celli) const override {
-      return impl_.S(xi);
+  scalar S(const dimensionedScalar &xi, label celli) const override {
+      return impl_.S(xi).value();
   }
 
 private:

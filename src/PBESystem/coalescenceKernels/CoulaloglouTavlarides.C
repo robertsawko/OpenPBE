@@ -55,20 +55,15 @@ CoulaloglouTavlaridesC::CoulaloglouTavlaridesC
 {
 }
 
-dimensionedScalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
+scalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
                                             const dimensionedScalar &xi2,
                                             label celli) const {
 
-    const volScalarField& epsilonField (
+    static const volScalarField& epsilonField (
         phase_.U().mesh().lookupObject<volScalarField>(epsilonName_));
 
-    dimensionedScalar epsilon(
-        "epsilon", epsilonField.dimensions(), epsilonField[celli]),
-        rhod("rhod", rhod_.dimensions(), rhod_[celli]),
-        nud("nud", nud_.dimensions(), nud_[celli]),
-        Vcell("V", dimVolume, phase_.U().mesh().V()[celli]);
-
-    return impl_.S(xi1, xi2, epsilon, rhod, nud, Vcell);
+    return impl_.S(xi1.value(), xi2.value(), epsilonField[celli], rhod_[celli], nud_[celli],
+                   phase_.U().mesh().V()[celli]);
 }
 
 CoulaloglouTavlaridesCImpl::CoulaloglouTavlaridesCImpl(scalar c1,
@@ -79,20 +74,19 @@ CoulaloglouTavlaridesCImpl::CoulaloglouTavlaridesCImpl(scalar c1,
       c1_(c1), c2_(c2), gamma_(gamma), sigma_(sigma)
 {}
 
-dimensionedScalar CoulaloglouTavlaridesCImpl::S
-(
-        const dimensionedScalar& xi1,
-        const dimensionedScalar& xi2,
-        const dimensionedScalar& epsilon,
-        const dimensionedScalar& rhoc,
-        const dimensionedScalar& nuc,
-        const dimensionedScalar& Vcell
+scalar CoulaloglouTavlaridesCImpl::S(
+        scalar xi1,
+        scalar xi2,
+        scalar epsilon,
+        scalar rhoc,
+        scalar nuc,
+        scalar Vcell
 ) const
 {
-    dimensionedScalar xi1pow13 = pow(xi1, 1.0 / 3.0);
-    dimensionedScalar xi2pow13 = pow(xi2, 1.0 / 3.0);
+    scalar xi1pow13 = pow(xi1, 1.0 / 3.0);
+    scalar xi2pow13 = pow(xi2, 1.0 / 3.0);
 
-    dimensionedScalar frequency =
+    scalar frequency =
         c1_ * pow(epsilon, 1.0 / 3.0) *
         pow(xi1pow13 + xi2pow13, 2) *
         pow
@@ -103,16 +97,16 @@ dimensionedScalar CoulaloglouTavlaridesCImpl::S
         / (1 + gamma_) / Vcell;
 
 
-    dimensionedScalar rate =
+    scalar rate =
         exp
         (
-            (- c2_ * rhoc.value() * epsilon.value() * (rhoc * nuc).value()
+            (- c2_ * rhoc * epsilon * (rhoc * nuc)
             / ( pow(sigma_, 2) * pow(1 + gamma_, 3) )
             * pow
                 (
                     xi1pow13 * xi2pow13 / (xi1pow13 + xi2pow13),
                     4.0
-                ).value())
+                ))
         );
 
     return frequency * rate;
