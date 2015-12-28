@@ -73,7 +73,7 @@ include_directories ("$ENV{FOAM_SRC}/finiteVolume/lnInclude")
 set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 
 #gtest for testing
-add_subdirectory(ext/gtest/)
+add_subdirectory(ext/googletest/)
 #find_package(GTest REQUIRED)
 #include_directories(${GTEST_INCLUDE_DIRS})
 #find_package(Boost REQUIRED)
