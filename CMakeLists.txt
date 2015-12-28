@@ -91,6 +91,6 @@ add_subdirectory(applications/PBEFoam)
 
 ##benchmarks
 #set(CMAKE_BUILD_TYPE Release)
-#add_subdirectory(ext/benchmark)
-#set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
-#add_subdirectory(benchmarks)
+add_subdirectory(ext/benchmark)
+set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
+add_subdirectory(benchmarks)
