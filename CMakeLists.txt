@@ -20,12 +20,13 @@ include_directories (${EIGEN3_INCLUDE_DIR})
 #TODO Is there a better way to break lines?
 
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "-O3 -m64 -Dlinux64 -DWM_DP")
+set(CMAKE_CXX_FLAGS "-O3 -m64 -Dlinux64 -DWM_DP -DWM_ARCH_OPTION=64")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWM_LABEL_SIZE=32 -std=c++11")
 #g++ will inform you of unused typedefs and we want to suppress this as there
 #are typedefs like this in OF
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-local-typedefs")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
