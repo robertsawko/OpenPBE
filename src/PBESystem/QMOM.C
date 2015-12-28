@@ -179,7 +179,6 @@ void QMOM::solveWithMULES(const std::vector<volScalarField> &S) {
                      S[k],
                      maxmk,
                      0,
-                     3,
                      true);
     }
 

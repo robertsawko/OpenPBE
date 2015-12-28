@@ -288,7 +288,6 @@ void MOC::solveWithMULES(const PtrList<volScalarField>& S){
             S[k], 
             maxNk,
             0,
-            3,
             true
         );
     }
