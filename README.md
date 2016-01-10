@@ -1,5 +1,10 @@
 #OpenPBE
 
+[![Join the chat at https://gitter.im/robertsawko/OpenPBE](https://badges.gitter.im/robertsawko/OpenPBE.svg)](https://gitter.im/robertsawko/OpenPBE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Join the chat at https://gitter.im/robertsawko/OpenPBE](https://badges.gitter.im/robertsawko/OpenPBE.svg)](https://gitter.im/robertsawko/OpenPBE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
 An implementation of population balance solution strategies for OpenFOAM.
 
 ## Copyright information
