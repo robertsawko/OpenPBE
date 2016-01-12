@@ -4,8 +4,7 @@
 #include "breakupKernels/CoulaloglouTavlarides.H"
 
 static void binaryBreakup(benchmark::State& state) {
-    Foam::dimensionedScalar xi(
-                "xi", Foam::dimensionSet(0, 3, 0, 0, 0), 6);
+    Foam::scalar xi = 6.;
 
     Foam::breakupKernels::binaryBreakupImpl kernel;
 
@@ -16,10 +15,9 @@ static void binaryBreakup(benchmark::State& state) {
 BENCHMARK(binaryBreakup);
 
 static void noBreakup(benchmark::State& state) {
-    Foam::dimensionedScalar xi(
-                "xi", Foam::dimensionSet(0, 3, 0, 0, 0), 6);
+    Foam::scalar xi = 6.;
 
-    Foam::breakupKernels::binaryBreakupImpl kernel;
+    Foam::breakupKernels::noBreakupImpl kernel;
 
     while (state.KeepRunning())
         kernel.S(xi);
