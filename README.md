@@ -47,6 +47,7 @@ git submodule update
 
 # Build the project
 mkdir build
+cd build
 cmake ../
 make # alternatively make -j 4 for parallell build
 ```
