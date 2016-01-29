@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.1.x                                 |
+|  \\    /   O peration     | Version:  2.3.1                                 |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -11,19 +11,17 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      LESProperties;
+    object      turbulenceProperties.oil;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-LESModel        Smagorinsky;
+simulationType  RAS;
 
-printCoeffs     on;
-
-delta           cubeRootVol;
-
-cubeRootVolCoeffs
+RAS
 {
-    deltaCoeff      1;
-}
+    RASModel mixtureKEpsilon; //LaheyKEpsilon;
 
+    turbulence      on;
+    printCoeffs     on;
+}
 // ************************************************************************* //

@@ -1,0 +1,134 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.3;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+phases (acps kerosene);
+
+acps
+{
+    diameterModel   PBEDiameter;
+    PBEDiameterCoeffs
+    {
+        method methodOfClasses;
+        MOCCoeffs
+        {
+            numberOfClasses 3;
+            xi1 1.0e-10;
+            usingMULES 1;
+        }
+        coalescenceKernel noCoalescence;
+        breakupKernel noBreakup;
+        daughterParticleDistribution uniformBinaryBreakup;
+        noCoalescenceCoeffs
+        {}
+        noBreakupCoeffs
+        {}
+        uniformBinaryBreakupCoeffs
+        {}
+        CoulaloglouTavlaridesCoeffs
+        {
+                //c1 and c2 after Hsia and Talvarides (1983)
+                c1	0.1;
+                c2	0.06354;
+                sigma	0.047;
+                gamma	0.0;
+        }
+    }
+    residualAlpha   1e-6;
+}
+
+//aqueous potassium carbonate solution
+kerosene
+{
+    diameterModel constant;
+    constantCoeffs
+    {
+        d               1e-3;
+    }
+    residualAlpha   1e-6;
+}
+
+blending
+{
+    default
+    {
+        type            none;
+        continuousPhase kerosene;
+    }
+}
+
+sigma
+(
+    (kerosene and acps)     0.00
+);
+
+aspectRatio
+(
+    (acps in kerosene)
+    {
+        type            constant;
+        E0              1.0;
+    }
+);
+
+drag
+(
+    (acps in kerosene)
+    {
+        type            SchillerNaumann;
+        residualRe      1e-3;
+        swarmCorrection
+        {
+            type        none;
+        }
+    }
+);
+
+virtualMass
+(
+    (acps in kerosene)
+    {
+        type            constantCoefficient;
+        Cvm             0.5;
+    }
+);
+
+heatTransfer
+(
+    (acps in kerosene)
+    {
+        type            RanzMarshall;
+        residualAlpha   1e-4;
+    }
+);
+
+lift
+(
+);
+
+wallLubrication
+(
+);
+
+turbulentDispersion
+(
+);
+
+// Minimum allowable pressure
+pMin            10000;
+
+
+// ************************************************************************* //

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.1.x                                 |
+|  \\    /   O peration     | Version:  2.3.1                                 |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -11,10 +11,42 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      turbulenceProperties;
+    object      thermophysicalProperties.water;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType RASModel;
+thermoType
+{
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hConst;
+    equationOfState rhoConst;
+    specie          specie;
+    energy          sensibleInternalEnergy;
+}
+
+mixture
+{
+    specie
+    {
+        nMoles      1;
+        molWeight   18;
+    }
+    equationOfState
+    {
+        rho        1166;
+    }
+    thermodynamics
+    {
+        Cp          4195;
+        Hf          0;
+    }
+    transport
+    {
+        mu          1.599752e-03;
+        Pr          2.289;
+    }
+}
 
 // ************************************************************************* //
