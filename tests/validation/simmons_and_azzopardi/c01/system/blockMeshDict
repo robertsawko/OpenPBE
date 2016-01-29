@@ -15,69 +15,81 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 convertToMeters 1;
 
-sqrR    0.00837212;
-oilR    0.0209303;
-waterR  0.0222739;
+diameter   0.063;
+length     4.5;
 
-msqrR    #calc "-$sqrR";
-moilR    #calc "-$oilR";
-mwaterR  #calc "-$waterR";
+corner     #calc "$diameter / sqrt(2.0)";
+
+sqrX       #calc "0.18 * $corner";
+oilX       #calc "0.48 * $corner";
+waterX     #calc "0.50 * $corner";
+
+msqrX      #calc "-$sqrX";
+moilX      #calc "-$oilX";
+mwaterX    #calc "-$waterX";
+
+sqrXarc    #calc "sqrt(2.0) * $sqrX";
+msqrXarc   #calc "-$sqrXarc";
+oilXarc    #calc "sqrt(2.0) * $oilX";
+moilXarc   #calc "-$oilXarc";
+waterXarc  #calc "sqrt(2.0) * $waterX";
+mwaterXarc #calc "-$waterXarc";
 
 vertices
 (
- ($msqrR $msqrR 0 ) //0
- ($sqrR $msqrR 0 ) //1
- ($sqrR $sqrR 0 ) //2
- ($msqrR $sqrR 0 ) //3
- ($msqrR $msqrR 4.5 ) //4
- ($sqrR $msqrR 4.5 ) //5
- ($sqrR $sqrR 4.5 ) //6
- ($msqrR $sqrR 4.5 ) //7
- ($oilR $oilR 0 ) //8
- ($moilR $oilR 0 ) //9
- ($oilR $oilR 4.5 ) //10
- ($moilR $oilR 4.5 ) //11
- ($moilR $moilR 0 ) //12
- ($moilR $moilR 4.5 ) //13
- ($oilR $moilR 0 ) //14
- ($oilR $moilR 4.5 ) //15
- ($waterR $waterR 0 ) //16
- ($mwaterR $waterR 0 ) //17
- ($waterR $waterR 4.5 ) //18
- ($mwaterR $waterR 4.5 ) //19
- ($mwaterR $mwaterR 0 ) //20
- ($mwaterR $mwaterR 4.5 ) //21
- ($waterR $mwaterR 0 ) //22
- ($waterR $mwaterR 4.5 ) //23
+ ($msqrX $msqrX 0 ) //0
+ ($sqrX $msqrX 0 ) //1
+ ($sqrX $sqrX 0 ) //2
+ ($msqrX $sqrX 0 ) //3
+ ($msqrX $msqrX $length ) //4
+ ($sqrX $msqrX $length ) //5
+ ($sqrX $sqrX $length ) //6
+ ($msqrX $sqrX $length ) //7
+ ($oilX $oilX 0 ) //8
+ ($moilX $oilX 0 ) //9
+ ($oilX $oilX $length ) //10
+ ($moilX $oilX $length ) //11
+ ($moilX $moilX 0 ) //12
+ ($moilX $moilX $length ) //13
+ ($oilX $moilX 0 ) //14
+ ($oilX $moilX $length ) //15
+ ($waterX $waterX 0 ) //16
+ ($mwaterX $waterX 0 ) //17
+ ($waterX $waterX $length ) //18
+ ($mwaterX $waterX $length ) //19
+ ($mwaterX $mwaterX 0 ) //20
+ ($mwaterX $mwaterX $length ) //21
+ ($waterX $mwaterX 0 ) //22
+ ($waterX $mwaterX $length ) //23
 );
 
 
 edges
 (
- arc 0 1 (0 -0.0100465 0)
- arc 1 2 (0.0100465 -1.71294e-10 0)
- arc 2 3 (0 0.0100465 0)
- arc 3 0 (-0.0100465 -1.71294e-10 0)
- arc 4 5 (0 -0.0100465 4.5)
- arc 5 6 (0.0100465 -1.71294e-10 4.5)
- arc 6 7 (0 0.0100465 4.5)
- arc 7 4 (-0.0100465 -1.71294e-10 4.5)
- arc 8 9 (-4.11707e-10 0.0295999 0)
- arc 10 11 (-4.11707e-10 0.0295999 4.5)
- arc 9 12 (-0.0295999 9.40878e-10 0)
- arc 11 13 (-0.0295999 9.40878e-10 4.5)
- arc 12 14 (-3.17561e-09 -0.0295999 0)
- arc 13 15 (-3.17561e-09 -0.0295999 4.5)
- arc 14 8 (0.0295999 -1.88176e-09 0)
- arc 15 10 (0.0295999 -1.88176e-09 4.5)
- arc 16 17 (-4.38136e-10 0.0315 0)
- arc 18 19 (-4.38136e-10 0.0315 4.5)
- arc 17 20 (-0.0315 1.00128e-09 0)
- arc 19 21 (-0.0315 1.00128e-09 4.5)
- arc 20 22 (-3.37946e-09 -0.0315 0)
- arc 21 23 (-3.37946e-09 -0.0315 4.5)
- arc 22 16 (0.0315 -2.00255e-09 0)
- arc 23 18 (0.0315 -2.00255e-09 4.5)
+ arc 0 1 (0 $msqrXarc 0)
+ arc 1 2 ($sqrXarc 0 0)
+ arc 2 3 (0 $sqrXarc 0)
+ arc 3 0 ($msqrXarc 0 0)
+ arc 4 5 (0 $msqrXarc $length)
+ arc 5 6 ($sqrXarc 0 $length)
+ arc 6 7 (0 $sqrXarc $length)
+ arc 7 4 ($msqrXarc 0 $length)
+ arc 8 9 (0 $oilXarc 0)
+ arc 10 11 (0 $oilXarc $length)
+ arc 9 12 ($moilXarc 0 0)
+ arc 11 13 ($moilXarc 0 $length)
+ arc 12 14 (0 $moilXarc 0)
+ arc 13 15 (0 $moilXarc $length)
+ arc 14 8 ($oilXarc 0 0)
+ arc 15 10 ($oilXarc 0 $length)
+ arc 16 17 (0 $waterXarc 0)
+ arc 18 19 (0 $waterXarc $length)
+ arc 17 20 ($mwaterXarc 0 0)
+ arc 19 21 ($mwaterXarc 0 $length)
+ arc 20 22 (0 $mwaterXarc 0)
+ arc 21 23 (0 $mwaterXarc $length)
+ arc 22 16 ($waterXarc 0 0)
+ arc 23 18 ($waterXarc 0 $length)
 );
 
 blocks
