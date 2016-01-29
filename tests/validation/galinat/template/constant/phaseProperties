@@ -47,6 +47,7 @@ oil
                 gamma	0.0;
         }
     }
+    residualAlpha   1e-6;
 }
 
 
@@ -57,6 +58,7 @@ water
     {
         d               1e-3;
     }
+    residualAlpha   1e-6;
 }
 
 blending
@@ -87,7 +89,6 @@ drag
     (oil in water)
     {
         type            SchillerNaumann;
-        residualAlpha   1e-6;
         residualRe      1e-3;
         swarmCorrection
         {
