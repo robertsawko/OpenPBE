@@ -27,19 +27,31 @@ gradSchemes
 
 divSchemes
 {
-    default		 Gauss limitedLinear01 1;
-    "div\(phi,alpha.*\)"    Gauss vanLeer;
-    "div\(phir,alpha.*,alpha.*\)"   Gauss vanLeer;
-    "div\(phiAlpha.*,U.*\)" Gauss limitedLinearV 1;
-    "div\(rhoPhi.*,epsilon.*\)" Gauss limitedLinear01 1;
-    "div\(rhoPhi.*,R.*\)" Gauss linear;
-    div(Rc)                 Gauss linear;
-    "div\(phi.*,U.*\)"      Gauss limitedLinearV 1;
+    default                         none;
+
+    div(phi,alpha.acps)              Gauss vanLeer;
+    div(phir,alpha.acps)             Gauss vanLeer;
+    "div\(phi,n.*\)"                     Gauss vanLeer;
+
+    "div\(alphaRhoPhi.*,U.*\)"      Gauss limitedLinearV 1;
+    "div\(phi.*,U.*\)"              Gauss limitedLinearV 1;
+
+    div(phi.acps,kappai.oil)         Gauss vanLeer;
+
+    "div\(alphaRhoPhi.*,(h|e).*\)"  Gauss limitedLinear 1;
+    "div\(alphaRhoPhi.*,K.*\)"      Gauss limitedLinear 1;
+    "div\(alphaPhi.*,p\)"           Gauss limitedLinear 1;
+    "div\(U,nk\)"                   Gauss vanLeer;
+
+    "div\(alphaRhoPhi.*,(k|epsilon).*\)"  Gauss limitedLinear 1;
+    "div\(phim,(k|epsilon)m\)"      Gauss limitedLinear 1;
+
+    "div\(\(\(\(alpha.**thermo:rho.*\)*nuEff.*\)*dev2\(T\(grad\(U.*\)\)\)\)\)" Gauss linear;
 }
 
 laplacianSchemes
 {
-    default         Gauss linear corrected;
+    default         Gauss linear uncorrected;
 }
 
 interpolationSchemes
@@ -49,14 +61,13 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default         corrected;
+    default         uncorrected;
 }
 
 fluxRequired
 {
     default         no;
-    p;
-    pcorr;
+    p               ;
 }
 
 
