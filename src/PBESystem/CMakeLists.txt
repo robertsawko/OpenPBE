@@ -59,5 +59,6 @@ target_link_libraries(PBE ${GSL_LIBRARIES} ${Boost_LIBRARIES})
 set_target_properties (PBE PROPERTIES LIBRARY_OUTPUT_DIRECTORY
   "$ENV{FOAM_USER_LIBBIN}")
 
-
-add_subdirectory(bindings)
+if (BUILD_BINDINGS)
+    add_subdirectory(bindings)
+endif()
