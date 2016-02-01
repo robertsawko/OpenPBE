@@ -33,3 +33,4 @@ PlyParser_FoamFileParser_parsetab.py
 __pycache__/
 *.pyc
 postProcessing
+dynamicCode

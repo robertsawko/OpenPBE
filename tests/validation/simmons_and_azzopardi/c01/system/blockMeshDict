@@ -17,11 +17,13 @@ convertToMeters 1;
 
 diameter   0.063;
 length     4.5;
+oil_inlet_fraction 0.938;
 
 corner     #calc "$diameter / sqrt(2.0)";
 
 sqrX       #calc "0.18 * $corner";
-oilX       #calc "0.48 * $corner";
+// Correction for the area based phase fraction
+oilX       #calc "0.50 * $corner * sqrt($oil_inlet_fraction)";
 waterX     #calc "0.50 * $corner";
 
 msqrX      #calc "-$sqrX";
