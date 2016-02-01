@@ -12,8 +12,12 @@ class test_case:
         self.nr_classes = nr_classes
         dmax = 7.0e-4  # Read from figure9 (could calculate from Hinze!)
         vmax = pi / 6 * dmax**3
+        vhalf = vmax / 2
+        # vmixture = 2.551
+        dpipe = 0.063
+        N = (6.2 * pi / 4 * dpipe**2 * 1) / vhalf
         self.dv, self.Ninit = vmax / nr_classes, zeros(nr_classes)
-        self.Ninit[nr_classes // 2] = 1
+        self.Ninit[nr_classes // 2] = N
 
 
 def case_setup(ci):
@@ -49,7 +53,7 @@ def case_setup(ci):
     #     "n{0}".format(n) for n in range(ci.nr_classes)]
     # controlDict.writeFile()
 
-pbe_grids = [50]
+pbe_grids = [10, 50]
 cases = [test_case(g) for g in pbe_grids]
 
 if __name__ == "__main__":
