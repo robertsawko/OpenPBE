@@ -30,7 +30,7 @@ msqrX      #calc "-$sqrX";
 moilX      #calc "-$oilX";
 mwaterX    #calc "-$waterX";
 
-sqrXarc    #calc "sqrt(2.0) * $sqrX";
+sqrXarc    #calc "sqrt(2.0) * 0.8 * $sqrX";
 msqrXarc   #calc "-$sqrXarc";
 oilXarc    #calc "sqrt(2.0) * $oilX";
 moilXarc   #calc "-$oilXarc";

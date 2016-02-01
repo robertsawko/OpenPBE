@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 0.0225;
+internalField   uniform 0.0;
 
 boundaryField
 {
@@ -33,12 +33,12 @@ boundaryField
     oilInlet
     {
         type            fixedValue;
-        value           uniform 1;
+        value           uniform 0;
     }
     waterInlet
     {
         type            fixedValue;
-        value           uniform 0;
+        value           uniform 1;
     }
 }
 
