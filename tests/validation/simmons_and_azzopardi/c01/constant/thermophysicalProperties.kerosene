@@ -35,7 +35,7 @@ mixture
     }
     equationOfState
     {
-        rho         683.7;
+        rho         797;
     }
     thermodynamics
     {
@@ -44,7 +44,7 @@ mixture
     }
     transport
     {
-        mu          4.498746e-04;
+        mu          0.0018;
         Pr          0.7;
     }
 }

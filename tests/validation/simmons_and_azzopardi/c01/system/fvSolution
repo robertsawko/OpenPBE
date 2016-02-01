@@ -67,9 +67,9 @@ solvers
     {
         solver          smoothSolver;
         smoother        symGaussSeidel;
-        tolerance       1e-8;
-        relTol          0;
-        minIter         1;
+        tolerance       1e-7;
+        relTol          2;
+        minIter         0;
     }
     "(k|epsilon|Theta).*"
     {

@@ -40,12 +40,15 @@ acps
         {}
         CoulaloglouTavlaridesCoeffs
         {
-                //c1 and c2 after Hsia and Talvarides (1983)
-                c1	0.1;
-                c2	0.06354;
-                sigma	0.047;
-                gamma	0.0;
+            //c1 and c2 after Hsia and Talvarides (1983)
+            c1      0.1;
+            c2      0.06354;
+            sigma   0.01;
+            gamma   0.0;
         }
+    }
+    constantCoeffs{
+            d 4.2e-4;
     }
     residualAlpha   1e-6;
 }
@@ -53,7 +56,7 @@ acps
 //aqueous potassium carbonate solution
 kerosene
 {
-    diameterModel constant;
+    diameterModel   constant;
     constantCoeffs
     {
         d               1e-3;

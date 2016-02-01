@@ -17,29 +17,29 @@ FoamFile
 
 dimensions      [0 2 -1 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform 0.0003316;
 
 boundaryField
 {
     outlet
     {
         type            calculated;
-        value           uniform 0;
+        value           $internalField;
     }
     walls
     {
         type            nutkWallFunction;
-        value           uniform 0;
+        value           $internalField;
     }
     oilInlet
     {
         type            calculated;
-        value           uniform 0;
+        value           $internalField;
     }
     waterInlet
     {
         type            calculated;
-        value           uniform 0;
+        value           $internalField;
     }
 }
 
