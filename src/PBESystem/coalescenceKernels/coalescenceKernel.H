@@ -82,6 +82,8 @@ class coalescenceKernel
 
   virtual ~coalescenceKernel() = default;
 
+  virtual void update() {}
+
   virtual scalar S(
       const dimensionedScalar& xi1,
       const dimensionedScalar& xi2,

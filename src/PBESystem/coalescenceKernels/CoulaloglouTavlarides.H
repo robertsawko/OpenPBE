@@ -38,59 +38,50 @@ SourceFiles
 
 #include "coalescenceKernel.H"
 
-namespace Foam
-{
-namespace coalescenceKernels
-{
+namespace Foam {
+namespace coalescenceKernels {
 
-class CoulaloglouTavlaridesCImpl
-{
-public:
- CoulaloglouTavlaridesCImpl(scalar c1, scalar c2, scalar gamma, scalar sigma);
+class CoulaloglouTavlaridesCImpl {
+  public:
+    CoulaloglouTavlaridesCImpl(scalar c1,
+                               scalar c2,
+                               scalar gamma,
+                               scalar sigma);
 
- scalar S
- (scalar xi1,
-         scalar xi2,
-         scalar epsilon,
-         scalar rhoc,
-         scalar nuc,
-         scalar V
- ) const;
+    scalar S(scalar xi1,
+             scalar xi2,
+             scalar epsilon,
+             scalar rhoc,
+             scalar nuc,
+             scalar V) const;
 
-private:
- const scalar c1_;
- const scalar c2_;
- const scalar gamma_;
- const scalar sigma_;
-
+  private:
+    const scalar c1_;
+    const scalar c2_;
+    const scalar gamma_;
+    const scalar sigma_;
 };
 
-class CoulaloglouTavlaridesC
-:
-    public coalescenceKernel
-{
- public:  
-  TypeName("CoulaloglouTavlaridesC")
+class CoulaloglouTavlaridesC : public coalescenceKernel {
+  public:
+    TypeName("CoulaloglouTavlaridesC")
 
-  CoulaloglouTavlaridesC
-  (
-      const dictionary& coalescenceDict,
-      const phaseModel& dispersedPhase
-  );
+        CoulaloglouTavlaridesC(const dictionary &coalescenceDict,
+                               const phaseModel &dispersedPhase);
 
-  virtual ~CoulaloglouTavlaridesC() = default;
+    virtual ~CoulaloglouTavlaridesC() = default;
 
-  scalar S(
-      const dimensionedScalar& xi1,
-      const dimensionedScalar& xi2,
-      label celli) const override;
+    scalar S(const dimensionedScalar &xi1,
+             const dimensionedScalar &xi2,
+             label celli) const override;
+    virtual void update();
 
-private:
-  CoulaloglouTavlaridesCImpl impl_;
-  const phaseModel& phase_;
-  const volScalarField& rhod_;
-  const volScalarField& nud_;
-  const word epsilonName_;
+  private:
+    CoulaloglouTavlaridesCImpl impl_;
+    const phaseModel &phase_;
+    const volScalarField &rhod_;
+    volScalarField nud_;
+    const word epsilonName_;
 };
 
 } // End namespace coalescenceModels
