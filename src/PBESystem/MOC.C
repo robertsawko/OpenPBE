@@ -84,7 +84,6 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 volScalarField MOC::classSourceTerm(label i) {
-    coalescence_().update();
     return coalescenceSourceTerm(i) + breakupSourceTerm(i);
 }
 volScalarField MOC::coalescenceSourceTerm(label i) {
@@ -104,7 +103,11 @@ volScalarField MOC::coalescenceSourceTerm(label i) {
     forAll(phase_, celli) {
         // the upper limit stops from removing mass through coalescence that
         // results in drops that are outside of PBE domain
-
+        for(int j = 0; j < classNumberDensity_.size() - i - 1; ++j){
+            coalescenceField[celli] -=
+                coalescence_().S(xi_[i], xi_[j], celli)
+                * classNumberDensity_[j][celli];
+        }
         coalescenceField[celli] *= classNumberDensity_[i][celli];
         //-1 in pairs account for zero-based numbering
         for (int j = 0; j < i; ++j) {
@@ -164,6 +167,7 @@ void MOC::correct() {
         }
     }
 
+    coalescence_().update();
     PtrList<volScalarField> S(classNumberDensity_.size());
     forAll(classNumberDensity_, k) { S.set(k, classSourceTerm(k)); }
 
