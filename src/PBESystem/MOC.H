@@ -59,6 +59,8 @@ class MOC
     public PBEMethod
 {
 private:
+ const Time& runTime;
+
  //- class sizes
  PtrList<volScalarField> classNumberDensity_;
 
@@ -86,6 +88,8 @@ private:
  void solveWithMULES(const PtrList<volScalarField>& sources);
 
  std::vector<scalar> breakupCache_;
+
+ scalar source_term_relaxation_;
 
 protected:
  // Protected data

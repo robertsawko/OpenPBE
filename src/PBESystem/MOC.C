@@ -47,7 +47,7 @@ inline dimensionedScalar volumeToDiameter(const dimensionedScalar &v) {
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
-    : PBEMethod(pbeProperties, phase), deltaXi_("deltaXi", dimVolume, 0.) {
+    : PBEMethod(pbeProperties, phase), runTime(phase.mesh().time()), deltaXi_("deltaXi", dimVolume, 0.) {
     auto MOCDict_ = pbeProperties.subDict("MOCCoeffs");
     auto numberOfClasses_ = readLabel(MOCDict_.lookup("numberOfClasses"));
 
@@ -57,6 +57,7 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
 
     usingMULES_ = MOCDict_.lookupOrDefault<Switch>("usingMULES", false);
     breakupCache_.resize(numberOfClasses_ * phase.size());
+    source_term_relaxation_ = readScalar(MOCDict_.lookup("relaxation"));
 
     Info << "Creating " << numberOfClasses_ << " class";
     // Taking pedantry one step too far!
@@ -84,7 +85,9 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 volScalarField MOC::classSourceTerm(label i) {
-    return coalescenceSourceTerm(i) + breakupSourceTerm(i);
+    return max(
+        coalescenceSourceTerm(i) + breakupSourceTerm(i),
+        - source_term_relaxation_ * classNumberDensity_[i] / runTime.deltaT());
 }
 volScalarField MOC::coalescenceSourceTerm(label i) {
     // boost::timer::auto_cpu_timer t;
@@ -175,6 +178,9 @@ void MOC::correct() {
         solveWithMULES(S);
     else
         solveWithFVM(S);
+    forAll(classNumberDensity_, k) { 
+        Info << min(classNumberDensity_[k]) << endl;
+    }
 }
 
 void MOC::solveWithFVM(const PtrList<volScalarField> &S) {
