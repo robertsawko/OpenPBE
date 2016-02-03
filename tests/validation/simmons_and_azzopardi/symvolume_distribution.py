@@ -11,20 +11,17 @@ C1 then Y=phi(X) has a PDF given by:
 
 where, h(s) = phi^{-1}(s) and I=(a, b)
 """
-from sympy import symbols, diff, pi, sqrt, exp, log, Rational, Function
-from sympy.utilities.lambdify import implemented_function
-from sympy import pprint
-
-v = symbols('v', positive=True)
-sigma = 0.23482069474132783
-mu = -7.8028262260262604
+from sympy import symbols, diff, pi, sqrt, exp, log, Rational
 
 
-def diameter_pdf(d):
-    return 1 / (d * sigma * sqrt(2 * pi)) * exp(
-        - (log(d) - mu)**2 / (2 * sigma**2))
+def construct_pdfs(mu, sigma):
+    v = symbols('v', positive=True)
+    d = symbols('d', positive=True)
 
-h = (6 / pi * v)**Rational(1, 3)
-hprime = diff(h)
-volume_pdf = diameter_pdf(h) * abs(hprime)
-pprint(volume_pdf)
+    def diameter_pdf(d):
+        return 1 / (d * sigma * sqrt(2 * pi)) * exp(
+            - (log(d) - mu)**2 / (2 * sigma**2))
+
+    h = (6 / pi * v)**Rational(1, 3)
+    hprime = diff(h)
+    return v, diameter_pdf(h) * abs(hprime), d, diameter_pdf(d)
