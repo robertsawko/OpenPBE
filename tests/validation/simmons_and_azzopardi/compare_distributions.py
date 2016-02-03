@@ -2,7 +2,7 @@ from numpy import pi, exp, log, sqrt
 from scipy.stats import lognorm
 from sympy import lambdify
 from numpy import histogram, linspace
-from symvolume_distribution import construct_pdfs
+from symcalc import construct_pdfs
 from matplotlib.pyplot import figure
 
 # Below are the sample mean and standard deviation of the non-logorithmicied
