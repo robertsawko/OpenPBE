@@ -1,5 +1,23 @@
 # Simmons and Azzopardi case
 
+Horizontal case is selected
+
+| Dir | Mixture superficial velocity [m/s] | Dispersed phase concentration [%]|
+| --- |:----------------------------------:|:--------------------------------:|
+| c01 | 2.551                              | 6.2                              |
+
+## Inlet and initial conditions
+
+The inlet is subivided into a ring area and the centre area. The ring area
+occupies the area equal to the percentage of the volume fraction of the
+dispersed phase.
+
+### Velocity
+
+Mixture velocity is specified for both inlet regions.
+
+### Method of classes
+
 Inlet and initial conditions:
  * log-normally distributed diameter,
  * mean diameter 500micron with 50micron std,

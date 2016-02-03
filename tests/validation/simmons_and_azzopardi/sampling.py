@@ -1,3 +1,9 @@
+"""
+Sampling example that provides validation of symbolic calculation from symcalc.
+In this example N diameters is selected with lognormal distribution and then
+transformed into volumes. Subsequently plots are constructed with analytical
+and empircal distributions.
+"""
 from numpy import pi, exp, log, sqrt
 from scipy.stats import lognorm
 from sympy import lambdify
@@ -14,6 +20,7 @@ s2 = s**2  # Variance
 # https://en.wikipedia.org/wiki/Log-normal_distribution#Notation
 mu = log(m / sqrt(1 + s2 / (m**2)))
 sigma = sqrt(log(1 + s2 / m**2))
+
 v, volume_pdf, d, diameter_pdf = construct_pdfs(mu, sigma)
 
 f = lambdify(v, volume_pdf, "numpy")

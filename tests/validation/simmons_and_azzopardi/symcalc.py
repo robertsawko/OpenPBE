@@ -2,7 +2,8 @@
 Provide a volume distribution consistent with the log-normal diameter
 distribution.
 
-Sztencel and Jakubowski "Wstęp do Rachunku Prawdopodobieństwa" 5.5.
+Sztencel and Jakubowski "Wstęp do Rachunku Prawdopodobieństwa" section 5.5.
+2000 Warszawa
 
 If X has a continuous PDF f on (a,b) and function phi:(a, b) -> R is of class
 C1 then Y=phi(X) has a PDF given by:

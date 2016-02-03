@@ -34,6 +34,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Build
 
+Requires
+
+ * CMake version ???
+ * Eigen 3
+
 ```bash
 # Clone the project
 

@@ -1,16 +1,16 @@
+"""
+Scripts that sets up cases with a specified number of classes and with the use
+of expressions consistent with log-normal diameter distribution.
+
+Requires PyFoam
+"""
 from os import path
 from PyFoam.RunDictionary.SolutionDirectory import SolutionDirectory
 from PyFoam.RunDictionary.ParsedParameterFile import ParsedParameterFile
 from numpy import pi, log, sqrt, linspace
 from symcalc import construct_pdfs
-from scipy.stats import lognorm
 from sympy import lambdify
 from scipy.integrate import trapz
-
-
-def log_normal(x, d32, d03):
-    sigma = log(d32 / d03)
-    return lognorm.pdf(x, s=sigma, scale=d03)
 
 
 class test_case:
