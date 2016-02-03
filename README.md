@@ -7,7 +7,7 @@ An implementation of population balance solution strategies for OpenFOAM.
 
 ## Copyright information
 
-    Copyright (C) 2013-2015
+    Copyright (C) 2013-2016
     OpenPBE developers
     Cranfield University, UK
 
@@ -34,14 +34,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Build
 
-Requires
+### Requirements
 
- * CMake version ???
+ * CMake version 2.6 or higher
  * Eigen 3
+ * googletest (development optional)
+ * benchmark (development optional)
+
+
+### Basic
 
 ```bash
 # Clone the project
+# Load OpenFOAM environment
 
+cd <project_dir>
+mkdir build
+cd build
+cmake ../
+make # alternatively make -j 4 for parallell build
+```
+
+### Development
+
+```bash
+# Clone the project
 # Load OpenFOAM environment
 
 cd <project_dir>
@@ -53,7 +70,8 @@ git submodule update
 # Build the project
 mkdir build
 cd build
-cmake ../
+ccmake ../  # Alternatively cmake with appropriate options
+# Configure require options
 make # alternatively make -j 4 for parallell build
 ```
 

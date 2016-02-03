@@ -59,9 +59,7 @@ endmacro (TARGET_LINK_OPENFOAM_USERLIB)
 
 enable_testing()
 
-#option (UseOldLibs "Use old libraries" OFF)
 #General includes required by all code
-#include_directories ("${PROJECT_SOURCE_DIR}/src/multiphaseTurbulence/turbulenceModel")
 include_directories ("$ENV{FOAM_SRC}/OpenFOAM/lnInclude")
 include_directories ("$ENV{FOAM_SRC}/OSspecific/POSIX/lnInclude")
 
