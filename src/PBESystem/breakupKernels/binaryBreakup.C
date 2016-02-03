@@ -48,8 +48,8 @@ binaryBreakup::binaryBreakup
 {
 }
 
-dimensionedScalar binaryBreakupImpl::S(const dimensionedScalar &xi) const {
-    return dimensionedScalar("S", dimless / dimTime, pow(xi.value(), 2));
+scalar binaryBreakupImpl::S(scalar xi) const {
+    return pow(xi, 2);
 }
 
 } //End namespace breakupKernels

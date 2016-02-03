@@ -48,9 +48,9 @@ noBreakup::noBreakup
 {
 }
 
-dimensionedScalar noBreakupImpl::S(const dimensionedScalar &xi) const
+scalar noBreakupImpl::S(scalar xi) const
 {
-    return dimensionedScalar("S", dimless / dimTime, 0);
+    return 0.;
 }
 
 } //End namespace breakupKernels

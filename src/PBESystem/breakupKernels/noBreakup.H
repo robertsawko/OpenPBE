@@ -46,7 +46,7 @@ namespace breakupKernels
 class noBreakupImpl
 {
 public:
-    dimensionedScalar S(const dimensionedScalar& xi) const;
+    scalar S(scalar xi) const;
 };
 
 class noBreakup
@@ -65,7 +65,7 @@ public:
   virtual ~noBreakup() = default;
 
   scalar S(const dimensionedScalar &xi, label celli) const override {
-      return impl_.S(xi).value();
+      return impl_.S(xi.value());
   }
 
 private:

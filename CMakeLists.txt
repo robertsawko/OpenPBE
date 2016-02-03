@@ -73,7 +73,7 @@ include_directories ("$ENV{FOAM_SRC}/finiteVolume/lnInclude")
 set_source_files_properties(filename.c PROPERTIES LANGUAGE CXX )
 
 #gtest for testing
-add_subdirectory(ext/googletest/)
+
 #find_package(GTest REQUIRED)
 #include_directories(${GTEST_INCLUDE_DIRS})
 #find_package(Boost REQUIRED)
@@ -84,13 +84,21 @@ add_subdirectory(ext/googletest/)
 add_subdirectory(src/PBESystem)
 add_subdirectory(applications/PBEFoam)
 
+set(BUILD_TESTS false CACHE BOOL "Build tests")
+set(BUILD_BINDINGS false CACHE BOOL "Build python bindings")
+set(BUILD_BENCHMARKS false CACHE BOOL "Build benchmarks")
 
 ##unit tests
-#find_package (Threads)
-#add_subdirectory(tests)
+if (BUILD_TESTS)
+    add_subdirectory(ext/googletest/)
+    find_package (Threads)
+    add_subdirectory(tests)
+endif()
 
 ##benchmarks
-#set(CMAKE_BUILD_TYPE Release)
-add_subdirectory(ext/benchmark)
-set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
-add_subdirectory(benchmarks)
+if (BUILD_BENCHMARKS)
+    add_subdirectory(ext/benchmark)
+    set(GBENCH_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/benchmark/include)
+    add_subdirectory(benchmarks)
+endif()
+
