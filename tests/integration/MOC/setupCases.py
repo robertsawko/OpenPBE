@@ -32,11 +32,9 @@ class breakup_case(test_case):
                 return 1
 
         test_case.__init__(
-            self, "pure_br", nr_classes, self.l,
-            Nbr0,
-            "phaseProperties.breakup",
-            10, 0.005
-
+            self, "pure_br", nr_classes, vmax=self.l,
+            Ninit=Nbr0, phase_properties_name="phaseProperties.breakup",
+            end_time=10, delta_t=0.005
         )
 
 
@@ -50,9 +48,9 @@ class coalescence_case(test_case):
         self.C = C
         test_case.__init__(
             self, "pure_coal", nr_classes, vmax,
-            lambda v: (N0 / v0) * (v / v0) * exp(-v / v0) * dv,
-            "phaseProperties.coalescence",
-            1, 0.001
+            Ninit=lambda v: (N0 / v0) * (v / v0) * exp(-v / v0) * dv,
+            phase_properties_name="phaseProperties.coalescence",
+            end_time=1, delta_t=0.001
         )
 
 
