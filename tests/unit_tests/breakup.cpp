@@ -4,18 +4,16 @@
 #include "breakupKernels/CoulaloglouTavlarides.H"
 
 TEST(breakup, binary){
-    Foam::dimensionedScalar xi(
-        "xi", Foam::dimensionSet(0, 3, 0, 0, 0), 6);
+    Foam::scalar xi(6);
 
-    Foam::dimensionedScalar expected(
-        "expected", Foam::dimensionSet(0, 0, -1, 0, 0), 36);
+    Foam::scalar expected(36);
 
     Foam::breakupKernels::binaryBreakupImpl kernel;
 
     auto result = kernel.S(xi);
 
-    ASSERT_EQ(expected.value(), result.value());
-    ASSERT_EQ(expected.dimensions(), result.dimensions());
+    ASSERT_EQ(expected, result);
+    // ASSERT_EQ(expected.dimensions(), result.dimensions());
 }
 
 TEST(breakup, none){
@@ -27,10 +25,10 @@ TEST(breakup, none){
 
     Foam::breakupKernels::noBreakupImpl kernel;
 
-    auto result = kernel.S(xi);
+    auto result = kernel.S(xi.value());
 
-    ASSERT_EQ(expected.value(), result.value());
-    ASSERT_EQ(expected.dimensions(), result.dimensions());
+    ASSERT_EQ(expected.value(), result);
+    //ASSERT_EQ(expected.dimensions(), result.dimensions());
 }
 
 TEST(breakup, CoulaloglouTavlarides){
@@ -53,9 +51,9 @@ TEST(breakup, CoulaloglouTavlarides){
 
     Foam::breakupKernels::CoulaloglouTavlaridesImp kernel(C1, C2, alpha, sigma);
 
-    auto result = kernel.S(xi, rho_d, epsilon);
+    auto result = kernel.S(xi.value(), rho_d.value(), epsilon.value());
 
-    ASSERT_DOUBLE_EQ(expected.value(), result.value());
-    for(int i = 0; i < 7; ++i)
-        ASSERT_NEAR(expected.dimensions()[i], result.dimensions()[i], 1e-9);
+    ASSERT_DOUBLE_EQ(expected.value(), result);
+    //for(int i = 0; i < 7; ++i)
+        //ASSERT_NEAR(expected.dimensions()[i], result.dimensions()[i], 1e-9);
 }

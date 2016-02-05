@@ -90,6 +90,7 @@ set(BUILD_BENCHMARKS false CACHE BOOL "Build benchmarks")
 if (BUILD_TESTS)
     add_subdirectory(ext/googletest/)
     find_package (Threads)
+    set(GTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/ext/googletest/googletest/include)
     add_subdirectory(tests)
 endif()
 
