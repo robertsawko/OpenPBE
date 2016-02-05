@@ -40,14 +40,10 @@ CoulaloglouTavlaridesC::CoulaloglouTavlaridesC(
             coalescenceDict.lookupOrDefault<scalar>("c2", 0.008),
             coalescenceDict.lookupOrDefault<scalar>("gamma", 0.0),
             coalescenceDict.lookupOrDefault<scalar>("sigma", 0.047)),
-      phase_(dispersedPhase),
-      rhod_(dispersedPhase.rho()),
-      nud_(dispersedPhase.nu()),
-      epsilonName_("epsilon." + phase_.name()) {}
+      phase_(dispersedPhase), rhod_(dispersedPhase.rho()),
+      nud_(dispersedPhase.nu()), epsilonName_("epsilon." + phase_.name()) {}
 
-void CoulaloglouTavlaridesC::update(){
-    nud_ = dispersedPhase_.nu()();
-}
+void CoulaloglouTavlaridesC::update() { nud_ = dispersedPhase_.nu()(); }
 
 scalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
                                  const dimensionedScalar &xi2,
@@ -79,10 +75,12 @@ scalar CoulaloglouTavlaridesCImpl::S(scalar xi1,
     scalar xi1pow13 = pow(xi1, 1.0 / 3.0);
     scalar xi2pow13 = pow(xi2, 1.0 / 3.0);
 
+    // TODO investigate: Vcell is causing mesh effects. Is this supposed to be a
+    // constant parameter?
     scalar frequency = c1_ * pow(epsilon, 1.0 / 3.0) *
                        pow(xi1pow13 + xi2pow13, 2) *
                        pow(pow(xi1, 2.0 / 9.0) + pow(xi2, 2.0 / 9.0), 0.5) /
-                       (1 + gamma_) / Vcell;
+                       (1 + gamma_); // / Vcell;
 
     scalar rate = exp((-c2_ * rhoc * epsilon * (rhoc * nuc) /
                        (pow(sigma_, 2) * pow(1 + gamma_, 3)) *
