@@ -26,6 +26,7 @@ set(lib_header_files
   dummy.H
   MOC.H
   MOM.H
+  dMOM.H
   QMOM.H
   Integrator.H
   Utility.H
@@ -48,6 +49,7 @@ set(lib_source_files
   dummy.C
   MOC.C
   MOM.C
+  dMOM.C
   QMOM.C
   Utility.C
   MomentInversion.C
