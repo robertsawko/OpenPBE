@@ -25,7 +25,18 @@ Class
     Foam::dMOM
 
 Description
-   Method of moment solution with diamter as an internal variable.
+
+   Method of moment solution with diamter as an internal variable. The
+   implementation is based on:
+
+   Lo, S. and Rao, P. "Modelling of droplet breakup and coalescence in an
+   oil-water pipeline." 6th International Conference of Multiphase Flow,
+   2007
+
+   Assumptions are:
+    * specif breakup and coalescence models (integrated analytically),
+    * log-normal distribution of the diameter.
+
 
 SourceFiles
     dMOM.C
