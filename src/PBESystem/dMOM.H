@@ -70,9 +70,9 @@ private:
  volScalarField d_;
 
  //gamma distribution parameters
- volScalarField gamma_k_;
- volScalarField gamma_theta_;
- volScalarField gamma_c0_;
+ volScalarField log_d_bar_;
+ volScalarField sigma_hat_;
+ volScalarField number_density_;
 
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);
@@ -82,6 +82,8 @@ private:
  tmp<volScalarField> momentSourceTerm(label momenti);
 
  // Private member functions
+ 
+ volScalarField calculateSauterMean();
  
  //- Update values of moments and diameter
  void updateMoments();

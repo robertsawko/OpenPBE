@@ -27,7 +27,6 @@ License
 #include <sstream>
 #include <cmath>
 
-#include <boost/math/distributions/gamma.hpp>
 #include <cassert>
 
 #include "dMOM.H"
@@ -52,12 +51,16 @@ defineTypeNameAndDebug(dMOM, 0);
 addToRunTimeSelectionTable(PBEMethod, dMOM, dictionary);
 // * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
 
-
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+using constant::mathematical::pi;
 
+
+volScalarField dMOM::calculateSauterMean(){
+    // Diameter is assumed to be Sauter mean by following equation (6)
+    return 6.0 / pi * dispersedPhase_ / moments_[2];
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-using constant::mathematical::pi;
 
 dMOM::dMOM
 (
@@ -83,92 +86,90 @@ dMOM::dMOM
         mesh_,
         dimensionedScalar("diameter", dimLength, 0.0)
     ) ,
-    gamma_k_
+    log_d_bar_
     (
         IOobject
         (
-            "gamma_k",
+            "log(d bar)",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_k", dimless, 0.0)
+        dimensionedScalar("log(d bar)", dimless, 0.0)
     ),
-    gamma_theta_
+    sigma_hat_
     (
         IOobject
         (
-            "gamma_theta",
+            "sigma hat",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("gamma_theta", dimVolume, 0.0)
+        dimensionedScalar("sigma_hat", dimLength, 0.0)
     ),
-    gamma_c0_
+    number_density_
     (
         IOobject
         (
-            "gamma_c0",
+            "n",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("c0", dimless, 0.0)
+        dimensionedScalar("n", dimless, 0.0)
     )
 {
-    for (std::size_t i = 0; i<3; ++i){
+    for (std::size_t i = 0; i < 3; ++i){
         moments_.emplace_back
+            (
+                IOobject
                 (
-                    IOobject
-                    (
-                        "m" + std::to_string(i),
-                        mesh_.time().timeName(),
-                        mesh_,
-                        IOobject::MUST_READ,
-                        IOobject::AUTO_WRITE
-                    ),
-                    mesh_
-                );
+                    "m" + std::to_string(i),
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::MUST_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_
+            );
     }
 
-    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0 / 3.0);
+    d_ = calculateSauterMean();
 }
 
 dMOM::~dMOM()
 {
-
 }
+
 void dMOM::correct()
 {
-    Info<< "updating size moments" << endl;
-    gamma_c0_ = moments_[0];
-    gamma_k_ = pow(moments_[1] , 2)
-        / (moments_[2] * moments_[0] - pow(moments_[1],2)
-           + dimensionedScalar("small", dimensionSet(0, 6, 0, 0, 0), SMALL));
+    // Creating aliases to shorten notation
+    const volScalarField& m1 = moments_[1];
+    const volScalarField& m2 = moments_[2];
+    // Non-logarithmized variance
+    const volScalarField v = m2 - pow(m1, 2);
 
-    gamma_theta_ =
-        (moments_[0] * moments_[2] - pow(moments_[1], 2))
-        /
-        max(
-            moments_[0] * moments_[1],
-            dimensionedScalar("small", dimensionSet(0,3,0,0,0), SMALL)
-        );
-    
-    Info<< "gamma parameters:" << endl;
-    printAvgMaxMin(mesh_, gamma_c0_);
-    printAvgMaxMin(mesh_, gamma_k_);
-    printAvgMaxMin(mesh_, gamma_theta_);
+    Info<< "updating size moments" << endl;
+    number_density_ = moments_[0];
+    // Moment inversion is given analytically (see )
+    log_d_bar_ = log(m1 / sqrt(1 + v / pow(m1, 2)));
+    sigma_hat_ = sqrt(log(1.0 + v / pow(m1, 2)));
+
+    Info<< "Lognormal parameters:" << endl;
+    printAvgMaxMin(mesh_, number_density_);
+    printAvgMaxMin(mesh_, log_d_bar_);
+    printAvgMaxMin(mesh_, sigma_hat_);
 
     std::vector<volScalarField> mSources_;
 
-    for (std::size_t i = 0; i<moments_.size(); ++i){
+    for (std::size_t i = 0; i<moments_.size(); ++i) {
         mSources_.emplace_back
                 (
                     IOobject
@@ -230,7 +231,7 @@ void dMOM::correct()
         printAvgMaxMin(mesh_, moment);
     }
 
-    d_ = pow(6.0 / pi * moments_[1] / moments_[0], 1.0/3.0);
+    d_ = calculateSauterMean();
 
     printAvgMaxMin(mesh_, d_);
 }
@@ -253,8 +254,8 @@ tmp<volScalarField> dMOM::momentSourceTerm(label momenti)
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
-using GammaDistribution = boost::math::gamma_distribution<>;
-using boost::math::pdf;
+// using GammaDistribution = boost::math::gamma_distribution<>;
+// using boost::math::pdf;
 
 tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
 {
@@ -280,6 +281,7 @@ tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
+        /*
         GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
         auto m0 = moments_[0][celli];
@@ -311,6 +313,7 @@ tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
 
         toReturn[celli] = integrate(birthIntegrand, 0.) / 2. -
                           integrate(deathIntegrand, 0.);
+                          */
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
@@ -340,6 +343,7 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
+        /*
         GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 
         auto m0 = moments_[0][celli];
@@ -360,6 +364,7 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
         };
 
         toReturn[celli] = integrate(breakupSourceIntegrand, 0.);
+        */
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
