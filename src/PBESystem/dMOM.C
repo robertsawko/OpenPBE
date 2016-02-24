@@ -40,6 +40,7 @@ License
 #include "Integrator.H"
 #include "mathematicalConstants.H"
 #include "Utility.H"
+#include "twoPhaseSystem.C"
 
 namespace Foam
 {
@@ -106,8 +107,12 @@ dMOM::dMOM
         ),
         mesh_,
         dimensionedScalar("n", dimless, 0.0)
-    )
+    ),
+    Nf_(2.0),       // Both papers take 2. TODO: Could make user slectible
+    C_alpha_(0.5),  // TODO: This is not specified in any of the papers!
+    We_cr_(0.31)    // Following paper [2], which cites Yo and Morel (2001)
 {
+
     for (std::size_t i = 0; i < 3; ++i){
         moments_.emplace_back
             (
@@ -216,7 +221,7 @@ void dMOM::correct()
 
 const volScalarField dMOM::d() const
 {
-    // Diameter is assumed to be Sauter mean by following equation (6)
+    // Diameter is assumed to be Sauter mean by following equation (6) in [1]
     return 6.0 / pi * dispersedPhase_ / moments_[2];
 }
 
@@ -320,8 +325,17 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
         ) 
     );
 
+    const volScalarField& epsilon =
+        dispersedPhase_.U().mesh().lookupObject<volScalarField>(
+            "epsilon."+ dispersedPhase_.name());
+    const scalar sigma = phase_.fluid().sigma().value();
+
     forAll(dispersedPhase_, celli)
     {
+        scalar d_cr =
+            (1 + C_alpha_) *
+            pow(2 * sigma * We_cr_ / phase_.rho()[celli], 3.0 / 5.0) *
+            pow(epsilon[celli], -2.0 / 5.0);
         /*
         GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
 

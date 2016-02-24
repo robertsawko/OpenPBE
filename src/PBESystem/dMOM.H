@@ -29,9 +29,13 @@ Description
    Method of moment solution with diamter as an internal variable. The
    implementation is based on:
 
-   Lo, S. and Rao, P. "Modelling of droplet breakup and coalescence in an
+   [1] Lo, S. and Rao, P. "Modelling of droplet breakup and coalescence in an
    oil-water pipeline." 6th International Conference of Multiphase Flow,
    2007
+
+   [2] Lo, S. and Zhang, D. "Modelling of breakup and coalescence in vertical
+   bubbly two-phase flows" 6th International Conference on CFD in Oil and Gas,
+   Metalurgical and Process Inustries, 2008
 
    Assumptions are:
     * specific breakup and coalescence models (integrated analytically),
@@ -67,10 +71,15 @@ private:
 
  std::vector<volScalarField> moments_;
 
- //gamma distribution parameters
+ //log-normal distribution parameters
  volScalarField log_d_bar_;
  volScalarField sigma_hat_;
  volScalarField number_density_;
+
+ //Modelling parameters
+ const scalar Nf_;
+ const scalar C_alpha_;
+ const scalar We_cr_;
 
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);
