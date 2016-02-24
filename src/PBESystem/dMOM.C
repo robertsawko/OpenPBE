@@ -55,11 +55,6 @@ addToRunTimeSelectionTable(PBEMethod, dMOM, dictionary);
 using constant::mathematical::pi;
 
 
-volScalarField dMOM::calculateSauterMean(){
-    // Diameter is assumed to be Sauter mean by following equation (6)
-    return 6.0 / pi * dispersedPhase_ / moments_[2];
-}
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 dMOM::dMOM
@@ -73,19 +68,6 @@ dMOM::dMOM
     dispersedPhase_(phase),
     mesh_(dispersedPhase_.U().mesh()),
     moments_(),
-    d_
-    (
-        IOobject
-        (
-            "diameter",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar("diameter", dimLength, 0.0)
-    ) ,
     log_d_bar_
     (
         IOobject
@@ -140,8 +122,6 @@ dMOM::dMOM
                 mesh_
             );
     }
-
-    d_ = calculateSauterMean();
 }
 
 dMOM::~dMOM()
@@ -231,14 +211,13 @@ void dMOM::correct()
         printAvgMaxMin(mesh_, moment);
     }
 
-    d_ = calculateSauterMean();
-
-    printAvgMaxMin(mesh_, d_);
+    printAvgMaxMin(mesh_, d());
 }
 
 const volScalarField dMOM::d() const
 {
-    return d_;
+    // Diameter is assumed to be Sauter mean by following equation (6)
+    return 6.0 / pi * dispersedPhase_ / moments_[2];
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //

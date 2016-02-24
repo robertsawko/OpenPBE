@@ -34,7 +34,7 @@ Description
    2007
 
    Assumptions are:
-    * specif breakup and coalescence models (integrated analytically),
+    * specific breakup and coalescence models (integrated analytically),
     * log-normal distribution of the diameter.
 
 
@@ -67,8 +67,6 @@ private:
 
  std::vector<volScalarField> moments_;
 
- volScalarField d_;
-
  //gamma distribution parameters
  volScalarField log_d_bar_;
  volScalarField sigma_hat_;
@@ -82,8 +80,6 @@ private:
  tmp<volScalarField> momentSourceTerm(label momenti);
 
  // Private member functions
- 
- volScalarField calculateSauterMean();
  
  //- Update values of moments and diameter
  void updateMoments();
