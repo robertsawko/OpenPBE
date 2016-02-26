@@ -41,12 +41,12 @@ License
 #include "mathematicalConstants.H"
 #include "Utility.H"
 #include "twoPhaseSystem.C"
+#include <boost/math/distributions/normal.hpp> // for normal_distribution
 
 namespace Foam
 {
 namespace PBEMethods
 {
-
 
 defineTypeNameAndDebug(dMOM, 0);
 addToRunTimeSelectionTable(PBEMethod, dMOM, dictionary);
@@ -110,9 +110,9 @@ dMOM::dMOM
     ),
     Nf_(2.0),       // Both papers take 2. TODO: Could make user slectible
     C_alpha_(0.5),  // TODO: This is not specified in any of the papers!
-    We_cr_(0.31)    // Following paper [2], which cites Yo and Morel (2001)
+    We_cr_(0.31),   // Following paper [2], which cites Yo and Morel (2001)
+    k_br_(0.2)      // Following paper [2], comment below equation [30]
 {
-
     for (std::size_t i = 0; i < 3; ++i){
         moments_.emplace_back
             (
@@ -238,9 +238,6 @@ tmp<volScalarField> dMOM::momentSourceTerm(label momenti)
     return cS + bS;// breakupSourceTerm(momenti);
 }
 
-// using GammaDistribution = boost::math::gamma_distribution<>;
-// using boost::math::pdf;
-
 tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
 {
     volScalarField toReturn
@@ -303,6 +300,9 @@ tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
     return tmp<volScalarField>( new volScalarField(toReturn));
 }
 
+using boost::math::normal;
+using boost::math::pdf;
+
 tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
 {
     volScalarField toReturn
@@ -329,35 +329,52 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
         dispersedPhase_.U().mesh().lookupObject<volScalarField>(
             "epsilon."+ dispersedPhase_.name());
     const scalar sigma = phase_.fluid().sigma().value();
+    const label& gamma = momenti;
 
     forAll(dispersedPhase_, celli)
     {
-        scalar d_cr =
+        // scalar d_cr_viscous =
+        //    2 * sigma * Omega_cr_ / muc / gamma;
+
+        scalar d_cr_inertia =
             (1 + C_alpha_) *
             pow(2 * sigma * We_cr_ / phase_.rho()[celli], 3.0 / 5.0) *
             pow(epsilon[celli], -2.0 / 5.0);
-        /*
-        GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
+        
+        // Physical constants
+        auto tau_inertia_constant = 2 * pi * k_br_ * sqrt(
+            (3 * phase_.rho()[celli] + 2 * phase_.otherPhase().rho()[celli]) /
+            (192 * sigma)
+        );
 
-        auto m0 = moments_[0][celli];
 
-        auto breakupSourceIntegrand = [&](double xi) {
-            scalar breakupDeath =
-                breakup_->S(xi, celli) * m0 * pdf(gamma, xi);
+        // Modified distribution parameters
+        auto& std = sigma_hat_[celli];
+        auto mu = log_d_bar_[celli] + (gamma - 1.5) * std;
+        auto x_crit = log(d_cr_inertia);
 
-            auto breakupBirthIntegrand = [&](double xi_prime) {
-                return daughterParticleDistribution_->beta(xi, xi_prime) *
-                       breakup_->S(xi_prime, celli) * m0 *
-                       pdf(gamma, xi_prime);
-            };
+        normal distribution(mu, std);
 
-            double breakupBirth = integrate(breakupBirthIntegrand, xi);
-
-            return pow(xi, momenti) * (breakupBirth - breakupDeath);
-        };
-
-        toReturn[celli] = integrate(breakupSourceIntegrand, 0.);
-        */
+        toReturn[celli] = 
+            // DPD constant contribution; the remaining d^gamma goes into
+            // correction factor
+            (pow(Nf_, (3 - gamma) / 3) - 1.0) *
+            (
+                // Viscous breakup
+                // ??? +
+                // Inertial breakup contribution
+                1 / tau_inertia_constant * 
+                (1 - cdf(distribution, x_crit)) * //TODO: does x_crit need
+                // limiting? This is the correction factor that results from the
+                // x = log(d) substitution and the follow up term rearrangment.
+                // TODO: Needs more doc!
+                exp( 
+                    pow(gamma * std, 2) +
+                    2.0 * gamma * mu - 
+                    3.0 * gamma * pow(std, 2) - 
+                    3.0 * mu +
+                    9.0 / 4.0 * pow(sigma, 2))
+            );
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));

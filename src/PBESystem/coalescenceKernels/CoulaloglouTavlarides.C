@@ -55,7 +55,7 @@ scalar CoulaloglouTavlaridesC::S(const dimensionedScalar &xi1,
     return impl_.S(xi1.value(),
                    xi2.value(),
                    epsilonField[celli],
-                   rhod_[celli],
+                   rhod_[celli], //TODO why is rhod being fed to rhoc param???
                    nud_[celli],
                    phase_.U().mesh().V()[celli]);
 }
