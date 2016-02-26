@@ -353,37 +353,54 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
             pow(2 * sigma * We_cr_ / phase_.rho()[celli], 3.0 / 5.0) *
             pow(epsilon[celli], -2.0 / 5.0);
         
+        // Molecular viscosity ratio
+        auto lambda = phase_.mu()()[celli] / phase_.otherPhase().mu()()[celli];
+        auto ftau = exp(
+            1.43 + 0.267 * log(lambda) - 0.023 * pow(log(lambda), 2));
+        auto tau_viscous_constant =
+            (phase_.mu()()[celli] * shear_rate) / sigma * ftau;
         // Physical constants for inertial breakup
         auto tau_inertia_constant = 2 * pi * k_br_ * sqrt(
             (3 * phase_.rho()[celli] + 2 * phase_.otherPhase().rho()[celli]) /
             (192 * sigma));
 
 
-        // Modified distribution parameters
+        // Modified distributions parameters
         auto& std = sigma_hat_[celli];
-        auto mu = log_d_bar_[celli] + (gamma - 1.5) * std;
+        auto mu_viscous = log_d_bar_[celli] + (gamma - 1) * std;
+        auto mu_inertial = log_d_bar_[celli] + (gamma - 1.5) * std;
         auto x_crit = log(d_cr_inertia);
 
-        normal distribution(mu, std);
+        normal inertial(mu_inertial, std);
+        normal viscous(mu_viscous, std);
 
+        // exp expression are correction factor that results from the x = log(d)
+        // substitution and recasting the integrals as erfc. TODO: Needs more
+        // doc!
         toReturn[celli] = 
             // DPD constant contribution; the remaining d^gamma goes into
             // correction factor
             (pow(Nf_, (3 - gamma) / 3) - 1.0) *
             (
                 // Viscous breakup
-                // ??? +
-                // Inertial breakup contribution
-                1 / tau_inertia_constant * 
-                (1 - cdf(distribution, max(x_crit, log(L_k)))) * //TODO: does
-                //  x_crit need limiting? This is the correction factor that
-                // results from the x = log(d) substitution and the follow up
-                // term rearrangment. TODO: Needs more doc!
+                1 / tau_viscous_constant *
+                (cdf(viscous, log(L_k)) - cdf(viscous, log(d_cr_viscous))) * 
                 exp( 
                     pow(gamma * std, 2) +
-                    2.0 * gamma * mu - 
+                    2.0 * gamma * mu_viscous - 
+                    2.0 * gamma * pow(std, 2) - 
+                    2.0 * mu_viscous +
+                    pow(sigma, 2))
+                +
+                // Inertial breakup contribution
+                1 / tau_inertia_constant * 
+                //TODO: does x_crit need limiting? 
+                (1 - cdf(inertial, max(x_crit, log(L_k)))) * 
+                exp( 
+                    pow(gamma * std, 2) +
+                    2.0 * gamma * mu_inertial - 
                     3.0 * gamma * pow(std, 2) - 
-                    3.0 * mu +
+                    3.0 * mu_inertial +
                     9.0 / 4.0 * pow(sigma, 2))
             );
     }
