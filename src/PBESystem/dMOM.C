@@ -111,7 +111,9 @@ dMOM::dMOM
     Nf_(2.0),       // Both papers take 2. TODO: Could make user slectible
     C_alpha_(0.5),  // TODO: This is not specified in any of the papers!
     We_cr_(0.31),   // Following paper [2], which cites Yo and Morel (2001)
-    k_br_(0.2)      // Following paper [2], comment below equation [30]
+    k_br_(0.2),     // Following paper [2], comment below equation [30]
+    Ca_cr_(0.534)   // This follows Bruijn model for aqueous potassium carbonate
+                    // solution in kersone appropriate for S&A case.
 {
     for (std::size_t i = 0; i < 3; ++i){
         moments_.emplace_back
@@ -333,19 +335,28 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
 
     forAll(dispersedPhase_, celli)
     {
-        // scalar d_cr_viscous =
-        //    2 * sigma * Omega_cr_ / muc / gamma;
+        // Turbulent length scale
+        auto L_k = pow(
+            pow(phase_.otherPhase().nu()()[celli], 4) / epsilon[celli],
+            0.25);
 
+        auto shear_rate = sqrt(
+            phase_.otherPhase().rho()[celli] * epsilon[celli] /
+            phase_.otherPhase().mu()()[celli]);
+        // Critical diameter for viscous breakup
+        auto d_cr_viscous =
+            2 * sigma * Ca_cr_ / phase_.otherPhase().mu()()[celli] / shear_rate;
+
+        // Critical diameter for inertial breakup
         scalar d_cr_inertia =
             (1 + C_alpha_) *
             pow(2 * sigma * We_cr_ / phase_.rho()[celli], 3.0 / 5.0) *
             pow(epsilon[celli], -2.0 / 5.0);
         
-        // Physical constants
+        // Physical constants for inertial breakup
         auto tau_inertia_constant = 2 * pi * k_br_ * sqrt(
             (3 * phase_.rho()[celli] + 2 * phase_.otherPhase().rho()[celli]) /
-            (192 * sigma)
-        );
+            (192 * sigma));
 
 
         // Modified distribution parameters
@@ -364,10 +375,10 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
                 // ??? +
                 // Inertial breakup contribution
                 1 / tau_inertia_constant * 
-                (1 - cdf(distribution, x_crit)) * //TODO: does x_crit need
-                // limiting? This is the correction factor that results from the
-                // x = log(d) substitution and the follow up term rearrangment.
-                // TODO: Needs more doc!
+                (1 - cdf(distribution, max(x_crit, log(L_k)))) * //TODO: does
+                //  x_crit need limiting? This is the correction factor that
+                // results from the x = log(d) substitution and the follow up
+                // term rearrangment. TODO: Needs more doc!
                 exp( 
                     pow(gamma * std, 2) +
                     2.0 * gamma * mu - 

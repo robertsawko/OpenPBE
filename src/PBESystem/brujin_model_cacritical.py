@@ -29,3 +29,8 @@ def ca_critical(viscosity_ratio, eta=0.2):
         2 * c4 / c3 * log(viscosity_ratio) -
         1 / c3) - c2 / c3 * log(viscosity_ratio) - c5 / c3 - 1
     return exp(logCa)
+
+
+# Example usage. Values taken from Simmons and Azzopardi case
+if (__name__ == "__main__"):
+    print(ca_critical(1.599752e-03 / 0.0018))
