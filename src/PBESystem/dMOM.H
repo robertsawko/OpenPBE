@@ -82,6 +82,7 @@ private:
  const scalar We_cr_;
  const scalar k_br_;
  const scalar Ca_cr_;
+ const scalar k_cl_1_;
 
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);

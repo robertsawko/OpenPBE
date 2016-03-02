@@ -112,8 +112,9 @@ dMOM::dMOM
     C_alpha_(0.5),  // TODO: This is not specified in any of the papers!
     We_cr_(0.31),   // Following paper [2], which cites Yo and Morel (2001)
     k_br_(0.2),     // Following paper [2], comment below equation [30]
-    Ca_cr_(0.534)   // This follows Bruijn model for aqueous potassium carbonate
+    Ca_cr_(0.534),  // This follows Bruijn model for aqueous potassium carbonate
                     // solution in kersone appropriate for S&A case.
+    k_cl_1_(1.0)    // Paper [1], comment after eq 30
 {
     for (std::size_t i = 0; i < 3; ++i){
         moments_.emplace_back
@@ -262,41 +263,58 @@ tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
         )
     );
 
-    forAll(dispersedPhase_, celli)
-    {
-        /*
-        GammaDistribution gamma(gamma_k_[celli], gamma_theta_[celli]);
+    const volScalarField& epsilon =
+        dispersedPhase_.U().mesh().lookupObject<volScalarField>(
+            "epsilon."+ dispersedPhase_.name());
+    const scalar sigma = phase_.fluid().sigma().value();
+    const label& gamma = momenti;
+    forAll(dispersedPhase_, celli) {
 
-        auto m0 = moments_[0][celli];
+        //Equivalent diameter calculation
+        auto Sgamma = moments_[gamma][celli];
+        //Paper[1] equation (5)
+        auto S3 = phase_[celli] * 6.0 / pi;
+        //Paper[1] equation (3)
+        auto d3gamma = pow(S3 / Sgamma, 1 / (3 - gamma)); 
+        auto d_eq = k_cl_1_ * d3gamma;
 
-        auto deathIntegrand = [&](double xi){
+        // TODO: My guess is that here a switching MUST occur between inertial
+        // and viscous breakup.
 
-            auto deathInnerIntegrand = [&](double xi_prime){
+        // *** Viscous breakup ***
+        auto k_coll = sqrt(8 * pi / 3);
+        auto shear_rate = sqrt(
+            phase_.otherPhase().rho()[celli] * epsilon[celli] /
+            phase_.otherPhase().mu()()[celli]);
+        auto u_rel = shear_rate * d_eq;
+        // *** Viscous probability of coalescence ***
+        
+        // Hamaker constant; given in paper [2] after in the comment to eq 46
+        auto A_H = 5e-21;
+        // Critical film thickness eq (46) in paper [2]
+        auto h_cr = pow(A_H * d_eq / (24.0 * pi * sigma), 1 / 3);
 
-                return coalescence_->S(xi, xi_prime, celli) *
-                       m0 * pdf(gamma, xi_prime);
-            };
+        //Interaction force
+        auto F_i =
+            3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
+            shear_rate * pow(d_eq, 2);
 
-            return pow(xi, momenti) * m0 * pdf(gamma, xi) *
-                   integrate(deathInnerIntegrand, 0.);
-        };
+        // Finally, ladies and gentlemen, I present to you: Drainage model 3!
+        auto td = 
+            pi * phase_.mu()()[celli] * sqrt(F_i) /
+            (2 * h_cr) *
+            pow(d_eq / (4 * pi * sigma), 3.0 / 2.0);
+        
+        //Equation (40)
+        auto P_coal = exp(-td * shear_rate);
 
-        auto birthIntegrand = [&](double xi){
-
-            auto birthInnerIntegrand = [&](double xi_prime){
-
-                return coalescence_->S(xi, xi_prime, celli) *
-                       pow(xi_prime + xi, momenti) *
-                       m0 * pdf(gamma, xi_prime);
-            };
-
-            return m0 * pdf(gamma, xi) *
-                   integrate(birthInnerIntegrand, 0.);
-        };
-
-        toReturn[celli] = integrate(birthIntegrand, 0.) / 2. -
-                          integrate(deathIntegrand, 0.);
-                          */
+        toReturn[celli] = 
+            (pow(2.0, gamma / 3) - 2.0) *
+            pow(6.0 * phase_[celli] / pi, 2.0) *
+            k_coll *
+            u_rel *
+            P_coal *
+            pow(d_eq, gamma - 4);
     }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
