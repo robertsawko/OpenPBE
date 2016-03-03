@@ -114,7 +114,11 @@ dMOM::dMOM
     k_br_(0.2),     // Following paper [2], comment below equation [30]
     Ca_cr_(0.534),  // This follows Bruijn model for aqueous potassium carbonate
                     // solution in kersone appropriate for S&A case.
-    k_cl_1_(1.0)    // Paper [1], comment after eq 30
+    k_cl_1_(1.0),   // Paper [1], comment after eq 30
+    consistency_(   // TODO: Dimensional consistency is something not discussed
+        "1m",       // in either of the papers. log(d) as such cannot be a
+        dimLength,  // quantity as log is transcendental and d dimensional.
+        1.0)        // Therefore, there must be some sort of consistency scale.
 {
     for (std::size_t i = 0; i < 3; ++i){
         Sgammas_.emplace_back
@@ -150,7 +154,7 @@ void dMOM::correct()
 
     Info<< "updating size moments" << endl;
     // Moment inversion is given analytically (see )
-    log_d_bar_ = log(m1 / sqrt(1.0 + v / pow(m1, 2)));
+    log_d_bar_ = log(m1 / consistency_ / sqrt(1.0 + v / pow(m1, 2)));
     sigma_hat_ = sqrt(log(1.0 + v / pow(m1, 2)));
 
     Info<< "Lognormal parameters:" << endl;
@@ -165,7 +169,7 @@ void dMOM::correct()
                 (
                     IOobject
                     (
-                        "m" + std::to_string(i) + "Source",
+                        "S" + std::to_string(i) + "Source",
                         mesh_.time().timeName(),
                         mesh_,
                         IOobject::NO_READ,
