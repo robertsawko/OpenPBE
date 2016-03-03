@@ -68,7 +68,7 @@ dMOM::dMOM
     dMOMDict_(pbeProperties.subDict("dMOMCoeffs")),
     dispersedPhase_(phase),
     mesh_(dispersedPhase_.U().mesh()),
-    moments_(),
+    Sgammas_(),
     log_d_bar_
     (
         IOobject
@@ -93,7 +93,7 @@ dMOM::dMOM
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("sigma_hat", dimLength, 0.0)
+        dimensionedScalar("sigma_hat", dimless, 0.0)
     ),
     number_density_
     (
@@ -117,11 +117,11 @@ dMOM::dMOM
     k_cl_1_(1.0)    // Paper [1], comment after eq 30
 {
     for (std::size_t i = 0; i < 3; ++i){
-        moments_.emplace_back
+        Sgammas_.emplace_back
             (
                 IOobject
                 (
-                    "m" + std::to_string(i),
+                    "S" + std::to_string(i),
                     mesh_.time().timeName(),
                     mesh_,
                     IOobject::MUST_READ,
@@ -139,25 +139,28 @@ dMOM::~dMOM()
 void dMOM::correct()
 {
     // Creating aliases to shorten notation
-    const volScalarField& m1 = moments_[1];
-    const volScalarField& m2 = moments_[2];
+    const volScalarField& S0 = Sgammas_[0];
+    const volScalarField& S1 = Sgammas_[1];
+    const volScalarField& S2 = Sgammas_[2];
+    // Calculate moments (note equation (2) in paper [1])
+    const volScalarField m1 = S1 / S0;
+    const volScalarField m2 = S2 / S0;
     // Non-logarithmized variance
     const volScalarField v = m2 - pow(m1, 2);
 
     Info<< "updating size moments" << endl;
-    number_density_ = moments_[0];
     // Moment inversion is given analytically (see )
-    log_d_bar_ = log(m1 / sqrt(1 + v / pow(m1, 2)));
+    log_d_bar_ = log(m1 / sqrt(1.0 + v / pow(m1, 2)));
     sigma_hat_ = sqrt(log(1.0 + v / pow(m1, 2)));
 
     Info<< "Lognormal parameters:" << endl;
-    printAvgMaxMin(mesh_, number_density_);
+    printAvgMaxMin(mesh_, S0);
     printAvgMaxMin(mesh_, log_d_bar_);
     printAvgMaxMin(mesh_, sigma_hat_);
 
     std::vector<volScalarField> mSources_;
 
-    for (std::size_t i = 0; i<moments_.size(); ++i) {
+    for (std::size_t i = 0; i<Sgammas_.size(); ++i) {
         mSources_.emplace_back
                 (
                     IOobject
@@ -195,12 +198,12 @@ void dMOM::correct()
         printAvgMaxMin(mesh_, mSource);
     }
 
-    for (std::size_t i = 0; i<moments_.size(); ++i)
+    for (std::size_t i = 0; i<Sgammas_.size(); ++i)
     {
         fvScalarMatrix mEqn
         (
-            fvm::ddt(moments_[i])
-            + fvm::div(dispersedPhase_.phi(),moments_[i])
+            fvm::ddt(Sgammas_[i])
+            + fvm::div(dispersedPhase_.phi(), Sgammas_[i])
             //+ fvm::div(limitedFlux_,moments_[i])
             ==
             mSources_[i]
@@ -209,7 +212,7 @@ void dMOM::correct()
         mEqn.solve();
     }
 
-    for (auto& moment : moments_)
+    for (auto& moment : Sgammas_)
     {
         moment = max(
             moment,
@@ -225,7 +228,7 @@ void dMOM::correct()
 const volScalarField dMOM::d() const
 {
     // Diameter is assumed to be Sauter mean by following equation (6) in [1]
-    return 6.0 / pi * dispersedPhase_ / moments_[2];
+    return 6.0 / pi * dispersedPhase_ / Sgammas_[2];
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -271,7 +274,7 @@ tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
     forAll(dispersedPhase_, celli) {
 
         //Equivalent diameter calculation
-        auto Sgamma = moments_[gamma][celli];
+        auto Sgamma = Sgammas_[gamma][celli];
         //Paper[1] equation (5)
         auto S3 = phase_[celli] * 6.0 / pi;
         //Paper[1] equation (3)

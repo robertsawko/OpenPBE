@@ -69,7 +69,7 @@ private:
  const phaseModel& dispersedPhase_;
  const fvMesh& mesh_;
 
- std::vector<volScalarField> moments_;
+ std::vector<volScalarField> Sgammas_;
 
  //log-normal distribution parameters
  volScalarField log_d_bar_;
@@ -99,7 +99,7 @@ private:
  void solve();
 
 public:
- TypeName("methodOfMoments");
+ TypeName("diameterMethodOfMoments");
 
  // Constructors
 
