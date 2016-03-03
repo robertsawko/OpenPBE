@@ -1,4 +1,10 @@
-# Simmons and Azzopardi case
+# Simmons and Azzopardi
+
+Simmons, M. and Azzopardi, J. "Drop size distributions in
+dispersed liquid--liquid pipe flow", International Journal of
+Multiphase Flow, 2001
+
+Pipe diameter is 0.063m
 
 Horizontal case is selected
 
