@@ -29,14 +29,14 @@ divSchemes
 {
     default                         none;
 
-    div(phi,alpha.acps)              Gauss vanLeer;
-    div(phir,alpha.acps)             Gauss vanLeer;
-    "div\(phi,n.*\)"                     Gauss vanLeer;
+    div(phi,alpha.acps)             Gauss vanLeer;
+    div(phir,alpha.acps)            Gauss vanLeer;
+    "div\(phi.acps,S.*\)"           Gauss vanLeer;
 
     "div\(alphaRhoPhi.*,U.*\)"      Gauss limitedLinearV 1;
     "div\(phi.*,U.*\)"              Gauss limitedLinearV 1;
 
-    div(phi.acps,kappai.oil)         Gauss vanLeer;
+    div(phi.acps,kappai.oil)        Gauss vanLeer;
 
     "div\(alphaRhoPhi.*,(h|e).*\)"  Gauss limitedLinear 1;
     "div\(alphaRhoPhi.*,K.*\)"      Gauss limitedLinear 1;
