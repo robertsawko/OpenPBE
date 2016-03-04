@@ -70,6 +70,7 @@ private:
  const fvMesh& mesh_;
 
  std::vector<volScalarField> Sgammas_;
+ std::vector<volScalarField> breakupSource_;
 
  //log-normal distribution parameters
  volScalarField log_d_bar_;
@@ -84,13 +85,13 @@ private:
  const scalar Ca_cr_;
  const scalar k_cl_1_;
  const dimensionedScalar consistency_;
+ const scalar interfacialTension_;
+ const dimensionedScalar minDiameter_;
 
  //- Return a source term due to breakup
  tmp<volScalarField> breakupSourceTerm(label momenti);
  //- Return a source term due to coalescence
  tmp<volScalarField> coalescenceSourceTerm(label momenti);
- //- Return a source term due to coalescence
- tmp<volScalarField> momentSourceTerm(label momenti);
 
  // Private member functions
  

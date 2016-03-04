@@ -69,6 +69,7 @@ dMOM::dMOM
     dispersedPhase_(phase),
     mesh_(dispersedPhase_.U().mesh()),
     Sgammas_(),
+    breakupSource_(),
     log_d_bar_
     (
         IOobject
@@ -118,27 +119,46 @@ dMOM::dMOM
     consistency_(   // TODO: Dimensional consistency is something not discussed
         "1m",       // in either of the papers. log(d) as such cannot be a
         dimLength,  // quantity as log is transcendental and d dimensional.
-        1.0)        // Therefore, there must be some sort of consistency scale.
+        1.0),       // Therefore, there must be some sort of consistency scale.
+    interfacialTension_(0.01), //Must be separate for 2phase Euler!
+    minDiameter_("min(d)", dimLength, SMALL)
 {
-    for (std::size_t i = 0; i < 3; ++i){
+    for (std::size_t i = 0; i < 3; ++i) {
         Sgammas_.emplace_back
+        (
+            IOobject
             (
-                IOobject
-                (
-                    "S" + std::to_string(i),
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::MUST_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                mesh_
-            );
+                "S" + std::to_string(i),
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::MUST_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh_
+        );
+        breakupSource_.emplace_back
+        (
+            IOobject
+            (
+                "breakup" + std::to_string(i) + "Source",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("0", Sgammas_[i].dimensions() / dimTime, 0.0)
+        );
     }
 }
 
 dMOM::~dMOM()
 {
 }
+
+using boost::math::normal;
+using boost::math::pdf;
+
 
 void dMOM::correct()
 {
@@ -163,46 +183,95 @@ void dMOM::correct()
     printAvgMaxMin(mesh_, sigma_hat_);
 
     std::vector<volScalarField> mSources_;
+    const volScalarField& epsilon =
+        dispersedPhase_.U().mesh().lookupObject<volScalarField>(
+            "epsilon."+ dispersedPhase_.name());
+    const scalar& sigma = interfacialTension_;
 
-    for (std::size_t i = 0; i<Sgammas_.size(); ++i) {
-        mSources_.emplace_back
+    forAll(dispersedPhase_, celli)
+    {
+        // Turbulent length scale
+        auto L_k = pow(
+            pow(phase_.otherPhase().nu()()[celli], 4) / epsilon[celli],
+            0.25);
+
+        auto shear_rate = sqrt(
+            phase_.otherPhase().rho()[celli] * epsilon[celli] /
+            phase_.otherPhase().mu()()[celli]);
+        // Critical diameter for viscous breakup
+        auto d_cr_viscous =
+            2 * sigma * Ca_cr_ / phase_.otherPhase().mu()()[celli] / shear_rate;
+
+        // Critical diameter for inertial breakup
+        scalar d_cr_inertia =
+            (1 + C_alpha_) *
+            pow(2 * sigma * We_cr_ / phase_.rho()[celli], 3.0 / 5.0) *
+            pow(epsilon[celli], -2.0 / 5.0);
+        
+        // Molecular viscosity ratio
+        auto lambda = phase_.mu()()[celli] / phase_.otherPhase().mu()()[celli];
+        auto ftau = exp(
+            1.43 + 0.267 * log(lambda) - 0.023 * pow(log(lambda), 2));
+        auto tau_viscous_constant =
+            (phase_.mu()()[celli] * shear_rate) / sigma * ftau;
+        // Physical constants for inertial breakup
+        auto tau_inertia_constant = 2 * pi * k_br_ * sqrt(
+            (3 * phase_.rho()[celli] + 2 * phase_.otherPhase().rho()[celli]) /
+            (192 * sigma));
+
+
+        // Modified distributions parameters
+        auto& std = sigma_hat_[celli];
+
+        for(label gamma = 0; gamma < 3; ++gamma ) {
+            auto mu_viscous = log_d_bar_[celli] + (gamma - 1) * std;
+            auto mu_inertial = log_d_bar_[celli] + (gamma - 1.5) * std;
+            auto x_crit = log(d_cr_inertia);
+
+            normal inertial(mu_inertial, std);
+            normal viscous(mu_viscous, std);
+
+            // exp expression are correction factor that results from the
+            // x = log(d) substitution and recasting the integrals as erfc.
+            // TODO: Needs more doc!
+            breakupSource_[gamma][celli] = 
+                // DPD constant contribution; the remaining d^gamma goes into
+                // correction factor
+                (pow(Nf_, (3 - gamma) / 3) - 1.0) *
                 (
-                    IOobject
-                    (
-                        "S" + std::to_string(i) + "Source",
-                        mesh_.time().timeName(),
-                        mesh_,
-                        IOobject::NO_READ,
-                        IOobject::AUTO_WRITE
-                        ),
-                    momentSourceTerm(i)
-                    );
-    }
+                    // Viscous breakup
+                    1 / tau_viscous_constant *
+                    (cdf(viscous, log(L_k)) - cdf(viscous, log(d_cr_viscous))) * 
+                    exp( 
+                        pow(gamma * std, 2) +
+                        2.0 * gamma * mu_viscous - 
+                        2.0 * gamma * pow(std, 2) - 
+                        2.0 * mu_viscous +
+                        pow(sigma, 2))
+                    +
+                    // Inertial breakup contribution
+                    1 / tau_inertia_constant * 
+                    //TODO: does x_crit need limiting? 
+                    (1 - cdf(inertial, max(x_crit, log(L_k)))) * 
+                    exp( 
+                        pow(gamma * std, 2) +
+                        2.0 * gamma * mu_inertial - 
+                        3.0 * gamma * pow(std, 2) - 
+                        3.0 * mu_inertial +
+                        9.0 / 4.0 * pow(sigma, 2))
+                );
 
-    Info<< "moment sources:" << endl;
+        }
+    }
+    for (auto bs : breakupSource_)
+        printAvgMaxMin(mesh_, bs);
     //TODO: is there a better way to assure that source terms on boundaries
     //are equal to 0?
     //maybe using internalField() instead of the whole field somewhere?
     //how source terms are handled in combustion/chemistry/turbulence codes in
     //OF
-    for (auto& mSource : mSources_)
-    {
-        mSource.boundaryField() = 0;
 
-        //fix for nan values
-        forAll(mesh_.C(), celli)
-        {
-            auto& mSource_i = mSource[celli];
-            if ( std::isnan(mSource_i) )
-            {
-                mSource_i = 0.0;
-            }
-        }
-
-        printAvgMaxMin(mesh_, mSource);
-    }
-
-    for (std::size_t i = 0; i<Sgammas_.size(); ++i)
+    for (std::size_t i = 0; i < Sgammas_.size(); ++i)
     {
         fvScalarMatrix mEqn
         (
@@ -210,7 +279,7 @@ void dMOM::correct()
             + fvm::div(dispersedPhase_.phi(), Sgammas_[i])
             //+ fvm::div(limitedFlux_,moments_[i])
             ==
-            mSources_[i]
+            breakupSource_[i]
         );
         mEqn.relax();
         mEqn.solve();
@@ -232,21 +301,10 @@ void dMOM::correct()
 const volScalarField dMOM::d() const
 {
     // Diameter is assumed to be Sauter mean by following equation (6) in [1]
-    return 6.0 / pi * dispersedPhase_ / Sgammas_[2];
+    return max(6.0 / pi * dispersedPhase_ / Sgammas_[2], minDiameter_);
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-tmp<volScalarField> dMOM::momentSourceTerm(label momenti)
-{
-    volScalarField bS = breakupSourceTerm(momenti);
-    volScalarField cS = coalescenceSourceTerm(momenti);
-    Info<< "breakup (moment " << momenti << ") "
-        << bS.weightedAverage(mesh_.V()).value() << endl;
-    Info<< "coalescence (moment " << momenti << ") "
-        << cS.weightedAverage(mesh_.V()).value() << endl;
-    return cS + bS;// breakupSourceTerm(momenti);
-}
 
 tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
 {
@@ -327,9 +385,6 @@ tmp<volScalarField> dMOM::coalescenceSourceTerm(label momenti)
     return tmp<volScalarField>( new volScalarField(toReturn));
 }
 
-using boost::math::normal;
-using boost::math::pdf;
-
 tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
 {
     volScalarField toReturn
@@ -347,88 +402,11 @@ tmp<volScalarField> dMOM::breakupSourceTerm(label momenti)
         dimensionedScalar
         (
             "Sbr", 
-            pow(dimVolume, momenti) /dimTime,
+            pow(dimVolume, momenti) / dimTime,
             0
         ) 
     );
 
-    const volScalarField& epsilon =
-        dispersedPhase_.U().mesh().lookupObject<volScalarField>(
-            "epsilon."+ dispersedPhase_.name());
-    const scalar sigma = phase_.fluid().sigma().value();
-    const label& gamma = momenti;
-
-    forAll(dispersedPhase_, celli)
-    {
-        // Turbulent length scale
-        auto L_k = pow(
-            pow(phase_.otherPhase().nu()()[celli], 4) / epsilon[celli],
-            0.25);
-
-        auto shear_rate = sqrt(
-            phase_.otherPhase().rho()[celli] * epsilon[celli] /
-            phase_.otherPhase().mu()()[celli]);
-        // Critical diameter for viscous breakup
-        auto d_cr_viscous =
-            2 * sigma * Ca_cr_ / phase_.otherPhase().mu()()[celli] / shear_rate;
-
-        // Critical diameter for inertial breakup
-        scalar d_cr_inertia =
-            (1 + C_alpha_) *
-            pow(2 * sigma * We_cr_ / phase_.rho()[celli], 3.0 / 5.0) *
-            pow(epsilon[celli], -2.0 / 5.0);
-        
-        // Molecular viscosity ratio
-        auto lambda = phase_.mu()()[celli] / phase_.otherPhase().mu()()[celli];
-        auto ftau = exp(
-            1.43 + 0.267 * log(lambda) - 0.023 * pow(log(lambda), 2));
-        auto tau_viscous_constant =
-            (phase_.mu()()[celli] * shear_rate) / sigma * ftau;
-        // Physical constants for inertial breakup
-        auto tau_inertia_constant = 2 * pi * k_br_ * sqrt(
-            (3 * phase_.rho()[celli] + 2 * phase_.otherPhase().rho()[celli]) /
-            (192 * sigma));
-
-
-        // Modified distributions parameters
-        auto& std = sigma_hat_[celli];
-        auto mu_viscous = log_d_bar_[celli] + (gamma - 1) * std;
-        auto mu_inertial = log_d_bar_[celli] + (gamma - 1.5) * std;
-        auto x_crit = log(d_cr_inertia);
-
-        normal inertial(mu_inertial, std);
-        normal viscous(mu_viscous, std);
-
-        // exp expression are correction factor that results from the x = log(d)
-        // substitution and recasting the integrals as erfc. TODO: Needs more
-        // doc!
-        toReturn[celli] = 
-            // DPD constant contribution; the remaining d^gamma goes into
-            // correction factor
-            (pow(Nf_, (3 - gamma) / 3) - 1.0) *
-            (
-                // Viscous breakup
-                1 / tau_viscous_constant *
-                (cdf(viscous, log(L_k)) - cdf(viscous, log(d_cr_viscous))) * 
-                exp( 
-                    pow(gamma * std, 2) +
-                    2.0 * gamma * mu_viscous - 
-                    2.0 * gamma * pow(std, 2) - 
-                    2.0 * mu_viscous +
-                    pow(sigma, 2))
-                +
-                // Inertial breakup contribution
-                1 / tau_inertia_constant * 
-                //TODO: does x_crit need limiting? 
-                (1 - cdf(inertial, max(x_crit, log(L_k)))) * 
-                exp( 
-                    pow(gamma * std, 2) +
-                    2.0 * gamma * mu_inertial - 
-                    3.0 * gamma * pow(std, 2) - 
-                    3.0 * mu_inertial +
-                    9.0 / 4.0 * pow(sigma, 2))
-            );
-    }
 
     return tmp<volScalarField>( new volScalarField(toReturn));
 }
