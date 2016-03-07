@@ -25,6 +25,7 @@ acps
     dMOMCoeffs
     {
       usingMULES 1;
+      interfacialTension 0.01;
     }
     coalescenceKernel CoulaloglouTavlaridesC;
     breakupKernel CoulaloglouTavlarides;
@@ -81,7 +82,7 @@ sigma
       and
       acps
     )
-    0.0
+    0
   );
 
 aspectRatio

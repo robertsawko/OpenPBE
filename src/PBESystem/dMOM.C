@@ -120,8 +120,12 @@ dMOM::dMOM
         "1m",       // in either of the papers. log(d) as such cannot be a
         dimLength,  // quantity as log is transcendental and d dimensional.
         1.0),       // Therefore, there must be some sort of consistency scale.
-    interfacialTension_(0.01), //Must be separate for 2phase Euler!
-    minDiameter_("min(d)", dimLength, SMALL)
+    interfacialTension_(    //Must be separate for 2phase Euler!
+        readScalar(dMOMDict_.lookup("interfacialTension"))),
+    minDiameter_(
+        "min(d)",
+        dimLength,
+        dMOMDict_.lookupOrDefault<scalar>("minDiameter", 1e-9))
 {
     for (std::size_t i = 0; i < 3; ++i) {
         Sgammas_.emplace_back
