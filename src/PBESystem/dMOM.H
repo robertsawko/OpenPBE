@@ -52,6 +52,8 @@ SourceFiles
 
 #include "PBEMethod.H"
 
+
+#define NO_OF_MOMENTS 3
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -69,8 +71,8 @@ private:
  const phaseModel& dispersedPhase_;
  const fvMesh& mesh_;
 
- std::vector<volScalarField> Sgammas_;
- std::vector<volScalarField> breakupSource_;
+ PtrList<volScalarField> Sgammas_;
+ PtrList<volScalarField> breakupSource_;
 
  //log-normal distribution parameters
  volScalarField log_d_bar_;
