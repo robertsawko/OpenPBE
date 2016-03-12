@@ -164,7 +164,8 @@ void dMOM::correct() {
     const volScalarField m1 = S1 / S0;
     const volScalarField m2 = S2 / S0;
     // Non-logarithmized variance
-    const volScalarField v = m2 - pow(m1, 2);
+    // TODO: Investigate why variance become negative
+    const volScalarField v = mag(m2 - pow(m1, 2));
 
     Info << "updating size moments" << endl;
     // Moment inversion is given analytically (see )

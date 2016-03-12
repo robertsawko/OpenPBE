@@ -17,7 +17,7 @@ FoamFile
 
 application     multiphaseEulerFoam;
 
-startFrom       latestTime;
+startFrom       startTime;
 
 startTime       0;
 
@@ -29,7 +29,7 @@ deltaT          2.5e-04;//3e-04;//5e-05;//0.00005;
 
 writeControl    timeStep;//timeStep;//adjustableRunTime;
 
-writeInterval   100;
+writeInterval   1;
 
 purgeWrite      0;
 
