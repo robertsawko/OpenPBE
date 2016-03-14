@@ -217,7 +217,7 @@ void dMOM::correct() {
         for (int gamma=0; gamma < NO_OF_MOMENTS; ++gamma){
             auto Sgamma = Sgammas_[gamma][celli];
             // Paper[1] equation (3)
-            auto d3gamma = pow(S3 / Sgamma, 1 / (3 - gamma)); 
+            auto d3gamma = pow(S3 / Sgamma, 1 / (3.0 - gamma)); 
             d_eq[gamma] = k_cl_1_ * d3gamma;
             u_rel[gamma] = shear_rate * d_eq[gamma];
             // Critical film thickness eq (46) in paper [2]
@@ -248,7 +248,7 @@ void dMOM::correct() {
             breakupSource_[gamma][celli] =
                 // DPD constant contribution; the remaining d^gamma goes into
                 // correction factor
-                (pow(Nf_, (3 - gamma) / 3) - 1.0) *
+                (pow(Nf_, (3.0 - gamma) / 3.0) - 1.0) *
                 (
                     // Viscous breakup
                     1 / tau_viscous_constant *
@@ -266,7 +266,7 @@ void dMOM::correct() {
                             9.0 / 4.0 * pow(sigma, 2)));
 
             coalescenceSource_[gamma][celli] =
-                (pow(2.0, gamma / 3) - 2.0) *
+                (pow(2.0, gamma / 3.0) - 2.0) *
                 pow(6.0 * phase_[celli] / pi, 2.0) *
                 k_coll_ * u_rel[gamma] *
                 P_coal[gamma] *
