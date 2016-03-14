@@ -73,6 +73,7 @@ private:
 
  PtrList<volScalarField> Sgammas_;
  PtrList<volScalarField> breakupSource_;
+ PtrList<volScalarField> coalescenceSource_;
 
  //log-normal distribution parameters
  volScalarField log_d_bar_;
@@ -89,11 +90,8 @@ private:
  const dimensionedScalar consistency_;
  const scalar interfacialTension_;
  const dimensionedScalar minDiameter_;
-
- //- Return a source term due to breakup
- tmp<volScalarField> breakupSourceTerm(label momenti);
- //- Return a source term due to coalescence
- tmp<volScalarField> coalescenceSourceTerm(label momenti);
+ const scalar k_coll_;
+ const scalar A_H_;
 
  // Private member functions
  
