@@ -221,12 +221,14 @@ void dMOM::correct() {
             d_eq[gamma] = k_cl_1_ * d3gamma;
             u_rel[gamma] = shear_rate * d_eq[gamma];
             // Critical film thickness eq (46) in paper [2]
-            auto h_cr = pow(A_H_ * d_eq[gamma] / (24.0 * pi * sigma), 1 / 3);
-            auto F_i = 3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
+            auto h_cr = pow(A_H_ * d_eq[gamma] / (25.0 * pi * sigma), 1.0 / 3.0);
+            auto F_i =
+                3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
                 shear_rate * pow(d_eq[gamma], 2);
             // Finally, ladies and gentlemen, I present to you:
             // Drainage model 3!
-            auto td = pi * phase_.mu()()[celli] * sqrt(F_i) / (2 * h_cr) *
+            auto td =
+                pi * phase_.mu()()[celli] * sqrt(F_i) / (2 * h_cr) *
                 pow(d_eq[gamma] / (4 * pi * sigma), 3.0 / 2.0);
             // Equation (40)
             P_coal[gamma] = exp(-td * shear_rate);
@@ -265,13 +267,16 @@ void dMOM::correct() {
 
             coalescenceSource_[gamma][celli] =
                 (pow(2.0, gamma / 3) - 2.0) *
-                pow(6.0 * phase_[celli] / pi, 2.0) * k_coll_ * u_rel[gamma] *
+                pow(6.0 * phase_[celli] / pi, 2.0) *
+                k_coll_ * u_rel[gamma] *
                 P_coal[gamma] *
                 pow(d_eq[gamma], gamma - 4);
         }
     }
     for (auto bs : breakupSource_)
         printAvgMaxMin(mesh_, bs);
+    for (auto cs : coalescenceSource_)
+        printAvgMaxMin(mesh_, cs);
     // TODO: is there a better way to assure that source terms on boundaries
     // are equal to 0?
     // maybe using internalField() instead of the whole field somewhere?
