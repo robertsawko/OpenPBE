@@ -85,12 +85,11 @@ dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
       C_alpha_(0.5), // TODO: This is not specified in any of the papers!
       We_cr_(0.31),  // Following paper [2], which cites Yo and Morel (2001)
       k_br_(0.2),    // Following paper [2], comment below equation [30]
-      Ca_cr_(
-          0.534),   // This follows Bruijn model for aqueous potassium carbonate
-                    // solution in kersone appropriate for S&A case.
-      k_cl_1_(1.0), // Paper [1], comment after eq 30
-      consistency_( // TODO: Dimensional consistency is something not discussed
-          "1m",     // in either of the papers. log(d) as such cannot be a
+      Ca_cr_(0.534), // Following Bruijn model for aqueous potassium carbonate
+                     // solution in kersone appropriate for S&A case.
+      k_cl_1_(1.0),  // Paper [1], comment after eq 30
+      consistency_(  // TODO: Dimensional consistency is something not discussed
+          "1m",      // in either of the papers. log(d) as such cannot be a
           dimLength, // quantity as log is transcendental and d dimensional.
           1.0),      // Therefore, there must be some sort of consistency scale.
       interfacialTension_( // Must be separate for 2phase Euler!
@@ -99,8 +98,8 @@ dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
                    dimLength,
                    dMOMDict_.lookupOrDefault<scalar>("minDiameter", 1e-9)),
       k_coll_(sqrt(8 * pi / 3)),
-      // Hamaker constant; given in paper [2] after in the comment to eq 46
-      A_H_(5e-21)
+      A_H_(5e-21) // Hamaker constant; given in paper [2] after in the comment
+                  // to eq 46
 {
     forAll(Sgammas_, i) {
         Sgammas_.set(i,
