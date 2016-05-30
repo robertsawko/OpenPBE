@@ -136,23 +136,23 @@ void dMOM::correct() {
     // Creating aliases to shorten notation
     // const auto S0 = 6.0 / pi * phase_ * pow(d(), -3.0);
     const volScalarField S3(
-        "S3,", max(phase_ * 6.0 / pi, dimensionedScalar("s", dimless, 1e-6)));
+        "S3,", max(phase_ * 6.0 / pi, dimensionedScalar("s", dimless, 1e-3)));
     // This stems from sphericity assumption and equality of d30 and d32.
     // Compare paper [2] equations 16 and 17. This looks like a dodgy hack!
     const volScalarField S0(
         "S0",
         pow(S2_, 3.0) /
-            max(pow(S3, 2.0), dimensionedScalar("s", dimless, 1e-6)));
+            max(pow(S3, 2.0), dimensionedScalar("s", dimless, 1e-3)));
     // Inversion procedure
     printAvgMaxMin(mesh_, S0);
     printAvgMaxMin(mesh_, S3);
     const volScalarField logm2 =
         log(max(S2_ / S0,
-                dimensionedScalar("s", dimensionSet(0, 2, 0, 0, 0), 1e-6)) *
+                dimensionedScalar("s", dimensionSet(0, 2, 0, 0, 0), 1e-3)) *
             pow(consistency_, -2.0));
     const volScalarField logm3 =
         log(max(S3 / S0,
-                dimensionedScalar("s", dimensionSet(0, 3, 0, 0, 0), 1e-6)) *
+                dimensionedScalar("s", dimensionSet(0, 3, 0, 0, 0), 1e-3)) *
             pow(consistency_, -3.0));
 
     Info << "updating size moments" << endl;
@@ -287,6 +287,7 @@ void dMOM::correct() {
     mEqn.relax();
     mEqn.solve();
 
+    printAvgMaxMin(mesh_, S2_);
     printAvgMaxMin(mesh_, d());
 }
 
@@ -303,7 +304,7 @@ const volScalarField dMOM::d() const {
     // zero phase fraction values do not compromise the stability of two fluid
     // model (zero diameter limit).
     return max(6.0 / pi * dispersedPhase_ / S2_, // Equation (6) from paper [1]
-               dimensionedScalar("min", dimLength, SMALL));
+               dimensionedScalar("min", dimLength, 0.0004));
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
