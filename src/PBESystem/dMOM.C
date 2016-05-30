@@ -23,23 +23,23 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include <string>
-#include <sstream>
 #include <cmath>
+#include <sstream>
+#include <string>
 
 #include <cassert>
 
-#include "dMOM.H"
 #include "addToRunTimeSelectionTable.H"
+#include "dMOM.H"
 
-#include "fvScalarMatrix.H"
-#include "fvcSnGrad.H"
-#include "fvcFlux.H"
-#include "fvcAverage.H"
-#include "fvm.H"
 #include "Integrator.H"
-#include "mathematicalConstants.H"
 #include "Utility.H"
+#include "fvScalarMatrix.H"
+#include "fvcAverage.H"
+#include "fvcFlux.H"
+#include "fvcSnGrad.H"
+#include "fvm.H"
+#include "mathematicalConstants.H"
 #include "twoPhaseSystem.C"
 #include <boost/math/distributions/normal.hpp> // for normal_distribution
 
@@ -84,23 +84,26 @@ dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
       Nf_(2.0),      // Both papers take 2. TODO: Could make user slectible
       C_alpha_(0.5), // TODO: This is not specified in any of the papers!
       We_cr_(0.31),  // Following paper [2], which cites Yo and Morel (2001)
-      k_br_(0.2),    // Following paper [2], comment below equation [30]
+      We0_(0.8 * We_cr_), // Paper [1] equation 51
+      k_br_(0.2),         // Paper [2], comment below equation [30]
       Ca_cr_(0.534), // Following Bruijn model for aqueous potassium carbonate
                      // solution in kersone appropriate for S&A case.
       k_cl_1_(1.0),  // Paper [1], comment after eq 30
+      k_cl_2_(12.7), // Paper [1], given by eq 50
       consistency_(  // TODO: Dimensional consistency is something not discussed
           "1m",      // in either of the papers. log(d) as such cannot be a
-          dimLength, // quantity as log is transcendental and d dimensional.
-          1.0),      // Therefore, there must be some sort of consistency scale.
+          dimLength, // dimensional quantity as log is transcendental and d is
+          1.0),      // dimensional. There must be some sort of scaling.
       interfacialTension_( // Must be separate for 2phase Euler!
           readScalar(dMOMDict_.lookup("interfacialTension"))),
       minDiameter_("min(d)",
                    dimLength,
                    dMOMDict_.lookupOrDefault<scalar>("minDiameter", 1e-9)),
-      k_coll_(sqrt(8 * pi / 3)),
-      A_H_(5e-21) // Hamaker constant; given in paper [2] after in the comment
-                  // to eq 46
-{
+      k_collv_(sqrt(8 * pi / 3)),  // Paper [1] equation 36
+      k_colli_(sqrt(2 * pi / 15)), // Paper [1] equation 46
+      A_H_(5e-21), // Hamaker constant; given in paper [2] after in the comment
+                   // to eq 46
+      Fcl_(dMOMDict_.lookupOrDefault<scalar>("calibration", 1.0)) {
     forAll(Sgammas_, i) {
         Sgammas_.set(i,
                      new volScalarField(IOobject("S" + std::to_string(i),
@@ -205,32 +208,42 @@ void dMOM::correct() {
         // **** COALESCENCE CHARACTERISTICS CALCULATIONS ****
         // Paper[1] equation (5)
         auto S3 = phase_[celli] * 6.0 / pi;
-        scalar d_eq[NO_OF_MOMENTS], u_rel[NO_OF_MOMENTS];
-        // Critical film thickness
-        scalar h_cr[NO_OF_MOMENTS];
+        scalar d_eq[NO_OF_MOMENTS], u_relv[NO_OF_MOMENTS],
+            u_reli[NO_OF_MOMENTS];
         // Interaction force
-        scalar P_coal[NO_OF_MOMENTS];
+        scalar P_coalv[NO_OF_MOMENTS], P_coali[NO_OF_MOMENTS];
 
         // TODO: My guess is that here a switching MUST occur between inertial
         // and viscous breakup.
-        for (int gamma=0; gamma < NO_OF_MOMENTS; ++gamma){
-            auto Sgamma = Sgammas_[gamma][celli];
+        for (int gamma = 0; gamma < NO_OF_MOMENTS; ++gamma) {
+            const auto &Sgamma = Sgammas_[gamma][celli];
             // Paper[1] equation (3)
-            auto d3gamma = pow(S3 / Sgamma, 1 / (3.0 - gamma)); 
+            const auto d3gamma = pow(S3 / Sgamma, 1 / (3.0 - gamma));
             d_eq[gamma] = k_cl_1_ * d3gamma;
-            u_rel[gamma] = shear_rate * d_eq[gamma];
+            u_relv[gamma] = shear_rate * d_eq[gamma];
+            u_reli[gamma] = pow(epsilon[celli] * d_eq[gamma], 1.0 / 3.0);
             // Critical film thickness eq (46) in paper [2]
-            auto h_cr = pow(A_H_ * d_eq[gamma] / (25.0 * pi * sigma), 1.0 / 3.0);
-            auto F_i =
-                3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
-                shear_rate * pow(d_eq[gamma], 2);
+            auto h_cr =
+                pow(A_H_ * d_eq[gamma] / (24.0 * pi * sigma), 1.0 / 3.0);
+            auto F_i = 3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
+                       shear_rate * pow(d_eq[gamma], 2);
             // Finally, ladies and gentlemen, I present to you:
             // Drainage model 3!
-            auto td =
-                pi * phase_.mu()()[celli] * sqrt(F_i) / (2 * h_cr) *
-                pow(d_eq[gamma] / (4 * pi * sigma), 3.0 / 2.0);
+            auto td = pi * phase_.mu()()[celli] * sqrt(F_i) / (2 * h_cr) *
+                      pow(d_eq[gamma] / (4 * pi * sigma), 3.0 / 2.0);
             // Equation (40)
-            P_coal[gamma] = exp(-td * shear_rate);
+            P_coalv[gamma] = exp(-td * shear_rate);
+            auto h0 = 8.3 * h_cr; // Paper [1] equation 53
+            auto Phi_max = 2.0 * pow(h0, 2.0) *
+                           phase_.otherPhase().rho()[celli] *
+                           interfacialTension_ /
+                           (We0_ * phase_.mu()()[celli] * d_eq[gamma]);
+            auto We = phase_.otherPhase().rho()[celli] *
+                      pow(epsilon[celli], 2.0 / 3.0) *
+                      pow(d_eq[gamma], 5.0 / 3.0) / interfacialTension_;
+            P_coali[gamma] =
+                Phi_max / pi *
+                pow(1.0 - pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0), 0.5);
         }
 
         for (label gamma = 0; gamma < NO_OF_MOMENTS; ++gamma) {
@@ -265,10 +278,11 @@ void dMOM::correct() {
                             9.0 / 4.0 * pow(sigma, 2)));
 
             coalescenceSource_[gamma][celli] =
-                (pow(2.0, gamma / 3.0) - 2.0) *
+                Fcl_ * (pow(2.0, gamma / 3.0) - 2.0) *
                 pow(6.0 * phase_[celli] / pi, 2.0) *
-                k_coll_ * u_rel[gamma] *
-                P_coal[gamma] *
+                (k_collv_ * u_relv[gamma] * P_coalv[gamma] + // viscous
+                 k_colli_ * u_reli[gamma] * P_coali[gamma]   // inertia
+                 ) *
                 pow(d_eq[gamma], gamma - 4);
         }
     }
@@ -283,12 +297,10 @@ void dMOM::correct() {
     // OF
 
     forAll(Sgammas_, i) {
-        fvScalarMatrix mEqn(
-            fvm::ddt(Sgammas_[i]) +
-            fvm::div(dispersedPhase_.phi(), Sgammas_[i])
-            //+ fvm::div(limitedFlux_,moments_[i])
-            ==
-            breakupSource_[i] + coalescenceSource_[i]);
+        fvScalarMatrix mEqn(fvm::ddt(Sgammas_[i]) +
+                                fvm::div(dispersedPhase_.phi(), Sgammas_[i])
+                            //+ fvm::div(limitedFlux_,moments_[i])
+                            == breakupSource_[i] + coalescenceSource_[i]);
         mEqn.relax();
         mEqn.solve();
     }
@@ -316,10 +328,10 @@ const volScalarField dMOM::d() const {
     // The expression below is used for thresholding the value so that small or
     // zero phase fraction values do not compromise the stability of two fluid
     // model (zero diameter limit).
-    return max(
-        6.0 / pi * dispersedPhase_ / Sgammas_[2],            // Equatio (6) from paper [1]
-        Sgammas_[1] / Sgammas_[0]); // This could be user defined
-                                    // mean diameter, instead.
+    return max(6.0 / pi * dispersedPhase_ /
+                   Sgammas_[2],            // Equation (6) from paper [1]
+               Sgammas_[1] / Sgammas_[0]); // This could be user defined
+                                           // mean diameter, instead.
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //

@@ -11,8 +11,8 @@ sigma = sqrt(log(1 + dvar / dmean**2))
 ds = lognormal(mean=mu, sigma=sigma, size=100000)
 vmean = mean(pi / 6 * ds**3)
 # Calculate total number of drops
-dpipe = 0.063
-alpha = 0.062
+dpipe = 0.063  # [m]
+alpha = 0.062  # [1]
 S0 = alpha / vmean
 S1 = S0 * dmean
 S2 = S0 * (dvar + dmean**2)

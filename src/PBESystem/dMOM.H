@@ -84,14 +84,18 @@ private:
  const scalar Nf_;
  const scalar C_alpha_;
  const scalar We_cr_;
+ const scalar We0_;
  const scalar k_br_;
  const scalar Ca_cr_;
  const scalar k_cl_1_;
+ const scalar k_cl_2_;
  const dimensionedScalar consistency_;
  const scalar interfacialTension_;
  const dimensionedScalar minDiameter_;
- const scalar k_coll_;
+ const scalar k_collv_;
+ const scalar k_colli_;
  const scalar A_H_;
+ const scalar Fcl_;
 
  // Private member functions
  
