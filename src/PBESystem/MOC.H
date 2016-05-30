@@ -43,6 +43,7 @@ SourceFiles
 #define MOCPBE_H
 
 #include "PBEMethod.H"
+#include<vector>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

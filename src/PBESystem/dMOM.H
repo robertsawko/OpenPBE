@@ -71,9 +71,9 @@ private:
  const phaseModel& dispersedPhase_;
  const fvMesh& mesh_;
 
- PtrList<volScalarField> Sgammas_;
- PtrList<volScalarField> breakupSource_;
- PtrList<volScalarField> coalescenceSource_;
+ volScalarField S2_;
+ volScalarField breakupSource_;
+ volScalarField coalescenceSource_;
 
  //log-normal distribution parameters
  volScalarField log_d_bar_;

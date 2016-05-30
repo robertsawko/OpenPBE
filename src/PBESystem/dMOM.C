@@ -58,8 +58,27 @@ using constant::mathematical::pi;
 dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
     : PBEMethod(pbeProperties, phase),
       dMOMDict_(pbeProperties.subDict("dMOMCoeffs")), dispersedPhase_(phase),
-      mesh_(dispersedPhase_.U().mesh()), Sgammas_(NO_OF_MOMENTS),
-      breakupSource_(NO_OF_MOMENTS), coalescenceSource_(NO_OF_MOMENTS),
+      mesh_(dispersedPhase_.U().mesh()), S2_(IOobject("S2",
+                                                      mesh_.time().timeName(),
+                                                      mesh_,
+                                                      IOobject::MUST_READ,
+                                                      IOobject::AUTO_WRITE),
+                                             mesh_),
+      breakupSource_(IOobject("breakupSource",
+                              mesh_.time().timeName(),
+                              mesh_,
+                              IOobject::NO_READ,
+                              IOobject::AUTO_WRITE),
+                     mesh_,
+                     dimensionedScalar("0", S2_.dimensions() / dimTime, 0.0)),
+      coalescenceSource_(
+          IOobject("coalescenceSource",
+                   mesh_.time().timeName(),
+                   mesh_,
+                   IOobject::NO_READ,
+                   IOobject::AUTO_WRITE),
+          mesh_,
+          dimensionedScalar("0", S2_.dimensions() / dimTime, 0.0)),
       log_d_bar_(IOobject("logd_bar",
                           mesh_.time().timeName(),
                           mesh_,
@@ -104,37 +123,7 @@ dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
       A_H_(5e-21), // Hamaker constant; given in paper [2] after in the comment
                    // to eq 46
       Fcl_(dMOMDict_.lookupOrDefault<scalar>("calibration", 1.0)) {
-    forAll(Sgammas_, i) {
-        Sgammas_.set(i,
-                     new volScalarField(IOobject("S" + std::to_string(i),
-                                                 mesh_.time().timeName(),
-                                                 mesh_,
-                                                 IOobject::MUST_READ,
-                                                 IOobject::AUTO_WRITE),
-                                        mesh_));
-        breakupSource_.set(
-            i,
-            new volScalarField(
-                IOobject("breakup" + std::to_string(i) + "Source",
-                         mesh_.time().timeName(),
-                         mesh_,
-                         IOobject::NO_READ,
-                         IOobject::AUTO_WRITE),
-                mesh_,
-                dimensionedScalar(
-                    "0", Sgammas_[i].dimensions() / dimTime, 0.0)));
-        coalescenceSource_.set(
-            i,
-            new volScalarField(
-                IOobject("coalescence" + std::to_string(i) + "Source",
-                         mesh_.time().timeName(),
-                         mesh_,
-                         IOobject::NO_READ,
-                         IOobject::AUTO_WRITE),
-                mesh_,
-                dimensionedScalar(
-                    "0", Sgammas_[i].dimensions() / dimTime, 0.0)));
-    }
+
     printAvgMaxMin(mesh_, d());
 }
 
@@ -145,27 +134,37 @@ using boost::math::pdf;
 
 void dMOM::correct() {
     // Creating aliases to shorten notation
-    const volScalarField &S0 = Sgammas_[0];
-    const volScalarField &S1 = Sgammas_[1];
-    const volScalarField &S2 = Sgammas_[2];
-    // Calculate moments (note equation (2) in paper [1])
-    const volScalarField m1 = S1 / S0;
-    const volScalarField m2 = S2 / S0;
-    // Non-logarithmized variance
-    // TODO: Investigate why variance become negative
-    const volScalarField v = mag(m2 - pow(m1, 2));
+    // const auto S0 = 6.0 / pi * phase_ * pow(d(), -3.0);
+    const volScalarField S3(
+        "S3,", max(phase_ * 6.0 / pi, dimensionedScalar("s", dimless, 1e-6)));
+    // This stems from sphericity assumption and equality of d30 and d32.
+    // Compare paper [2] equations 16 and 17. This looks like a dodgy hack!
+    const volScalarField S0(
+        "S0",
+        pow(S2_, 3.0) /
+            max(pow(S3, 2.0), dimensionedScalar("s", dimless, 1e-6)));
+    // Inversion procedure
+    printAvgMaxMin(mesh_, S0);
+    printAvgMaxMin(mesh_, S3);
+    const volScalarField logm2 =
+        log(max(S2_ / S0,
+                dimensionedScalar("s", dimensionSet(0, 2, 0, 0, 0), 1e-6)) *
+            pow(consistency_, -2.0));
+    const volScalarField logm3 =
+        log(max(S3 / S0,
+                dimensionedScalar("s", dimensionSet(0, 3, 0, 0, 0), 1e-6)) *
+            pow(consistency_, -3.0));
 
     Info << "updating size moments" << endl;
     // Moment inversion is given analytically (see )
-    log_d_bar_ = log(m1 / consistency_ / sqrt(1.0 + v / pow(m1, 2)));
-    sigma_hat_ = sqrt(log(1.0 + v / pow(m1, 2)));
+    sigma_hat_ = sqrt(2.0 / 3.0 * logm3 - logm2);
+    log_d_bar_ = 0.5 * logm2 - sigma_hat_;
 
     Info << "Lognormal parameters:" << endl;
-    printAvgMaxMin(mesh_, S0);
+    // printAvgMaxMin(mesh_, S0);
     printAvgMaxMin(mesh_, log_d_bar_);
     printAvgMaxMin(mesh_, sigma_hat_);
 
-    std::vector<volScalarField> mSources_;
     const volScalarField &epsilon =
         dispersedPhase_.U().mesh().lookupObject<volScalarField>(
             "epsilon." + dispersedPhase_.name());
@@ -207,111 +206,86 @@ void dMOM::correct() {
 
         // **** COALESCENCE CHARACTERISTICS CALCULATIONS ****
         // Paper[1] equation (5)
-        auto S3 = phase_[celli] * 6.0 / pi;
-        scalar d_eq[NO_OF_MOMENTS], u_relv[NO_OF_MOMENTS],
-            u_reli[NO_OF_MOMENTS];
-        // Interaction force
-        scalar P_coalv[NO_OF_MOMENTS], P_coali[NO_OF_MOMENTS];
 
         // TODO: My guess is that here a switching MUST occur between inertial
         // and viscous breakup.
-        for (int gamma = 0; gamma < NO_OF_MOMENTS; ++gamma) {
-            const auto &Sgamma = Sgammas_[gamma][celli];
-            // Paper[1] equation (3)
-            const auto d3gamma = pow(S3 / Sgamma, 1 / (3.0 - gamma));
-            d_eq[gamma] = k_cl_1_ * d3gamma;
-            u_relv[gamma] = shear_rate * d_eq[gamma];
-            u_reli[gamma] = pow(epsilon[celli] * d_eq[gamma], 1.0 / 3.0);
-            // Critical film thickness eq (46) in paper [2]
-            auto h_cr =
-                pow(A_H_ * d_eq[gamma] / (24.0 * pi * sigma), 1.0 / 3.0);
-            auto F_i = 3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
-                       shear_rate * pow(d_eq[gamma], 2);
-            // Finally, ladies and gentlemen, I present to you:
-            // Drainage model 3!
-            auto td = pi * phase_.mu()()[celli] * sqrt(F_i) / (2 * h_cr) *
-                      pow(d_eq[gamma] / (4 * pi * sigma), 3.0 / 2.0);
-            // Equation (40)
-            P_coalv[gamma] = exp(-td * shear_rate);
-            auto h0 = 8.3 * h_cr; // Paper [1] equation 53
-            auto Phi_max = 2.0 * pow(h0, 2.0) *
-                           phase_.otherPhase().rho()[celli] *
-                           interfacialTension_ /
-                           (We0_ * phase_.mu()()[celli] * d_eq[gamma]);
-            auto We = phase_.otherPhase().rho()[celli] *
-                      pow(epsilon[celli], 2.0 / 3.0) *
-                      pow(d_eq[gamma], 5.0 / 3.0) / interfacialTension_;
-            P_coali[gamma] =
-                Phi_max / pi *
-                pow(1.0 - pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0), 0.5);
-        }
+        // Paper[1] equation (3) for gamma = 2
+        const auto d32 = S3[celli] / S2_[celli];
+        scalar d_eq = k_cl_1_ * d32;
+        scalar u_relv = shear_rate * d_eq;
+        scalar u_reli = pow(epsilon[celli] * d_eq, 1.0 / 3.0);
+        // Critical film thickness eq (46) in paper [2]
+        auto h_cr = pow(A_H_ * d_eq / (24.0 * pi * sigma), 1.0 / 3.0);
+        auto F_i = 3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
+                   shear_rate * pow(d_eq, 2);
+        // Finally, ladies and gentlemen, I present to you:
+        // Drainage model 3!
+        auto td = pi * phase_.mu()()[celli] * sqrt(F_i) / (2 * h_cr) *
+                  pow(d_eq / (4 * pi * sigma), 3.0 / 2.0);
+        // Equation (40)
+        scalar P_coalv = exp(-td * shear_rate);
+        auto h0 = 8.3 * h_cr; // Paper [1] equation 53
+        auto Phi_max = 2.0 * pow(h0, 2.0) * phase_.otherPhase().rho()[celli] *
+                       interfacialTension_ /
+                       (We0_ * phase_.mu()()[celli] * d_eq);
+        auto We = phase_.otherPhase().rho()[celli] *
+                  pow(epsilon[celli], 2.0 / 3.0) * pow(d_eq, 5.0 / 3.0) /
+                  interfacialTension_;
+        //scalar P_coali =
+            //Phi_max / pi *
+            //pow(1.0 - pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0), 0.5);
 
-        for (label gamma = 0; gamma < NO_OF_MOMENTS; ++gamma) {
-            auto mu_viscous = log_d_bar_[celli] + (gamma - 1) * std;
-            auto mu_inertial = log_d_bar_[celli] + (gamma - 1.5) * std;
-            auto x_crit = log(d_cr_inertia);
+        // Equationsw with gamma = 2.0
+        auto mu_viscous = log_d_bar_[celli] + std;
+        auto mu_inertial = log_d_bar_[celli] + 0.5 * std;
+        auto x_crit = log(d_cr_inertia);
 
-            normal inertial(mu_inertial, std);
-            normal viscous(mu_viscous, std);
+        normal inertial(mu_inertial, std);
+        normal viscous(mu_viscous, std);
 
-            // exp expression are correction factor that results from the
-            // x = log(d) substitution and recasting the integrals as erfc.
-            // TODO: Needs more doc!
-            breakupSource_[gamma][celli] =
-                // DPD constant contribution; the remaining d^gamma goes into
-                // correction factor
-                (pow(Nf_, (3.0 - gamma) / 3.0) - 1.0) *
-                (
-                    // Viscous breakup
-                    1 / tau_viscous_constant *
-                        (cdf(viscous, log(L_k)) -
-                         cdf(viscous, log(d_cr_viscous))) *
-                        exp(pow(gamma * std, 2) + 2.0 * gamma * mu_viscous -
-                            2.0 * gamma * pow(std, 2) - 2.0 * mu_viscous +
-                            pow(sigma, 2)) +
-                    // Inertial breakup contribution
-                    1 / tau_inertia_constant *
-                        // TODO: does x_crit need limiting?
-                        (1 - cdf(inertial, max(x_crit, log(L_k)))) *
-                        exp(pow(gamma * std, 2) + 2.0 * gamma * mu_inertial -
-                            3.0 * gamma * pow(std, 2) - 3.0 * mu_inertial +
-                            9.0 / 4.0 * pow(sigma, 2)));
+        // exp expression are correction factor that results from the
+        // x = log(d) substitution and recasting the integrals as erfc.
+        // TODO: Needs more doc!
+        breakupSource_[celli] =
+            // DPD constant contribution; the remaining d^gamma goes into
+            // correction factor
+            (pow(Nf_, 1.0 / 3.0) - 1.0) *
+            (
+                // Viscous breakup
+                1 / tau_viscous_constant *
+                    (cdf(viscous, log(L_k)) - cdf(viscous, log(d_cr_viscous))) *
+                    exp(pow(2.0 * std, 2) + 2.0 * 2.0 * mu_viscous -
+                        2.0 * 2.0 * pow(std, 2) - 2.0 * mu_viscous +
+                        pow(sigma, 2)) +
+                // Inertial breakup contribution
+                1 / tau_inertia_constant *
+                    // TODO: does x_crit need limiting?
+                    (1 - cdf(inertial, max(x_crit, log(L_k)))) *
+                    exp(pow(2.0 * std, 2) + 2.0 * 2.0 * mu_inertial -
+                        3.0 * 2.0 * pow(std, 2) - 3.0 * mu_inertial +
+                        9.0 / 4.0 * pow(sigma, 2)));
 
-            coalescenceSource_[gamma][celli] =
-                Fcl_ * (pow(2.0, gamma / 3.0) - 2.0) *
-                pow(6.0 * phase_[celli] / pi, 2.0) *
-                (k_collv_ * u_relv[gamma] * P_coalv[gamma] + // viscous
-                 k_colli_ * u_reli[gamma] * P_coali[gamma]   // inertia
-                 ) *
-                pow(d_eq[gamma], gamma - 4);
-        }
+        coalescenceSource_[celli] = Fcl_ * (pow(2.0, 2.0 / 3.0) - 2.0) *
+                                    pow(6.0 * phase_[celli] / pi, 2.0) *
+                                    (k_collv_ * u_relv * P_coalv // viscous
+                                     //k_colli_ * u_reli * P_coali   // inertia
+                                     ) *
+                                    pow(d_eq, -2.0);
     }
-    for (auto bs : breakupSource_)
-        printAvgMaxMin(mesh_, bs);
-    for (auto cs : coalescenceSource_)
-        printAvgMaxMin(mesh_, cs);
+    printAvgMaxMin(mesh_, breakupSource_);
+    printAvgMaxMin(mesh_, coalescenceSource_);
     // TODO: is there a better way to assure that source terms on boundaries
     // are equal to 0?
     // maybe using internalField() instead of the whole field somewhere?
     // how source terms are handled in combustion/chemistry/turbulence codes in
     // OF
 
-    forAll(Sgammas_, i) {
-        fvScalarMatrix mEqn(fvm::ddt(Sgammas_[i]) +
-                                fvm::div(dispersedPhase_.phi(), Sgammas_[i])
-                            //+ fvm::div(limitedFlux_,moments_[i])
-                            == breakupSource_[i] + coalescenceSource_[i]);
-        mEqn.relax();
-        mEqn.solve();
-    }
-
-    for (auto &moment : Sgammas_) {
-        moment =
-            max(moment,
-                dimensionedScalar(moment.name(), moment.dimensions(), SMALL));
-        // TODO: print a warning message
-        printAvgMaxMin(mesh_, moment);
-    }
+    // Paper [1] comment below equation 8: only S2 is solved
+    fvScalarMatrix mEqn(fvm::ddt(S2_) + fvm::div(dispersedPhase_.phi(), S2_)
+                        //+ fvm::div(limitedFlux_,moments_[i])
+                        == breakupSource_ + coalescenceSource_);
+    mEqn.relax();
+    mEqn.solve();
 
     printAvgMaxMin(mesh_, d());
 }
@@ -328,10 +302,8 @@ const volScalarField dMOM::d() const {
     // The expression below is used for thresholding the value so that small or
     // zero phase fraction values do not compromise the stability of two fluid
     // model (zero diameter limit).
-    return max(6.0 / pi * dispersedPhase_ /
-                   Sgammas_[2],            // Equation (6) from paper [1]
-               Sgammas_[1] / Sgammas_[0]); // This could be user defined
-                                           // mean diameter, instead.
+    return max(6.0 / pi * dispersedPhase_ / S2_, // Equation (6) from paper [1]
+               dimensionedScalar("min", dimLength, SMALL));
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //

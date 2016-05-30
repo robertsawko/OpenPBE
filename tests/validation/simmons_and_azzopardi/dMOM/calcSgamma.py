@@ -18,3 +18,4 @@ S1 = S0 * dmean
 S2 = S0 * (dvar + dmean**2)
 print(S0, S1, S2)
 print(mu, sigma)
+print(S2 / S0)
