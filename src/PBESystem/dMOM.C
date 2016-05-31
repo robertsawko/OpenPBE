@@ -304,7 +304,7 @@ const volScalarField dMOM::d() const {
     // zero phase fraction values do not compromise the stability of two fluid
     // model (zero diameter limit).
     return max(6.0 / pi * dispersedPhase_ / S2_, // Equation (6) from paper [1]
-               dimensionedScalar("min", dimLength, 0.0004));
+               minDiameter_);
 }
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
