@@ -83,5 +83,5 @@ change is to include
 ```
 libs ("libPBE.so")
 ``` 
-
-in your `controlDict`. See `testing/twoPhaseEulerFoam` for the full setup.
+in your `controlDict`. See `tests/validation/twoPhaseEulerFoam` for example
+usages against some known experimental cases.
