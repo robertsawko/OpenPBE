@@ -57,7 +57,7 @@ MOC::MOC(const dictionary &pbeProperties, const phaseModel &phase)
 
     usingMULES_ = MOCDict_.lookupOrDefault<Switch>("usingMULES", false);
     breakupCache_.resize(numberOfClasses_ * phase.size());
-    source_term_relaxation_ = readScalar(MOCDict_.lookup("relaxation"));
+    source_term_relaxation_ = MOCDict_.lookupOrDefault<scalar>("sourceRelaxation", 1.0);
 
     Info << "Creating " << numberOfClasses_ << " class";
     // Taking pedantry one step too far!
