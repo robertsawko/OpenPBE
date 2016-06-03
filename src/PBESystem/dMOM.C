@@ -117,7 +117,7 @@ dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
           readScalar(dMOMDict_.lookup("interfacialTension"))),
       minDiameter_("min(d)",
                    dimLength,
-                   dMOMDict_.lookupOrDefault<scalar>("minDiameter", 1e-9)),
+                   dMOMDict_.lookupOrDefault<scalar>("minDiameter", 1e-5)),
       k_collv_(sqrt(8 * pi / 3)),  // Paper [1] equation 36
       k_colli_(sqrt(2 * pi / 15)), // Paper [1] equation 46
       A_H_(5e-21), // Hamaker constant; given in paper [2] after in the comment
@@ -210,7 +210,7 @@ void dMOM::correct() {
         // TODO: My guess is that here a switching MUST occur between inertial
         // and viscous breakup.
         // Paper[1] equation (3) for gamma = 2
-        const auto d32 = S3[celli] / S2_[celli];
+        const auto d32 = max(S3[celli] / S2_[celli], minDiameter_.value());
         scalar d_eq = k_cl_1_ * d32;
         scalar u_relv = shear_rate * d_eq;
         scalar u_reli = pow(epsilon[celli] * d_eq, 1.0 / 3.0);
@@ -224,16 +224,25 @@ void dMOM::correct() {
                   pow(d_eq / (4 * pi * sigma), 3.0 / 2.0);
         // Equation (40)
         scalar P_coalv = exp(-td * shear_rate);
-        auto h0 = 8.3 * h_cr; // Paper [1] equation 53
-        auto Phi_max = 2.0 * pow(h0, 2.0) * phase_.otherPhase().rho()[celli] *
-                       interfacialTension_ /
-                       (We0_ * phase_.mu()()[celli] * d_eq);
-        auto We = phase_.otherPhase().rho()[celli] *
-                  pow(epsilon[celli], 2.0 / 3.0) * pow(d_eq, 5.0 / 3.0) /
-                  interfacialTension_;
+        //Info << "P_coalv=" << P_coalv << endl;
+        //auto h0 = 8.3 * h_cr; // Paper [1] equation 53
+        //Info << "h0=" << h0 << " rho=" << phase_.otherPhase().rho()[celli]
+            //<< " sigma=" << interfacialTension_ << " epsilon="
+            //<< epsilon[celli] << " We0=" << We0_ << " d_eq=" << d_eq
+            //<< " mu2=" << pow(phase_.mu()()[celli], 2.0) << endl;
+        //auto Phi_max = 2.0 * pow(h0, 2.0) * phase_.otherPhase().rho()[celli] *
+                       //interfacialTension_ /
+                       //(We0_ * pow(phase_.mu()()[celli], 2.0) * d_eq);
+        //Info << "Phi_max=" << Phi_max << endl;
+        //auto We = phase_.otherPhase().rho()[celli] *
+                  //pow(epsilon[celli], 2.0 / 3.0) * pow(d_eq, 5.0 / 3.0) /
+                  //interfacialTension_;
+        //Info << "We=" << We << " We0=" << We0_ << " pow="
+            //<< pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0) << endl;
         //scalar P_coali =
             //Phi_max / pi *
             //pow(1.0 - pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0), 0.5);
+        //Info << "P_coali=" << P_coali << endl;
 
         // Equationsw with gamma = 2.0
         auto mu_viscous = log_d_bar_[celli] + std;
