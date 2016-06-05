@@ -171,17 +171,16 @@ void dMOM::correct() {
     const scalar &sigma = interfacialTension_;
 
     forAll(dispersedPhase_, celli) {
+        const scalar &muc = phase_.otherPhase().mu()()[celli];
         // **** BREAKUP CHARACTERISTICS CALCULATIONS ****
         // Turbulent length scale
         auto L_k = pow(
             pow(phase_.otherPhase().nu()()[celli], 4) / epsilon[celli], 0.25);
 
         auto shear_rate =
-            sqrt(phase_.otherPhase().rho()[celli] * epsilon[celli] /
-                 phase_.otherPhase().mu()()[celli]);
+            sqrt(phase_.otherPhase().rho()[celli] * epsilon[celli] / muc);
         // Critical diameter for viscous breakup
-        auto d_cr_viscous =
-            2 * sigma * Ca_cr_ / phase_.otherPhase().mu()()[celli] / shear_rate;
+        auto d_cr_viscous = 2 * sigma * Ca_cr_ / (muc * shear_rate);
 
         // Critical diameter for inertial breakup
         scalar d_cr_inertia =
@@ -190,16 +189,16 @@ void dMOM::correct() {
             pow(epsilon[celli], -2.0 / 5.0);
 
         // Molecular viscosity ratio
-        auto lambda = phase_.mu()()[celli] / phase_.otherPhase().mu()()[celli];
+        auto lambda = phase_.mu()()[celli] / muc;
+        // Constants takens from Hill's/Brujin
         auto ftau =
             exp(1.43 + 0.267 * log(lambda) - 0.023 * pow(log(lambda), 2));
-        auto tau_viscous_constant =
-            (phase_.mu()()[celli] * shear_rate) / sigma * ftau;
+        auto tau_viscous_constant = muc / sigma * ftau;
         // Physical constants for inertial breakup
         auto tau_inertia_constant =
-            2 * pi * k_br_ * sqrt((3 * phase_.rho()[celli] +
-                                   2 * phase_.otherPhase().rho()[celli]) /
-                                  (192 * sigma));
+            2.0 * pi * k_br_ * sqrt((3.0 * phase_.rho()[celli] +
+                                     2.0 * phase_.otherPhase().rho()[celli]) /
+                                    (192.0 * sigma));
 
         // Modified distributions parameters
         auto &std = sigma_hat_[celli];
@@ -213,7 +212,7 @@ void dMOM::correct() {
         const auto d32 = max(S3[celli] / S2_[celli], minDiameter_.value());
         scalar d_eq = k_cl_1_ * d32;
         scalar u_relv = shear_rate * d_eq;
-        scalar u_reli = pow(epsilon[celli] * d_eq, 1.0 / 3.0);
+        // scalar u_reli = pow(epsilon[celli] * d_eq, 1.0 / 3.0);
         // Critical film thickness eq (46) in paper [2]
         auto h_cr = pow(A_H_ * d_eq / (24.0 * pi * sigma), 1.0 / 3.0);
         auto F_i = 3.0 * pi / 2.0 * phase_.otherPhase().mu()()[celli] *
@@ -224,25 +223,26 @@ void dMOM::correct() {
                   pow(d_eq / (4 * pi * sigma), 3.0 / 2.0);
         // Equation (40)
         scalar P_coalv = exp(-td * shear_rate);
-        //Info << "P_coalv=" << P_coalv << endl;
-        //auto h0 = 8.3 * h_cr; // Paper [1] equation 53
-        //Info << "h0=" << h0 << " rho=" << phase_.otherPhase().rho()[celli]
-            //<< " sigma=" << interfacialTension_ << " epsilon="
-            //<< epsilon[celli] << " We0=" << We0_ << " d_eq=" << d_eq
-            //<< " mu2=" << pow(phase_.mu()()[celli], 2.0) << endl;
-        //auto Phi_max = 2.0 * pow(h0, 2.0) * phase_.otherPhase().rho()[celli] *
-                       //interfacialTension_ /
-                       //(We0_ * pow(phase_.mu()()[celli], 2.0) * d_eq);
-        //Info << "Phi_max=" << Phi_max << endl;
-        //auto We = phase_.otherPhase().rho()[celli] *
-                  //pow(epsilon[celli], 2.0 / 3.0) * pow(d_eq, 5.0 / 3.0) /
-                  //interfacialTension_;
-        //Info << "We=" << We << " We0=" << We0_ << " pow="
-            //<< pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0) << endl;
-        //scalar P_coali =
-            //Phi_max / pi *
-            //pow(1.0 - pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0), 0.5);
-        //Info << "P_coali=" << P_coali << endl;
+        // Info << "P_coalv=" << P_coalv << endl;
+        // auto h0 = 8.3 * h_cr; // Paper [1] equation 53
+        // Info << "h0=" << h0 << " rho=" << phase_.otherPhase().rho()[celli]
+        //<< " sigma=" << interfacialTension_ << " epsilon="
+        //<< epsilon[celli] << " We0=" << We0_ << " d_eq=" << d_eq
+        //<< " mu2=" << pow(phase_.mu()()[celli], 2.0) << endl;
+        // auto Phi_max = 2.0 * pow(h0, 2.0) * phase_.otherPhase().rho()[celli]
+        // *
+        // interfacialTension_ /
+        //(We0_ * pow(phase_.mu()()[celli], 2.0) * d_eq);
+        // Info << "Phi_max=" << Phi_max << endl;
+        // auto We = phase_.otherPhase().rho()[celli] *
+        // pow(epsilon[celli], 2.0 / 3.0) * pow(d_eq, 5.0 / 3.0) /
+        // interfacialTension_;
+        // Info << "We=" << We << " We0=" << We0_ << " pow="
+        //<< pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0) << endl;
+        // scalar P_coali =
+        // Phi_max / pi *
+        // pow(1.0 - pow(k_cl_2_ * (We - We0_) / Phi_max, 2.0), 0.5);
+        // Info << "P_coali=" << P_coali << endl;
 
         // Equationsw with gamma = 2.0
         auto mu_viscous = log_d_bar_[celli] + std;
@@ -277,7 +277,7 @@ void dMOM::correct() {
         coalescenceSource_[celli] = Fcl_ * (pow(2.0, 2.0 / 3.0) - 2.0) *
                                     pow(6.0 * phase_[celli] / pi, 2.0) *
                                     (k_collv_ * u_relv * P_coalv // viscous
-                                     //k_colli_ * u_reli * P_coali   // inertia
+                                     // k_colli_ * u_reli * P_coali   // inertia
                                      ) *
                                     pow(d_eq, -2.0);
     }
