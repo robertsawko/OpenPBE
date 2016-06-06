@@ -233,6 +233,7 @@ void dMOM::correct() {
         // Equationsw with gamma = 2.0
         auto mu_viscous = var;
         auto mu_inertial = 0.5 * var;
+        auto t_k = log(L_k / d32[celli]);
         auto t_crv = log(d_cr_viscous / d32[celli]);
         auto t_cri = log(d_cr_inertia / d32[celli]);
 
@@ -249,13 +250,13 @@ void dMOM::correct() {
                 (
                     // Viscous breakup
                     1 / tau_viscous_constant *
-                    (cdf(viscous, log(L_k / d32[celli])) -
+                    (cdf(viscous, max(t_crv, t_k)) -
                      cdf(viscous, t_crv))) *
                 exp(var / 2.0) / d32[celli] +
             // Inertial breakup contribution
             1 / tau_inertia_constant *
                 // TODO: does t_cr need limiting?
-                (1 - cdf(inertial, max(t_cri, log(L_k / d32[celli])))) *
+                (1 - cdf(inertial, max(t_cri, t_k))) *
                 exp(var / 8.0) / d32[celli];
 
         coalescenceSource_[celli] = Fcl_ * (pow(2.0, 2.0 / 3.0) - 2.0) *
