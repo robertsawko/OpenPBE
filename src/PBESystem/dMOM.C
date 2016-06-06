@@ -79,20 +79,13 @@ dMOM::dMOM(const dictionary &pbeProperties, const phaseModel &phase)
                    IOobject::AUTO_WRITE),
           mesh_,
           dimensionedScalar("0", S2_.dimensions() / dimTime, 0.0)),
-      log_d_bar_(IOobject("logd_bar",
-                          mesh_.time().timeName(),
-                          mesh_,
-                          IOobject::NO_READ,
-                          IOobject::AUTO_WRITE),
-                 mesh_,
-                 dimensionedScalar("log_dbar", dimless, 0.0)),
-      sigma_hat_(IOobject("sigma_hat",
-                          mesh_.time().timeName(),
-                          mesh_,
-                          IOobject::NO_READ,
-                          IOobject::AUTO_WRITE),
-                 mesh_,
-                 dimensionedScalar("sigma_hat", dimless, 0.0)),
+      sigma2_hat_(IOobject("sigma2_hat",
+                           mesh_.time().timeName(),
+                           mesh_,
+                           IOobject::NO_READ,
+                           IOobject::AUTO_WRITE),
+                  mesh_,
+                  dimensionedScalar("sigma2_hat", dimless, 0.0)),
       number_density_(IOobject("n",
                                mesh_.time().timeName(),
                                mesh_,
@@ -146,29 +139,24 @@ void dMOM::correct() {
     // Inversion procedure
     printAvgMaxMin(mesh_, S0);
     printAvgMaxMin(mesh_, S3);
+    const auto d32 = d();
     const volScalarField logm2 =
-        log(max(S2_ / S0,
-                dimensionedScalar("s", dimensionSet(0, 2, 0, 0, 0), 1e-3)) *
-            pow(consistency_, -2.0));
-    const volScalarField logm3 =
-        log(max(S3 / S0,
-                dimensionedScalar("s", dimensionSet(0, 3, 0, 0, 0), 1e-3)) *
-            pow(consistency_, -3.0));
+        log(max(S2_ / S0 * pow(d32, -2.0),
+                dimensionedScalar("s", dimless, 1e-3)));
 
     Info << "updating size moments" << endl;
-    // Moment inversion is given analytically (see )
-    sigma_hat_ = sqrt(2.0 / 3.0 * logm3 - logm2);
-    log_d_bar_ = 0.5 * logm2 - sigma_hat_;
+    // Moment inversion is given analytically (we allow minimum 5% variation)
+    sigma2_hat_ = max(0.5 * logm2, 0.025);
 
     Info << "Lognormal parameters:" << endl;
     // printAvgMaxMin(mesh_, S0);
-    printAvgMaxMin(mesh_, log_d_bar_);
-    printAvgMaxMin(mesh_, sigma_hat_);
+    printAvgMaxMin(mesh_, sigma2_hat_);
 
     const volScalarField &epsilon =
         dispersedPhase_.U().mesh().lookupObject<volScalarField>(
             "epsilon." + dispersedPhase_.name());
     const scalar &sigma = interfacialTension_;
+
 
     forAll(dispersedPhase_, celli) {
         const scalar &muc = phase_.otherPhase().mu()()[celli];
@@ -201,7 +189,7 @@ void dMOM::correct() {
                                     (192.0 * sigma));
 
         // Modified distributions parameters
-        auto &std = sigma_hat_[celli];
+        auto &var = sigma2_hat_[celli];
 
         // **** COALESCENCE CHARACTERISTICS CALCULATIONS ****
         // Paper[1] equation (5)
@@ -209,8 +197,7 @@ void dMOM::correct() {
         // TODO: My guess is that here a switching MUST occur between inertial
         // and viscous breakup.
         // Paper[1] equation (3) for gamma = 2
-        const auto d32 = max(S3[celli] / S2_[celli], minDiameter_.value());
-        scalar d_eq = k_cl_1_ * d32;
+        scalar d_eq = k_cl_1_ * d32[celli];
         scalar u_relv = shear_rate * d_eq;
         // scalar u_reli = pow(epsilon[celli] * d_eq, 1.0 / 3.0);
         // Critical film thickness eq (46) in paper [2]
@@ -245,34 +232,30 @@ void dMOM::correct() {
         // Info << "P_coali=" << P_coali << endl;
 
         // Equationsw with gamma = 2.0
-        auto mu_viscous = log_d_bar_[celli] + std;
-        auto mu_inertial = log_d_bar_[celli] + 0.5 * std;
-        auto x_crit = log(d_cr_inertia);
+        auto mu_viscous = var;
+        auto mu_inertial = 0.5 * var;
+        auto t_cr = log(d_cr_inertia / d32[celli]);
 
-        normal inertial(mu_inertial, std);
-        normal viscous(mu_viscous, std);
+        normal inertial(mu_inertial, sqrt(var));
+        normal viscous(mu_viscous, sqrt(var));
 
         // exp expression are correction factor that results from the
-        // x = log(d) substitution and recasting the integrals as erfc.
+        // t = log(d/{\bar d}) substitution and recasting the integrals as erfc.
         // TODO: Needs more doc!
         breakupSource_[celli] =
             // DPD constant contribution; the remaining d^gamma goes into
             // correction factor
             (pow(Nf_, 1.0 / 3.0) - 1.0) *
-            (
-                // Viscous breakup
-                1 / tau_viscous_constant *
-                    (cdf(viscous, log(L_k)) - cdf(viscous, log(d_cr_viscous))) *
-                    exp(pow(2.0 * std, 2) + 2.0 * 2.0 * mu_viscous -
-                        2.0 * 2.0 * pow(std, 2) - 2.0 * mu_viscous +
-                        pow(sigma, 2)) +
-                // Inertial breakup contribution
-                1 / tau_inertia_constant *
-                    // TODO: does x_crit need limiting?
-                    (1 - cdf(inertial, max(x_crit, log(L_k)))) *
-                    exp(pow(2.0 * std, 2) + 2.0 * 2.0 * mu_inertial -
-                        3.0 * 2.0 * pow(std, 2) - 3.0 * mu_inertial +
-                        9.0 / 4.0 * pow(sigma, 2)));
+                (
+                    // Viscous breakup
+                    1 / tau_viscous_constant *
+                    (cdf(viscous, log(L_k / d32[celli])) - cdf(viscous, t_cr))) *
+                exp(var / 2.0) / d32[celli] +
+            // Inertial breakup contribution
+            1 / tau_inertia_constant *
+                // TODO: does t_cr need limiting?
+                (1 - cdf(inertial, max(t_cr, log(L_k / d32[celli])))) *
+                exp(var / 8.0) / d32[celli];
 
         coalescenceSource_[celli] = Fcl_ * (pow(2.0, 2.0 / 3.0) - 2.0) *
                                     pow(6.0 * phase_[celli] / pi, 2.0) *

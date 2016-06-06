@@ -76,8 +76,7 @@ private:
  volScalarField coalescenceSource_;
 
  //log-normal distribution parameters
- volScalarField log_d_bar_;
- volScalarField sigma_hat_;
+ volScalarField sigma2_hat_;
  volScalarField number_density_;
 
  //Modelling parameters
