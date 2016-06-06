@@ -138,11 +138,11 @@ void dMOM::correct() {
             max(pow(S3, 2.0), dimensionedScalar("s", dimless, 1e-3)));
     // Inversion procedure
     printAvgMaxMin(mesh_, S0);
+    printAvgMaxMin(mesh_, S2_);
     printAvgMaxMin(mesh_, S3);
     const auto d32 = d();
-    const volScalarField logm2 =
-        log(max(S2_ / S0 * pow(d32, -2.0),
-                dimensionedScalar("s", dimless, 1e-3)));
+    const volScalarField logm2 = log(
+        max(S2_ / S0 * pow(d32, -2.0), dimensionedScalar("s", dimless, 1e-3)));
 
     Info << "updating size moments" << endl;
     // Moment inversion is given analytically (we allow minimum 5% variation)
@@ -156,7 +156,6 @@ void dMOM::correct() {
         dispersedPhase_.U().mesh().lookupObject<volScalarField>(
             "epsilon." + dispersedPhase_.name());
     const scalar &sigma = interfacialTension_;
-
 
     forAll(dispersedPhase_, celli) {
         const scalar &muc = phase_.otherPhase().mu()()[celli];
@@ -234,7 +233,8 @@ void dMOM::correct() {
         // Equationsw with gamma = 2.0
         auto mu_viscous = var;
         auto mu_inertial = 0.5 * var;
-        auto t_cr = log(d_cr_inertia / d32[celli]);
+        auto t_crv = log(d_cr_viscous / d32[celli]);
+        auto t_cri = log(d_cr_inertia / d32[celli]);
 
         normal inertial(mu_inertial, sqrt(var));
         normal viscous(mu_viscous, sqrt(var));
@@ -249,12 +249,13 @@ void dMOM::correct() {
                 (
                     // Viscous breakup
                     1 / tau_viscous_constant *
-                    (cdf(viscous, log(L_k / d32[celli])) - cdf(viscous, t_cr))) *
+                    (cdf(viscous, log(L_k / d32[celli])) -
+                     cdf(viscous, t_crv))) *
                 exp(var / 2.0) / d32[celli] +
             // Inertial breakup contribution
             1 / tau_inertia_constant *
                 // TODO: does t_cr need limiting?
-                (1 - cdf(inertial, max(t_cr, log(L_k / d32[celli])))) *
+                (1 - cdf(inertial, max(t_cri, log(L_k / d32[celli])))) *
                 exp(var / 8.0) / d32[celli];
 
         coalescenceSource_[celli] = Fcl_ * (pow(2.0, 2.0 / 3.0) - 2.0) *
@@ -278,8 +279,10 @@ void dMOM::correct() {
                         == breakupSource_ + coalescenceSource_);
     mEqn.relax();
     mEqn.solve();
+    S2_ ==
+        max(S2_,
+            dimensionedScalar("0", dimensionSet(0, -1, 0, 0, 0, 0, 0), 0.001));
 
-    printAvgMaxMin(mesh_, S2_);
     printAvgMaxMin(mesh_, d());
 }
 
