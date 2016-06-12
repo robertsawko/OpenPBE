@@ -130,31 +130,27 @@ void dMOM::correct() {
     // const auto S0 = 6.0 / pi * phase_ * pow(d(), -3.0);
     const volScalarField S3(
         "S3,", max(phase_ * 6.0 / pi, dimensionedScalar("s", dimless, 1e-3)));
-    // This stems from sphericity assumption and equality of d30 and d32.
-    // Compare paper [2] equations 16 and 17. This looks like a dodgy hack!
-    const volScalarField S0(
-        "S0",
-        pow(S2_, 3.0) /
-            max(pow(S3, 2.0), dimensionedScalar("s", dimless, 1e-3)));
-    // Inversion procedure
-    printAvgMaxMin(mesh_, S0);
-    printAvgMaxMin(mesh_, S2_);
-    printAvgMaxMin(mesh_, S3);
     const auto d32 = d();
-    const volScalarField logm2 = log(
-        max(S2_ / S0 * pow(d32, -2.0), dimensionedScalar("s", dimless, 1e-3)));
-
-    Info << "updating size moments" << endl;
-    // Moment inversion is given analytically (we allow minimum 5% variation)
-    sigma2_hat_ = max(0.5 * logm2, 0.025);
-
-    Info << "Lognormal parameters:" << endl;
-    // printAvgMaxMin(mesh_, S0);
-    printAvgMaxMin(mesh_, sigma2_hat_);
 
     const volScalarField &epsilon =
         dispersedPhase_.U().mesh().lookupObject<volScalarField>(
             "epsilon." + dispersedPhase_.name());
+
+    Info << "updating size moments" << endl;
+    // Inversion procedure
+    // Moment inversion is given analytically (we allow minimum 1% variation)
+    sigma2_hat_ = max(2.0 / 5.0 * log(S3 / S2_ * pow(d32, -1.0)), 0.001);
+    Info << sigma2_hat_.dimensions() << " " << endl;
+    // Inversion procedure
+    const volScalarField S0("S0", exp(log(S2_ * d32) - sigma2_hat_));
+
+    printAvgMaxMin(mesh_, S0);
+    printAvgMaxMin(mesh_, S2_);
+    printAvgMaxMin(mesh_, S3);
+    Info << "Lognormal parameters:" << endl;
+    // printAvgMaxMin(mesh_, S0);
+    printAvgMaxMin(mesh_, sigma2_hat_);
+
     const scalar &sigma = interfacialTension_;
 
     forAll(dispersedPhase_, celli) {
@@ -250,21 +246,21 @@ void dMOM::correct() {
                 (
                     // Viscous breakup
                     1 / tau_viscous_constant *
-                    (cdf(viscous, max(t_crv, t_k)) -
-                     cdf(viscous, t_crv))) *
+                    (cdf(viscous, max(t_crv, t_k)) - cdf(viscous, t_crv))) *
                 exp(var / 2.0) / d32[celli] +
             // Inertial breakup contribution
             1 / tau_inertia_constant *
                 // TODO: does t_cr need limiting?
-                (1 - cdf(inertial, max(t_cri, t_k))) *
-                exp(var / 8.0) / d32[celli];
+                (1 - cdf(inertial, max(t_cri, t_k))) * exp(var / 8.0) /
+                d32[celli];
 
+        // Note many terms simplify and S2 remains
         coalescenceSource_[celli] = Fcl_ * (pow(2.0, 2.0 / 3.0) - 2.0) *
-                                    pow(6.0 * phase_[celli] / pi, 2.0) *
                                     (k_collv_ * u_relv * P_coalv // viscous
-                                     // k_colli_ * u_reli * P_coali   // inertia
+                                     // + k_colli_ * u_reli * P_coali // inertia
                                      ) *
-                                    pow(d_eq, -2.0);
+                                    pow(S2_[celli], 2.0) * // contribution from
+                                    pow(k_cl_1_, -2.0);    // pow(d_eq, -2)
     }
     printAvgMaxMin(mesh_, breakupSource_);
     printAvgMaxMin(mesh_, coalescenceSource_);
